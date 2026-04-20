@@ -82,6 +82,7 @@ const discount = (p) => Math.round((1 - p.price / p.originalPrice) * 100);
 const totalItems = () => state.cart.reduce((s, i) => s + i.qty, 0);
 const totalPrice = () => state.cart.reduce((s, i) => s + i.product.price * i.qty, 0);
 const totalSaved = () => state.cart.reduce((s, i) => s + (i.product.originalPrice - i.product.price) * i.qty, 0);
+const totalOriginal = () => state.cart.reduce((s, i) => s + i.product.originalPrice * i.qty, 0);
 
 function saveCart() {
   try { localStorage.setItem('iboardz-cart', JSON.stringify(state.cart)); } catch(e) {}
@@ -193,6 +194,7 @@ function renderCart() {
   const ti = totalItems();
   const tp = totalPrice();
   const ts = totalSaved();
+  const to = totalOriginal();
   const whatsappText = encodeURIComponent(
     'مرحباً، أريد طلب:\n' +
     items.map(i => `${i.product.name} × ${i.qty} = ${i.product.price * i.qty} ر.س`).join('\n') +
@@ -238,18 +240,24 @@ function renderCart() {
         </div>
         ${items.length > 0 ? `
           <div class="cart-footer">
-            ${ts > 0 ? `
-              <div class="cart-saved">
-                <span style="font-size:18px;">🎉</span>
-                <span>وفّرت ${ts} ر.س بفضل الخصومات!</span>
+            <div class="cart-totals">
+              <div class="cart-total-row original">
+                <span class="cart-total-label">الإجمالي قبل الخصم:</span>
+                <span class="cart-total-old">${to} ر.س</span>
               </div>
-            ` : ''}
-            <div class="cart-total">
-              <span class="cart-total-label">المجموع:</span>
-              <span class="cart-total-price">${tp} ر.س</span>
+              <div class="cart-total-row discounted">
+                <span class="cart-total-label">الإجمالي بعد الخصم:</span>
+                <span class="cart-total-new">${tp} ر.س</span>
+              </div>
+              ${ts > 0 ? `
+                <div class="cart-savings-badge">
+                  <span style="font-size:18px;">🎉</span>
+                  <span class="savings-text">وفّرت ${ts} ر.س</span>
+                </div>
+              ` : ''}
             </div>
-            <a href="https://wa.me/966552645082?text=${whatsappText}" target="_blank" rel="noopener noreferrer">
-              <button class="whatsapp-btn">${icons.whatsapp} اطلب عبر واتساب</button>
+            <a href="https://wa.me/966552645082?text=${whatsappText}" target="_blank" rel="noopener noreferrer" class="checkout-btn">
+              ${icons.whatsapp} اطلب عبر واتساب
             </a>
           </div>
         ` : ''}
