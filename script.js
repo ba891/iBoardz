@@ -256,7 +256,7 @@ function renderCart() {
                 </div>
               ` : ''}
             </div>
-            <a href="https://wa.me/966552645082?text=${whatsappText}" target="_blank" rel="noopener noreferrer" class="checkout-btn">
+            <a href="https://wa.me/966552645082?text=${whatsappText}" target="_blank" rel="noopener noreferrer" class="whatsapp-btn">
               ${icons.whatsapp} اطلب عبر واتساب
             </a>
           </div>
