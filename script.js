@@ -162,12 +162,12 @@ function renderHeader() {
           onerror="this.style.display='none';">
       </div>
       <div class="header-actions">
+        <button class="menu-btn" onclick="state.menuOpen=!state.menuOpen; render();">
+          ${icons.menu}
+        </button>
         <button class="cart-btn" onclick="state.cartOpen=true; render();">
           ${icons.cart}
           ${ti > 0 ? `<span class="cart-badge">${ti}</span>` : ''}
-        </button>
-        <button class="menu-btn" onclick="state.menuOpen=!state.menuOpen; render();">
-          ${icons.menu}
         </button>
       </div>
     </header>
