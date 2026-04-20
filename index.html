@@ -1,162 +1,894 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>iBoardz - ARDUINO FUTURE</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
-    <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{font-family:'Tajawal',sans-serif;direction:rtl;background:#fafafa;color:#1a1a2e;line-height:1.6;-webkit-font-smoothing:antialiased}a{text-decoration:none;color:inherit}button{cursor:pointer;border:none;background:none;font-family:inherit}img{max-width:100%;display:block}ul{list-style:none}
-.header{position:fixed;top:0;left:0;right:0;z-index:100;background:#fff;border-bottom:1px solid #eee;height:68px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;box-shadow:0 2px 12px rgba(0,0,0,0.06);direction:ltr}
-.header-left{display:flex;align-items:center;gap:12px;direction:ltr}
-.header-right{display:flex;align-items:center;gap:12px;direction:rtl}
-.logo-img{height:44px;width:auto;border-radius:8px}
-.logo-text{display:inline-flex;align-items:baseline;gap:1px;font-size:26px;font-weight:900;direction:ltr;letter-spacing:-0.5px;white-space:nowrap}
-.logo-text .io{color:#ff9500}.logo-text .rest{color:#1a1a2e}
-.logo-sub{font-size:9px;color:#888;font-weight:700;letter-spacing:3px;direction:ltr;margin-top:-2px}.logo-sub .w{color:#666}.logo-sub .o{color:#ff9500}
-.icon-btn{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;transition:all .2s;position:relative;background:#f5f5f5}.icon-btn:hover{background:#ff9500;color:#fff}.icon-btn svg{width:22px;height:22px}
-.cart-badge{position:absolute;top:-4px;right:-4px;background:#ff9500;color:#fff;font-size:11px;font-weight:700;min-width:20px;height:20px;border-radius:10px;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
-.dropdown-wrap{position:relative}
-.dropdown-menu{position:absolute;top:52px;right:0;background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,0.15);min-width:200px;padding:8px;opacity:0;visibility:hidden;transform:translateY(-8px);transition:all .25s;z-index:200}
-.dropdown-menu.show{opacity:1;visibility:visible;transform:translateY(0)}
-.dropdown-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:10px;font-size:15px;font-weight:600;color:#333;transition:all .2s}.dropdown-item:hover{background:#fff5e6;color:#ff9500}.dropdown-item svg{width:20px;height:20px;color:#ff9500}
-.main{margin-top:68px}.page{display:none}.page.active{display:block}
-.carousel-wrap{position:relative;width:100%;max-width:1000px;margin:0 auto;border-radius:20px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.1)}
-.carousel{display:flex;transition:transform .6s ease}
-.carousel-slide{min-width:100%;aspect-ratio:21/9;background:#eee;display:flex;align-items:center;justify-content:center;overflow:hidden}.carousel-slide img{width:100%;height:100%;object-fit:cover}
-.carousel-btn{position:absolute;top:50%;transform:translateY(-50%);width:44px;height:44px;background:rgba(255,255,255,0.9);border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,0.15);transition:all .2s;z-index:10}.carousel-btn:hover{background:#ff9500;color:#fff}
-.carousel-btn.prev{left:12px}.carousel-btn.next{right:12px}
-.carousel-dots{display:flex;justify-content:center;gap:8px;padding:16px 0}
-.carousel-dot{width:10px;height:10px;border-radius:50%;background:#ddd;transition:all .3s;cursor:pointer}.carousel-dot.active{background:#ff9500;width:28px;border-radius:5px}
-.features-bar{display:flex;justify-content:center;gap:40px;padding:32px 24px;background:#fff;border-bottom:1px solid #eee;flex-wrap:wrap}
-.feature-item{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:#555}.feature-item svg{width:28px;height:28px;color:#ff9500}
-.section{padding:48px 24px;max-width:1200px;margin:0 auto}
-.section-badge{display:inline-block;background:#fff5e6;color:#ff9500;font-size:13px;font-weight:700;padding:6px 16px;border-radius:20px;margin-bottom:8px}
-.section-title{font-size:28px;font-weight:900;color:#1a1a2e;margin-bottom:32px}
-.filter-bar{display:flex;gap:10px;margin-bottom:28px;flex-wrap:wrap}
-.filter-btn{padding:10px 22px;border-radius:25px;font-size:14px;font-weight:700;background:#f0f0f0;color:#666;transition:all .2s;border:2px solid transparent}.filter-btn.active,.filter-btn:hover{background:#ff9500;color:#fff;border-color:#ff9500}
-.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px}
-.product-card{background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.06);transition:all .3s;position:relative}.product-card:hover{transform:translateY(-6px);box-shadow:0 8px 30px rgba(0,0,0,0.12)}
-.product-img-wrap{aspect-ratio:1;background:#f8f8f8;display:flex;align-items:center;justify-content:center;overflow:hidden;cursor:pointer;position:relative}.product-img-wrap img{width:100%;height:100%;object-fit:cover;transition:transform .3s}.product-card:hover .product-img-wrap img{transform:scale(1.05)}
-.discount-badge{position:absolute;top:10px;right:10px;background:#e53935;color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:8px;z-index:5}
-.popular-badge{position:absolute;top:10px;left:10px;background:#ff9500;color:#fff;font-size:11px;font-weight:700;padding:4px 10px;border-radius:8px;z-index:5}
-.product-info{padding:16px}
-.product-name{font-size:14px;font-weight:700;color:#1a1a2e;margin-bottom:4px}
-.product-cat{font-size:12px;color:#999;margin-bottom:8px}
-.product-prices{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
-.old-price{font-size:13px;color:#bbb;text-decoration:line-through}
-.new-price{font-size:20px;font-weight:900;color:#ff9500}
-.price-sar{font-size:13px;font-weight:600;color:#ff9500}
-.product-actions{display:flex;align-items:center;gap:10px}
-.add-btn{flex:1;padding:10px;border-radius:12px;background:#ff9500;color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .2s}.add-btn:hover{background:#e68600}
-.view-btn{width:42px;height:42px;border-radius:12px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;transition:all .2s}.view-btn:hover{background:#e8e8e8}.view-btn svg{width:18px;height:18px;color:#666}
-.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:300;opacity:0;visibility:hidden;transition:all .3s}.cart-overlay.show{opacity:1;visibility:visible}
-.cart-panel{position:fixed;top:0;left:0;bottom:0;width:380px;max-width:100%;background:#fff;z-index:301;transform:translateX(-100%);transition:transform .35s;display:flex;flex-direction:column;box-shadow:4px 0 20px rgba(0,0,0,0.1)}.cart-panel.show{transform:translateX(0)}
-.cart-header{padding:20px;border-bottom:1px solid #eee;display:flex;align-items:center;justify-content:space-between}.cart-header h2{font-size:20px;font-weight:800}
-.cart-close{width:36px;height:36px;border-radius:10px;background:#f5f5f5;display:flex;align-items:center;justify-content:center}.cart-close:hover{background:#eee}
-.cart-items{flex:1;overflow-y:auto;padding:16px}
-.cart-empty{text-align:center;padding:60px 20px;color:#999}.cart-empty svg{width:64px;height:64px;color:#ddd;margin-bottom:16px}
-.cart-item{display:flex;gap:12px;padding:14px;background:#f9f9f9;border-radius:12px;margin-bottom:10px;align-items:center}
-.cart-item-img{width:56px;height:56px;border-radius:10px;background:#eee;overflow:hidden;flex-shrink:0}.cart-item-img img{width:100%;height:100%;object-fit:cover}
-.cart-item-info{flex:1}.cart-item-name{font-size:13px;font-weight:700;margin-bottom:4px}.cart-item-price{font-size:14px;font-weight:800;color:#ff9500}
-.cart-item-qty{display:flex;align-items:center;gap:8px;margin-top:6px}
-.qty-btn{width:28px;height:28px;border-radius:8px;background:#fff;border:1px solid #ddd;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700}.qty-btn:hover{border-color:#ff9500;color:#ff9500}
-.cart-item-remove{color:#e53935;font-size:18px;padding:4px;cursor:pointer}
-.cart-footer{padding:20px;border-top:1px solid #eee}
-.cart-totals{background:#f8f9fa;border-radius:12px;padding:14px;margin-bottom:14px}
-.cart-total-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0}
-.cart-total-row.original{border-bottom:1px dashed #ddd}
-.cart-total-row.discounted{padding-top:10px}
-.cart-total-label{font-weight:600;font-size:14px;color:#555}
-.cart-total-old{font-weight:600;font-size:15px;color:#999;text-decoration:line-through}
-.cart-total-new{font-weight:900;font-size:22px;color:#ff9500}
-.cart-savings-badge{background:linear-gradient(135deg,#e8f5e9,#c8e6c9);border-radius:8px;padding:8px 14px;margin-top:10px;display:flex;align-items:center;gap:8px;justify-content:center}
-.savings-text{color:#2e7d32;font-weight:800;font-size:14px}
-.whatsapp-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:#25D366;color:#fff;padding:10px 16px;border-radius:10px;font-weight:700;font-size:14px;border:none;cursor:pointer;width:100%;font-family:'Tajawal',sans-serif;transition:all .2s;text-decoration:none}.whatsapp-btn:hover{background:#1fb855;transform:translateY(-1px)}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;visibility:hidden;transition:all .3s}.modal-overlay.show{opacity:1;visibility:visible}
-.modal-content{background:#fff;border-radius:20px;max-width:560px;width:100%;max-height:90vh;overflow-y:auto;transform:scale(0.9);transition:transform .3s}.modal-overlay.show .modal-content{transform:scale(1)}
-.modal-img{width:100%;aspect-ratio:16/10;background:#f5f5f5;overflow:hidden;border-radius:20px 20px 0 0}.modal-img img{width:100%;height:100%;object-fit:cover}
-.modal-body{padding:28px}
-.modal-cat{font-size:12px;color:#ff9500;font-weight:700;margin-bottom:4px}
-.modal-title{font-size:24px;font-weight:900;margin-bottom:8px}
-.modal-desc{font-size:14px;color:#777;margin-bottom:20px;line-height:1.8}
-.modal-prices{display:flex;align-items:baseline;gap:12px;margin-bottom:20px}
-.modal-old-price{font-size:18px;color:#bbb;text-decoration:line-through}
-.modal-new-price{font-size:32px;font-weight:900;color:#ff9500}
-.modal-saved{font-size:14px;color:#43a047;font-weight:700;margin-bottom:20px}
-.modal-specs-title{font-size:16px;font-weight:800;margin-bottom:12px}
-.modal-specs{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
-.modal-spec{display:flex;align-items:center;gap:10px;font-size:14px;color:#555}.modal-spec svg{width:16px;height:16px;color:#ff9500;flex-shrink:0}
-.modal-add-btn{width:100%;padding:14px;border-radius:14px;background:#ff9500;color:#fff;font-size:16px;font-weight:800;transition:all .2s}.modal-add-btn:hover{background:#e68600}
-.features-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
-.feature-card{background:#fff;padding:32px;border-radius:16px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,0.06);transition:all .3s}.feature-card:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,0.1)}
-.feature-icon{width:64px;height:64px;border-radius:16px;background:#fff5e6;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}.feature-icon svg{width:32px;height:32px;color:#ff9500}
-.feature-card h3{font-size:18px;font-weight:800;margin-bottom:8px}.feature-card p{font-size:14px;color:#777;line-height:1.7}
-.reviews-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
-.review-card{background:#fff;padding:24px;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
-.review-stars{color:#ff9500;font-size:16px;margin-bottom:12px;letter-spacing:2px}
-.review-text{font-size:14px;color:#555;line-height:1.8;margin-bottom:16px}
-.review-author{display:flex;align-items:center;gap:12px;padding-top:14px;border-top:1px solid #f0f0f0}
-.review-avatar{width:40px;height:40px;border-radius:50%;background:#ff9500;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px}
-.review-name{font-size:14px;font-weight:700}
-.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px}
-.contact-card{background:#fff;padding:28px;border-radius:16px;box-shadow:0 2px 12px rgba(0,0,0,0.06)}.contact-card h3{font-size:20px;font-weight:800;margin-bottom:20px}
-.contact-item{display:flex;align-items:center;gap:14px;margin-bottom:18px}.contact-item svg{width:24px;height:24px;color:#ff9500;flex-shrink:0}
-.contact-item-text span{display:block;font-size:12px;color:#999}.contact-item-text strong{font-size:15px;color:#1a1a2e;direction:ltr;display:inline-block}
-.contact-form input,.contact-form textarea{width:100%;padding:14px 16px;border:2px solid #eee;border-radius:12px;font-size:14px;font-family:inherit;margin-bottom:14px;transition:border-color .2s;direction:rtl}.contact-form input:focus,.contact-form textarea:focus{border-color:#ff9500;outline:none}
-.contact-form textarea{min-height:120px;resize:vertical}
-.send-btn{width:100%;padding:14px;border-radius:14px;background:#ff9500;color:#fff;font-size:16px;font-weight:800;transition:all .2s}.send-btn:hover{background:#e68600}
-.footer{background:#1a1a2e;color:#fff;padding:48px 24px 24px;margin-top:48px}
-.footer-top{display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;max-width:1200px;margin:0 auto;padding-bottom:32px;border-bottom:1px solid rgba(255,255,255,0.1)}
-.footer-logo .logo-text{color:#fff}.footer-logo .logo-text .rest{color:#fff}
-.footer-logo p{color:#999;font-size:13px;margin-top:10px;max-width:280px}
-.footer-col h4{font-size:16px;font-weight:700;margin-bottom:14px}.footer-col a{display:block;font-size:14px;color:#aaa;margin-bottom:8px;transition:color .2s}.footer-col a:hover{color:#ff9500}
-.footer-bottom{text-align:center;padding-top:24px;color:#666;font-size:13px;max-width:1200px;margin:0 auto}
-@media(max-width:768px){.header{padding:0 16px;height:60px}.main{margin-top:60px}.section{padding:32px 16px}.section-title{font-size:22px}.features-bar{gap:16px;padding:24px 16px}.feature-item{font-size:13px}.products-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}.product-name{font-size:12px}.new-price{font-size:16px}.old-price{font-size:11px}.add-btn{padding:8px;font-size:12px}.contact-grid{grid-template-columns:1fr}.reviews-grid{grid-template-columns:1fr}.cart-panel{width:100%}.footer-top{flex-direction:column;gap:24px}.carousel-btn{width:36px;height:36px}.dropdown-menu{right:0;min-width:180px}.modal-content{border-radius:14px;margin:10px}.modal-body{padding:20px}.modal-title{font-size:20px}.modal-new-price{font-size:26px}}
-@media(min-width:769px) and (max-width:1024px){.products-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}}
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>iBoardz - ARDUINO FUTURE</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Tajawal', sans-serif;
+  direction: rtl;
+  background: #fafafa;
+  color: #1a1a2e;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { text-decoration: none; color: inherit; }
+button { font-family: 'Tajawal', sans-serif; }
+img { max-width: 100%; display: block; }
+
+.header {
+  position: fixed; top: 0; right: 0; left: 0; height: 70px;
+  background: #fff; border-bottom: 1px solid #eee;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px; z-index: 1000;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  direction: ltr;
+}
+.logo { display: flex; align-items: center; cursor: pointer; flex-shrink: 0; }
+.logo-text {
+  display: inline-flex; align-items: baseline; white-space: nowrap;
+  letter-spacing: -0.5px; direction: ltr; font-size: 34px; font-weight: 900;
+}
+.logo-text .i { color: #ff9500; line-height: 1; }
+.logo-text .boardz { color: #1a1a2e; line-height: 1; }
+.logo-img { height: 52px; object-fit: contain; margin-right: 8px; display: none; }
+.header-actions { display: flex; align-items: center; gap: 10px; direction: rtl; }
+.cart-btn {
+  position: relative; background: none; border: none; cursor: pointer;
+  color: #333; padding: 8px; display: flex; align-items: center;
+}
+.cart-badge {
+  position: absolute; top: 0; right: 0; background: #ff9500; color: #fff;
+  border-radius: 50%; width: 20px; height: 20px; font-size: 11px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+}
+.menu-btn {
+  background: #ff9500; border: none; border-radius: 12px; padding: 10px 14px;
+  cursor: pointer; color: #fff; display: flex; align-items: center;
+  transition: background 0.2s;
+}
+.menu-btn:hover { background: #e68600; }
+
+.dropdown-menu {
+  position: fixed; top: 74px; right: 24px; background: #fff;
+  border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+  z-index: 999; min-width: 220px; overflow: hidden;
+  animation: fadeIn 0.2s ease;
+}
+.dropdown-menu button {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  padding: 14px 20px; border: none; font-size: 15px;
+  cursor: pointer; border-bottom: 1px solid #f5f5f5;
+  font-family: 'Tajawal', sans-serif; transition: background 0.15s;
+}
+.dropdown-menu button:hover { background: #fff8f0; }
+.dropdown-menu button.active { background: #fff8f0; color: #ff9500; font-weight: 700; }
+.dropdown-menu button:not(.active) { color: #333; font-weight: 500; }
+
+.cart-overlay { position: fixed; inset: 0; z-index: 2000; display: none; }
+.cart-overlay.open { display: flex; }
+.cart-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.4); }
+.cart-panel {
+  position: absolute; top: 0; left: 0; bottom: 0; width: 100%; max-width: 420px;
+  background: #fff; box-shadow: 8px 0 40px rgba(0,0,0,0.12);
+  display: flex; flex-direction: column; overflow: hidden;
+}
+.cart-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 18px 24px; border-bottom: 1px solid #eee;
+}
+.cart-header h2 { font-size: 20px; font-weight: 800; margin: 0; }
+.cart-close { background: none; border: none; cursor: pointer; color: #666; padding: 4px; }
+.cart-body { flex: 1; overflow-y: auto; padding: 20px; }
+.cart-empty { text-align: center; padding: 60px 20px; color: #bbb; }
+.cart-empty p { margin-top: 8px; }
+.cart-item {
+  display: flex; gap: 14px; padding: 14px 0;
+  border-bottom: 1px solid #f5f5f5; align-items: center;
+}
+.cart-item-img {
+  width: 60px; height: 60px; border-radius: 12px; background: #f8f8f8;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; overflow: hidden;
+}
+.cart-item-img img { width: 48px; height: 48px; object-fit: contain; }
+.cart-item-info { flex: 1; min-width: 0; }
+.cart-item-name { font-weight: 700; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cart-item-prices { display: flex; align-items: center; gap: 6px; margin-top: 4px; }
+.cart-qty-controls { display: flex; align-items: center; gap: 6px; }
+.qty-btn {
+  width: 30px; height: 30px; border-radius: 8px; border: 1px solid #ddd;
+  background: #fff; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; color: #333; transition: all 0.15s;
+}
+.qty-btn:hover { border-color: #ff9500; color: #ff9500; }
+.cart-remove { background: none; border: none; cursor: pointer; color: #e74c3c; padding: 4px; margin-right: 2px; }
+.cart-footer { border-top: 1px solid #eee; padding: 20px; }
+.cart-totals { background: #f8f9fa; border-radius: 12px; padding: 14px; margin-bottom: 14px; }
+.cart-total-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; }
+.cart-total-row.original { border-bottom: 1px dashed #ddd; }
+.cart-total-row.discounted { padding-top: 10px; }
+.cart-total-label { font-weight: 600; font-size: 14px; color: #555; }
+.cart-total-old { font-weight: 600; font-size: 15px; color: #999; text-decoration: line-through; }
+.cart-total-new { font-weight: 900; font-size: 22px; color: #ff9500; }
+.cart-savings-badge {
+  background: linear-gradient(135deg, #e8f5e9, #c8e6c9); border-radius: 8px;
+  padding: 8px 14px; margin-top: 10px; display: flex; align-items: center;
+  gap: 8px; justify-content: center;
+}
+.savings-icon { font-size: 18px; }
+.savings-text { color: #2e7d32; font-weight: 800; font-size: 14px; }
+.whatsapp-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: #25D366; color: #fff; padding: 10px 16px; border-radius: 10px;
+  font-weight: 700; font-size: 14px; border: none; cursor: pointer;
+  width: 100%; font-family: 'Tajawal', sans-serif; transition: all 0.2s;
+}
+.whatsapp-btn:hover { background: #1fb855; transform: translateY(-1px); }
+
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 1500;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+}
+.modal-backdrop { position: absolute; inset: 0; background: rgba(0,0,0,0.5); }
+.modal-content {
+  position: relative; background: #fff; border-radius: 20px; max-width: 520px;
+  width: 100%; max-height: 90vh; overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.2);
+}
+.modal-close {
+  position: absolute; top: 14px; left: 14px; background: #f5f5f5; border: none;
+  border-radius: 50%; width: 38px; height: 38px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center; z-index: 10;
+}
+.modal-img {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 40px;
+  display: flex; justify-content: center; border-radius: 20px 20px 0 0;
+}
+.modal-img img { max-height: 200px; object-fit: contain; }
+.modal-body { padding: 28px; }
+.modal-badges { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+.modal-badges .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 6px; }
+.badge-orange { background: #fff5e6; color: #ff9500; }
+.badge-red { background: #fff0f0; color: #e74c3c; }
+.badge-gray { background: #f0f0f0; color: #666; }
+.modal-title { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
+.modal-desc { color: #666; font-size: 15px; line-height: 1.7; margin-bottom: 20px; }
+.modal-prices { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.modal-new-price { font-size: 32px; font-weight: 900; color: #ff9500; }
+.modal-old-price { font-size: 18px; color: #ccc; text-decoration: line-through; }
+.modal-specs {
+  background: #f8f9fa; border-radius: 14px; padding: 20px;
+  margin-bottom: 24px; border: 1px solid #f0f0f0;
+}
+.modal-specs h3 { font-weight: 800; margin-bottom: 12px; font-size: 16px; color: #1a1a2e; }
+.spec-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; }
+.spec-item + .spec-item { border-top: 1px solid #eee; }
+.spec-dot { width: 6px; height: 6px; border-radius: 50%; background: #ff9500; flex-shrink: 0; }
+.spec-text { font-size: 14px; color: #444; }
+.modal-add-btn {
+  width: 100%; padding: 16px 24px; font-size: 17px; background: #ff9500;
+  color: #fff; border: none; border-radius: 14px; cursor: pointer;
+  font-weight: 700; font-family: 'Tajawal', sans-serif;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: background 0.2s;
+}
+.modal-add-btn:hover { background: #e68600; }
+
+.main { padding-top: 70px; }
+
+.carousel {
+  position: relative; width: 100%; max-width: 1100px; margin: 0 auto;
+  aspect-ratio: 2.8/1; overflow: hidden; background: #1a1a2e;
+}
+.carousel img {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  object-fit: cover; transition: opacity 1s ease;
+}
+.carousel-overlay {
+  position: absolute; inset: 0; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: linear-gradient(135deg, rgba(26,26,46,0.85) 0%, rgba(26,26,46,0.5) 100%);
+}
+.carousel-title {
+  font-size: clamp(36px, 6vw, 64px); font-weight: 900; color: #fff;
+  margin: 0; white-space: nowrap; letter-spacing: -1px;
+}
+.carousel-title .i { color: #ff9500; }
+.carousel-title .boardz { color: #fff; }
+.carousel-subtitle {
+  color: rgba(255,255,255,0.8); font-size: clamp(14px, 2.5vw, 20px);
+  margin-top: 4px; font-weight: 500; letter-spacing: 4px;
+}
+.carousel-subtitle .future { color: #ff9500; font-weight: 700; }
+.carousel-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  background: rgba(255,255,255,0.85); border: none; border-radius: 50%;
+  width: 40px; height: 40px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.2s;
+}
+.carousel-arrow:hover { background: rgba(255,255,255,1); }
+.carousel-arrow.next { left: 12px; }
+.carousel-arrow.prev { right: 12px; }
+.carousel-dots {
+  position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 8px;
+}
+.carousel-dot {
+  height: 10px; border-radius: 5px; border: none; cursor: pointer;
+  transition: all 0.3s; background: rgba(255,255,255,0.5);
+}
+.carousel-dot.active { width: 28px; background: #ff9500; }
+.carousel-dot:not(.active) { width: 10px; }
+
+.quick-features { background: #fff; border-bottom: 1px solid #f0f0f0; }
+.quick-features-inner {
+  max-width: 1100px; margin: 0 auto; padding: 28px 24px;
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;
+}
+.quick-feature { display: flex; align-items: center; gap: 14px; }
+.quick-feature-icon {
+  width: 52px; height: 52px; border-radius: 12px; background: #fff8f0;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.quick-feature h3 { font-weight: 700; font-size: 15px; margin: 0; }
+.quick-feature p { color: #888; font-size: 13px; margin: 2px 0 0; }
+
+.section { max-width: 1200px; margin: 0 auto; padding: 48px 24px; }
+.section-narrow { max-width: 1000px; margin: 0 auto; padding: 48px 24px; }
+.section-contact { max-width: 800px; margin: 0 auto; padding: 48px 24px; }
+.section-header { text-align: center; margin-bottom: 36px; }
+.section-badge {
+  display: inline-block; background: #fff5e6; color: #ff9500; font-size: 13px;
+  font-weight: 700; padding: 4px 16px; border-radius: 20px; margin-bottom: 10px;
+}
+.section-title { font-size: 32px; font-weight: 900; margin: 8px 0 0; }
+.section-subtitle { color: #999; font-size: 15px; margin-top: 6px; }
+
+.products-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px;
+}
+.products-grid-large {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px;
+}
+.product-card {
+  background: #fff; border-radius: 16px; border: 1px solid #f0f0f0;
+  overflow: hidden; transition: all 0.3s ease;
+}
+.product-card:hover { transform: translateY(-6px); box-shadow: 0 12px 32px rgba(0,0,0,0.1); }
+.product-img {
+  position: relative; background: linear-gradient(135deg, #f8f9fa, #fff);
+  padding: 20px; display: flex; align-items: center; justify-content: center;
+  min-height: 160px; cursor: pointer;
+}
+.product-img img { max-height: 130px; object-fit: contain; transition: transform 0.3s; }
+.product-img-large { min-height: 170px; padding: 24px; }
+.product-img-large img { max-height: 140px; }
+.product-badge {
+  display: inline-block; font-size: 11px; font-weight: 700;
+  padding: 3px 10px; border-radius: 6px; position: absolute; top: 10px; right: 10px;
+}
+.badge-primary { background: #ff9500; color: #fff; }
+.discount-badge {
+  position: absolute; top: 10px; left: 10px;
+  background: #fff0f0; color: #e74c3c; font-size: 11px; font-weight: 700;
+  padding: 3px 10px; border-radius: 6px;
+}
+.product-info { padding: 14px 16px; }
+.product-name {
+  font-size: 13px; font-weight: 700; margin-bottom: 10px; min-height: 36px;
+  cursor: pointer; line-height: 1.5;
+}
+.product-name:hover { color: #ff9500; }
+.product-bottom { display: flex; align-items: center; justify-content: space-between; }
+.product-prices { display: flex; align-items: baseline; gap: 8px; }
+.price { color: #ff9500; font-weight: 800; font-size: 17px; }
+.old-price { color: #ccc; font-size: 12px; text-decoration: line-through; }
+.add-btn {
+  width: 38px; height: 38px; border-radius: 10px; background: #ff9500; color: #fff;
+  border: none; cursor: pointer; display: flex; align-items: center;
+  justify-content: center; flex-shrink: 0; transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(255,149,0,0.3);
+}
+.add-btn:hover { background: #e68600; transform: scale(1.1); }
+
+.filter-bar { display: flex; gap: 10px; margin-bottom: 32px; flex-wrap: wrap; }
+.filter-btn {
+  padding: 10px 24px; border-radius: 24px; border: none; font-size: 14px;
+  cursor: pointer; transition: all 0.2s; font-family: 'Tajawal', sans-serif;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+.filter-btn.active { background: #ff9500; color: #fff; font-weight: 700; box-shadow: 0 4px 12px rgba(255,149,0,0.3); }
+.filter-btn:not(.active) { background: #fff; color: #555; font-weight: 500; }
+.filter-btn:not(.active):hover { background: #f5f5f5; }
+
+.show-all-btn {
+  padding: 16px 48px; background: #ff9500; color: #fff; border: none;
+  border-radius: 14px; font-size: 17px; font-weight: 700; cursor: pointer;
+  font-family: 'Tajawal', sans-serif; transition: all 0.25s;
+  box-shadow: 0 4px 16px rgba(255,149,0,0.3);
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.show-all-btn:hover { background: #e68600; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255,149,0,0.4); }
+
+.features-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 18px; margin-bottom: 56px;
+}
+.feature-card {
+  padding: 28px; background: #fff; border-radius: 16px;
+  border: 1px solid #f0f0f0; transition: all 0.3s;
+}
+.feature-card:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+.feature-num {
+  width: 44px; height: 44px; border-radius: 10px; background: #fff5e6;
+  display: flex; align-items: center; justify-content: center;
+  color: #ff9500; font-weight: 900; font-size: 18px; margin-bottom: 12px;
+}
+.feature-card h3 { font-weight: 800; margin-bottom: 6px; font-size: 17px; }
+.feature-card p { color: #777; font-size: 14px; line-height: 1.6; }
+
+.reviews-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 18px;
+}
+.review-card {
+  padding: 24px; background: #fff; border-radius: 16px; border: 1px solid #f0f0f0;
+}
+.review-stars { display: flex; gap: 3px; margin-bottom: 12px; }
+.review-stars span { color: #ff9500; font-size: 16px; }
+.review-text { color: #444; font-size: 14px; line-height: 1.8; margin-bottom: 16px; }
+.review-author {
+  border-top: 1px solid #f0f0f0; padding-top: 14px;
+  display: flex; align-items: center; gap: 10px; margin-top: 16px;
+}
+.review-avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: #ff9500;
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 14px;
+}
+.review-name { font-weight: 700; font-size: 14px; color: #444; }
+
+.contact-cards {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px; margin-bottom: 36px;
+}
+.contact-card {
+  display: flex; align-items: center; gap: 16px; padding: 24px;
+  border-radius: 16px; text-decoration: none; border: 1px solid;
+  transition: all 0.2s;
+}
+.contact-card:hover { transform: translateY(-2px); }
+.contact-card.whatsapp { background: #f0fdf4; border-color: #dcfce7; }
+.contact-card.email { background: #eff6ff; border-color: #dbeafe; }
+.contact-icon {
+  width: 52px; height: 52px; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.contact-icon.whatsapp-icon { background: #25D366; color: #fff; }
+.contact-icon.email-icon { background: #3b82f6; color: #fff; }
+.contact-label { font-weight: 800; color: #1a1a2e; font-size: 16px; margin-bottom: 2px; }
+.contact-value { color: #666; font-size: 14px; direction: ltr; text-align: right; }
+.contact-form {
+  background: #fff; border-radius: 20px; padding: 32px;
+  border: 1px solid #f0f0f0; margin-bottom: 24px;
+}
+.contact-form h2 { font-weight: 800; margin-bottom: 24px; font-size: 20px; }
+.form-group { margin-bottom: 16px; }
+.form-group label { display: block; font-weight: 700; margin-bottom: 8px; font-size: 14px; }
+.form-input {
+  width: 100%; padding: 12px 16px; border-radius: 10px; border: 1.5px solid #e0e0e0;
+  font-size: 14px; outline: none; font-family: 'Tajawal', sans-serif;
+  transition: border-color 0.2s;
+}
+.form-input:focus { border-color: #ff9500; }
+textarea.form-input { resize: vertical; }
+.submit-btn {
+  width: 100%; padding: 16px; font-size: 17px; background: #ff9500;
+  color: #fff; border: none; border-radius: 14px; cursor: pointer;
+  font-weight: 700; font-family: 'Tajawal', sans-serif;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: background 0.2s;
+}
+.submit-btn:hover { background: #e68600; }
+.work-hours {
+  padding: 24px; background: #fff9f0; border-radius: 16px;
+  border: 1px solid #ffe0b2; text-align: center;
+}
+.work-hours h3 { font-weight: 800; margin-bottom: 10px; font-size: 17px; }
+.work-hours p { color: #666; font-size: 14px; margin-bottom: 4px; }
+
+.footer {
+  background: #1a1a2e; color: #fff; padding: 48px 24px 24px; margin-top: 0;
+}
+.footer-inner { max-width: 1000px; margin: 0 auto; }
+.footer-top { display: flex; flex-wrap: wrap; gap: 40px; margin-bottom: 32px; }
+.footer-col { flex: 1; min-width: 220px; }
+.footer-logo {
+  font-size: 28px; font-weight: 900; margin-bottom: 8px;
+  display: inline-flex; align-items: baseline; white-space: nowrap;
+  letter-spacing: -0.5px; direction: ltr;
+}
+.footer-logo .i { color: #ff9500; }
+.footer-logo .boardz { color: #fff; }
+.footer-subtitle {
+  color: #888; font-size: 14px; margin-bottom: 4px;
+  letter-spacing: 3px; direction: ltr; text-align: right;
+}
+.footer-subtitle .future { color: #ff9500; }
+.footer-desc { color: #666; font-size: 13px; line-height: 1.7; margin-top: 8px; }
+.footer h4 { font-weight: 800; margin-bottom: 16px; color: #ff9500; font-size: 16px; }
+.footer-links button {
+  display: block; background: none; border: none; color: #aaa;
+  padding: 5px 0; cursor: pointer; font-size: 14px;
+  font-family: 'Tajawal', sans-serif; text-align: right; transition: color 0.2s;
+}
+.footer-links button:hover { color: #ff9500; }
+.footer-contact p { color: #aaa; font-size: 14px; margin-bottom: 6px; direction: ltr; text-align: right; }
+.footer-bottom {
+  border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;
+  text-align: center; color: #555; font-size: 13px;
+}
+.footer-bottom span { direction: ltr; display: inline-block; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+@keyframes slideIn { from { transform: translateX(-100%); } to { transform: none; } }
+
+@media (max-width: 768px) {
+  .header { padding: 0 16px; height: 60px; }
+  .logo-text { font-size: 22px; }
+  .main { padding-top: 60px; }
+  .carousel { aspect-ratio: 1.5/1; }
+  .carousel-title { font-size: clamp(28px, 7vw, 48px); }
+  .section, .section-narrow, .section-contact { padding: 32px 16px; }
+  .section-title { font-size: 26px; }
+  .products-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; }
+  .products-grid-large { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; }
+  .product-img { min-height: 120px; padding: 14px; }
+  .product-img img { max-height: 100px; }
+  .product-info { padding: 10px 12px; }
+  .product-name { font-size: 12px; min-height: 28px; }
+  .price { font-size: 14px; }
+  .old-price { font-size: 10px; }
+  .add-btn { width: 32px; height: 32px; border-radius: 8px; }
+  .features-grid { grid-template-columns: 1fr; }
+  .reviews-grid { grid-template-columns: 1fr; }
+  .footer-top { flex-direction: column; gap: 24px; }
+  .cart-panel { max-width: 100%; }
+  .dropdown-menu { right: 12px; min-width: 180px; }
+  .modal-content { border-radius: 14px; }
+  .modal-body { padding: 20px; }
+  .modal-title { font-size: 20px; }
+  .modal-new-price { font-size: 26px; }
+}
+</style>
 </head>
 <body>
-<div id="app"></div>
+
+<header class="header">
+  <div class="logo" onclick="nav('home')">
+    <div class="logo-text"><span class="i">i</span><span class="boardz">Boardz</span></div>
+  </div>
+  <div class="header-actions">
+    <button class="menu-btn" onclick="toggleMenu(event)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <button class="cart-btn" onclick="openCart()">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+      <span class="cart-badge" id="cartBadge" style="display:none">0</span>
+    </button>
+  </div>
+</header>
+
+<div id="dropdown" class="dropdown-menu" style="display:none"></div>
+<div id="menuBackdrop" style="display:none;position:fixed;inset:0;z-index:998" onclick="closeMenu()"></div>
+
+<div id="cartOverlay" class="cart-overlay">
+  <div class="cart-backdrop" onclick="closeCart()"></div>
+  <div class="cart-panel">
+    <div class="cart-header">
+      <h2>سلة التسوق (<span id="cartCount">0</span>)</h2>
+      <button class="cart-close" onclick="closeCart()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="cart-body" id="cartBody"></div>
+    <div class="cart-footer" id="cartFooter" style="display:none"></div>
+  </div>
+</div>
+
+<div id="modalOverlay" class="modal-overlay" style="display:none"></div>
+
+<main class="main" id="mainContent"></main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-col">
+        <div class="footer-logo"><span class="i">i</span><span class="boardz">Boardz</span></div>
+        <div class="footer-subtitle">ARDUINO <span class="future">FUTURE</span></div>
+        <p class="footer-desc">منصتك الأولى لمكونات الإلكترونيات والبرمجة في المملكة العربية السعودية</p>
+      </div>
+      <div class="footer-col">
+        <h4>روابط سريعة</h4>
+        <div class="footer-links" id="footerLinks"></div>
+      </div>
+      <div class="footer-col">
+        <h4>تواصل معنا</h4>
+        <div class="footer-contact">
+          <p>واتساب: +966 552 645 082</p>
+          <p>البريد: iBoardz@outlook.com</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom"><span>© 2025 iBoardz</span> - جميع الحقوق محفوظة</div>
+  </div>
+</footer>
+
 <script>
-const products=[{id:2,name:'ESP32 DEV MODEL',price:39,originalPrice:60,category:'microcontrollers',image:'esp32-dev-model.png',specs:['واي فاي + بلوتوث','USB Type-C','340KB SRAM','48MHz processor','18 GPIO pin'],description:'نسخة مطورة من ESP32 مع منفذ USB-C',popular:true,badge:'مميز'},{id:3,name:'ARDUINO UNO R3',price:32,originalPrice:50,category:'microcontrollers',image:'arduino-uno-r3.png',specs:['ATmega328P','16MHz clock','32KB Flash','14 Digital I/O','6 Analog Inputs'],description:'المتحكم الأشهر في العالم، مثالي للمبتدئين',popular:true,badge:'الأكثر مبيعاً'},{id:4,name:'ESP32 C3 MINI',price:29,originalPrice:45,category:'microcontrollers',image:'esp32-c3-mini.png',specs:['RISC-V 160MHz','400KB SRAM','WiFi 4 + BT5','22 GPIO pin','حجم صغير جداً'],description:'متحكم صغير الحجم بكفاءة عالية'},{id:5,name:'ESP8266 D1 BOARD',price:29,originalPrice:42,category:'microcontrollers',image:'esp8266-d1-board.png',specs:['ESP8266 WiFi','80MHz clock','11 GPIO pin','ADC مدمج','USB Micro'],description:'لوحة تطوير اقتصادية مع واي فاي'},{id:6,name:'ESP32 D1 BOARD',price:39,originalPrice:58,category:'microcontrollers',image:'esp32-d1-board.png',specs:['ESP32 Dual Core','WiFi + BLE','30 GPIO pin','520KB SRAM','USB Type-C'],description:'لوحة D1 المطورة مع ESP32',popular:true,badge:'مميز'},{id:7,name:'MAX 30102',price:25,originalPrice:40,category:'sensors',image:'max-30102.png',specs:['مستشعر نبضات','IR + Red LED','I2C Interface','18-bit ADC','استهلاك منخفض'],description:'مستشعر نبضات القلب والأكسجين في الدم'},{id:8,name:'HC-SR04 ULTRASONIC',price:18,originalPrice:28,category:'sensors',image:'hc-sr04-ultrasonic.png',specs:['مستشعر مسافة','2cm - 4m','HC-SR04 Module','Trigger + Echo','استهلاك منخفض'],description:'مستشعر الموجات فوق الصوتية لقياس المسافة',popular:true,badge:'الأكثر طلباً'},{id:9,name:'DHT11 SENSOR',price:16,originalPrice:25,category:'sensors',image:'dht11-sensor.png',specs:['حرارة + رطوبة','0-50°C','20-90% RH','Digital Output','استهلاك منخفض'],description:'مستشعر درجة الحرارة والرطوبة',popular:true,badge:'الأكثر مبيعاً'},{id:10,name:'CAPACITIVE MOISTURE V2.0',price:20,originalPrice:32,category:'sensors',image:'capacitive-moisture-sensor-v2.png',specs:['مستشعر رطوبة تربة','Analog Output','3.3V - 5V','مقاوم للتآكل','استهلاك منخفض'],description:'مستشعر رطوبة التربة السعوي الإصدار الثاني'},{id:11,name:'MPU6050 SENSOR',price:23,originalPrice:36,category:'sensors',image:'mpu6050-sensor.png',specs:['جيروسكوب + مقياس تسارع','6 محاور','I2C Interface','16-bit ADC','استهلاك منخفض'],description:'مستشعر الحركة والتسارع بـ 6 محاور'},{id:12,name:'MATRIX KEYBOARD 3x4',price:14,originalPrice:22,category:'sensors',image:'matrix-keypad-3x4.png',specs:['لوحة مفاتيح','12 مفتاح','3×4','استهلاك منخفض','سهل التوصيل'],description:'لوحة مفاتيح مصفوفية 3×4'},{id:14,name:'WATER PUMP',price:21,originalPrice:33,category:'sensors',image:'water-pump.png',specs:['مضخة مياه','3-6V DC','معدل تدفق عالي','حجم صغير','سهل التوصيل'],description:'مضخة مياه صغيرة للمشاريع الإلكترونية'},{id:15,name:'SERVO MOTOR',price:16,originalPrice:25,category:'sensors',image:'servo-motor.png',specs:['محرك سيرفو','180° دورة','SG90','PWM Control','استهلاك منخفض'],description:'محرك سيرفو صغير للتحكم بالزوايا',popular:true,badge:'الأكثر مبيعاً'},{id:16,name:'MATRIX KEYBOARD 4x4',price:19,originalPrice:30,category:'sensors',image:'matrix-keypad-4x4.png',specs:['لوحة مفاتيح','16 مفتاح','4×4','استهلاك منخفض','سهل التوصيل'],description:'لوحة مفاتيح مصفوفية 4×4'},{id:17,name:'TDS METER V1.0',price:39,originalPrice:60,category:'sensors',image:'tds-meter-v1.png',specs:['قياس TDS','Analog Output','3.3V - 5V','0-1000ppm','استهلاك منخفض'],description:'مستشعر قياس إجمالي المواد الصلبة الذائبة في الماء'},{id:18,name:'AHT20+BMP280',price:22,originalPrice:35,category:'sensors',image:'aht20-bmp280.png',specs:['حرارة + رطوبة + ضغط','I2C Interface','دقة عالية','استهلاك منخفض','حجم صغير'],description:'مستشعر مزدوج للحرارة والرطوبة والضغط الجوي'},{id:19,name:'L298N MOTOR DRIVER',price:19,originalPrice:30,category:'sensors',image:'l298n-motor-driver.png',specs:['درع محرك','2 محرك DC','1 محرك خطوة','5V - 35V','2A max'],description:'وحدة تحكم بالمحركات ثنائية القناة'},{id:20,name:'MICRO SD CARD READER',price:16,originalPrice:25,category:'sensors',image:'micro-sd-card-reader.png',specs:['قارئ SD','SPI Interface','3.3V - 5V','Micro SD','استهلاك منخفض'],description:'وحدة قراءة بطاقات الذاكرة الخارجية'},{id:21,name:'DS18B20 SENSOR',price:18,originalPrice:28,category:'sensors',image:'ds18b20-sensor.png',specs:['مستشعر حرارة رقمي','-55°C إلى +125°C','±0.5°C','1-Wire','استهلاك منخفض'],description:'مستشعر حرارة رقمي عالي الدقة'},{id:22,name:'JUMPER WIRE',price:11,originalPrice:18,category:'sensors',image:'jumper-wire.png',specs:['أسلاك توصيل','40 سلك','M-M و F-F','20cm','متعددة الاستخدام'],description:'مجموعة أسلاك توصيل متنوعة'},{id:23,name:'ACS712 30A RANGE',price:30,originalPrice:48,category:'sensors',image:'acs712-30a.png',specs:['مستشعر تيار','0-30A','Analog Output','66mV/A','استهلاك منخفض'],description:'مستشعر قياس التيار حتى 30 أمبير'},{id:24,name:'JOYSTICK',price:10,originalPrice:16,category:'sensors',image:'joystick.png',specs:['عصا تحكم','2 محاور','زر مدمج','Analog Output','سهل الاستخدام'],description:'وحدة عصا تحكم تناظرية'},{id:25,name:'RELAY MODULE HIGH 5V',price:13,originalPrice:20,category:'sensors',image:'relay-module-5v.png',specs:['موديول ريليه','5V DC','تحكم عالي القدرة','عزل كهربائي','مؤشر LED'],description:'وحدة ريليه للتحكم بالأجهزة عالية القدرة'},{id:26,name:'SH1107 OLED DISPLAY',price:109,originalPrice:165,category:'displays',image:'sh1107-oled-display.png',specs:['شاشة OLED','128×128','I2C Interface','أبيض وأسود','استهلاك منخفض'],description:'شاشة OLED عالية الدقة',popular:true,badge:'مميز'},{id:27,name:'LCD 1602 WITH I2C',price:27,originalPrice:42,category:'displays',image:'lcd-1602-i2c.png',specs:['شاشة LCD','16×2','I2C Interface','إضاءة زرقاء','استهلاك منخفض'],description:'شاشة LCD مع وحدة I2C'},{id:28,name:'SSD1306 OLED 0.96"',price:35,originalPrice:52,category:'displays',image:'ssd1306-oled-096.png',specs:['شاشة OLED','128×64','I2C/SPI','0.96 بوصة','استهلاك منخفض جداً'],description:'شاشة OLED صغيرة ومثالية للأردوينو'}];
-const reviews=[{name:'mr.stornyt',text:'جاني المستشعرات وكل الجهاز مع بعض مغلف كويس وشرح لي كل التفاصيل، أنصحكم تتعاملون معه.'},{name:'mr.stornyt',text:'تعاملت معه لأنه كان عندي هاكاثون ومشروع يبيله برمجة ومستشعرات طبية وشغلات كثيرة، ما قصّر أبداً اشتغل من ذمّته ووفّر كل القطع وبرمجها لي، وكان يجاوب على أسئلتي وكل ما أعطيه يضيف شيء إضافي للمشروع وشرح لي بذمّة وضمير، الله يجزاه خير أنصحكم فيه.'},{name:'عميل',text:'شغله ما شاء الله رهيب.'},{name:'m.ddddi',text:'صراحة الرجال متعاون جداً وشغله مضمون، سويت عنده مشروع تخرج أردوينو وما قصّر معي في شيء، أنصح بالتعامل معه.'},{name:'عضو #15049',text:'بصراحة أنصح بالتعامل معه، الرجال خدوم في أيام قليلة وخلص المشروع.'},{name:'أحمد هاني آل عمير',text:'الرجال كثير طيب وتعامله راقي، يستاهل 10/10 وفنّان في المشاريع.'},{name:'store_nawaf',text:'الرجال ما قصّر، كان عندي مشروع حاولت تشغيله أكثر من مرّة وجا الرجال وعطاني الكود البرمجي واشتغل معي الحمد لله.'}];
-const catNames={all:'الكل',microcontrollers:'المتحكمات الدقيقة',sensors:'الحساسات',displays:'الشاشات'};
-let state={page:'home',menuOpen:false,cartOpen:false,modalProduct:null,cart:JSON.parse(localStorage.getItem('ib_cart')||'[]'),filter:'all',carousel:0};
-function saveCart(){localStorage.setItem('ib_cart',JSON.stringify(state.cart))}
-const S={menu:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>',cart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>',close:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>',box:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>',star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>',phone:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>',map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>',eye:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>',check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>',truck:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',hp:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',wa:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>',cL:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>',cR:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>'};
-function disc(p){return Math.round((1-p.price/p.originalPrice)*100)}
-function cTotal(){return state.cart.reduce((s,c)=>{const p=products.find(x=>x.id===c.id);return s+(p?p.price*c.qty:0)},0)}
-function cTotalOrig(){return state.cart.reduce((s,c)=>{const p=products.find(x=>x.id===c.id);return s+(p?p.originalPrice*c.qty:0)},0)}
-function cSaved(){return state.cart.reduce((s,c)=>{const p=products.find(x=>x.id===c.id);return s+(p?(p.originalPrice-p.price)*c.qty:0)},0)}
-function cCount(){return state.cart.reduce((s,c)=>s+c.qty,0)}
-function phSVG(cat){const c={microcontrollers:'%234f46e5',sensors:'%2316a34a',displays:'%239333ea'};const cl=c[cat]||'%23999';return`data:image/svg+xml,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><rect width="200" height="200" fill="#f3f4f6"/><rect x="55" y="55" width="90" height="90" rx="12" fill="'+decodeURIComponent(cl)+'" opacity="0.15"/><rect x="70" y="70" width="20" height="8" rx="2" fill="'+decodeURIComponent(cl)+'" opacity="0.4"/><rect x="70" y="84" width="20" height="8" rx="2" fill="'+decodeURIComponent(cl)+'" opacity="0.4"/><rect x="110" y="70" width="20" height="8" rx="2" fill="'+decodeURIComponent(cl)+'" opacity="0.4"/><rect x="110" y="84" width="20" height="8" rx="2" fill="'+decodeURIComponent(cl)+'" opacity="0.4"/><rect x="70" y="100" width="60" height="20" rx="3" fill="'+decodeURIComponent(cl)+'" opacity="0.3"/><circle cx="80" cy="110" r="3" fill="'+decodeURIComponent(cl)+'" opacity="0.5"/><circle cx="120" cy="110" r="3" fill="'+decodeURIComponent(cl)+'" opacity="0.5"/></svg>')}`}
-function r(){const a=document.getElementById('app');a.innerHTML=rH()+`<main class="main">${state.page==='home'?rHome():''}${state.page==='products'?rProd():''}${state.page==='features'?rFeat():''}${state.page==='contact'?rCont():''}</main>`+rFoot()+rCart()+(state.modalProduct?rMod():'');bindE()}
-function rH(){const cc=cCount();return`<header class="header"><div class="header-left"><a href="#" onclick="goTo('home');return false;" style="display:flex;align-items:center;gap:10px;text-decoration:none"><img src="images/logo.png" class="logo-img" alt="iBoardz" onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex'"><div class="logo-text" style="display:none"><span class="io">i</span><span class="rest">Boardz</span></div><div class="logo-sub"><span class="w">ARDUINO</span> <span class="o">FUTURE</span></div></a></div><div class="header-right"><div class="dropdown-wrap"><button class="icon-btn menu-btn" onclick="tMenu()">${S.menu}</button><div class="dropdown-menu ${state.menuOpen?'show':''}"><a class="dropdown-item" onclick="goTo('home')">${S.home}<span>الرئيسية</span></a><a class="dropdown-item" onclick="goTo('products')">${S.box}<span>المنتجات</span></a><a class="dropdown-item" onclick="goTo('features')">${S.star}<span>المميزات</span></a><a class="dropdown-item" onclick="goTo('contact')">${S.mail}<span>تواصل معنا</span></a></div></div><button class="icon-btn" onclick="tCart()">${S.cart}${cc>0?`<span class="cart-badge">${cc}</span>`:''}</button></div></header>`}
-function rCar(){return`<div style="padding:24px 24px 0;max-width:1200px;margin:0 auto"><div class="carousel-wrap"><div class="carousel" style="transform:translateX(-${state.carousel*100}%)"><div class="carousel-slide"><img src="images/add.png" alt="إعلان 1" onerror="this.src='${phSVG('microcontrollers')}'"></div><div class="carousel-slide"><img src="images/add1.png" alt="إعلان 2" onerror="this.src='${phSVG('sensors')}'"></div></div><button class="carousel-btn prev" onclick="pSlide()">${S.cR}</button><button class="carousel-btn next" onclick="nSlide()">${S.cL}</button></div><div class="carousel-dots"><div class="carousel-dot ${state.carousel===0?'active':''}" onclick="gSlide(0)"></div><div class="carousel-dot ${state.carousel===1?'active':''}" onclick="gSlide(1)"></div></div></div>`}
-function rHome(){const pop=products.filter(p=>p.popular);return rCar()+`<div class="features-bar"><div class="feature-item">${S.truck}<span>شحن سريع</span></div><div class="feature-item">${S.shield}<span>ضمان كامل</span></div><div class="feature-item">${S.hp}<span>دعم متواصل</span></div></div><section class="section"><div class="section-badge">الأكثر رواجاً</div><h2 class="section-title">المنتجات الأكثر مبيعاً</h2><div class="products-grid">${pop.map(p=>rCard(p)).join('')}</div></section>`}
-function rProd(){return`<section class="section"><div class="section-badge">المنتجات</div><h2 class="section-title">جميع المنتجات</h2><div class="filter-bar">${Object.entries(catNames).map(([k,v])=>`<button class="filter-btn ${state.filter===k?'active':''}" onclick="sFilt('${k}')">${v}</button>`).join('')}</div>${state.filter==='all'||state.filter==='microcontrollers'?`<h3 style="font-size:20px;font-weight:800;margin:24px 0 16px;color:#4f46e5">المتحكمات الدقيقة</h3><div class="products-grid">${products.filter(p=>p.category==='microcontrollers').map(p=>rCard(p)).join('')}</div>`:''} ${state.filter==='all'||state.filter==='sensors'?`<h3 style="font-size:20px;font-weight:800;margin:24px 0 16px;color:#16a34a">الحساسات</h3><div class="products-grid">${products.filter(p=>p.category==='sensors').map(p=>rCard(p)).join('')}</div>`:''} ${state.filter==='all'||state.filter==='displays'?`<h3 style="font-size:20px;font-weight:800;margin:24px 0 16px;color:#9333ea">الشاشات</h3><div class="products-grid">${products.filter(p=>p.category==='displays').map(p=>rCard(p)).join('')}</div>`:''}</section>`}
-function rCard(p){const d=disc(p);const ic=state.cart.find(c=>c.id===p.id);return`<div class="product-card"><div class="product-img-wrap" onclick="oMod(${p.id})"><img src="images/${p.image}" alt="${p.name}" onerror="this.src='${phSVG(p.category)}'"><div class="discount-badge">-${d}%</div>${p.badge?`<div class="popular-badge">${p.badge}</div>`:''}</div><div class="product-info"><div class="product-name">${p.name}</div><div class="product-cat">${catNames[p.category]}</div><div class="product-prices"><span class="old-price">${p.originalPrice} ر.س</span><span class="new-price">${p.price}</span><span class="price-sar">ر.س</span></div><div class="product-actions"><button class="add-btn" onclick="aCart(${p.id})">${ic?`<span>${ic.qty} في السلة</span>`:'<span>+ أضف للسلة</span>'}</button><button class="view-btn" onclick="oMod(${p.id})">${S.eye}</button></div></div></div>`}
-function rFeat(){const f=[{i:S.shield,t:'جودة عالية',d:'جميع منتجاتنا أصلية ومضمونة مع فحص شامل قبل الشحن'},{i:S.truck,t:'شحن سريع',d:'نوصل طلبك لباب بيتك في أسرع وقت ممكن لجميع مناطق المملكة'},{i:S.hp,t:'دعم فني متواصل',d:'فريق دعم فني متخصص جاهز لمساعدتك على مدار الساعة'},{i:S.check,t:'ضمان كامل',d:'ضمان على جميع المنتجات مع إمكانية الاستبدال المجاني'},{i:S.box,t:'أسعار تنافسية',d:'أفضل الأسعار في المملكة مع عروض وخصومات مستمرة'},{i:S.star,t:'موارد تعليمية',d:'شروحات وأكواد جاهزة لمساعدتك في مشاريعك'}];return`<section class="section"><div class="section-badge">المميزات</div><h2 class="section-title">لماذا <span dir="ltr" style="display:inline-block">iBoardz</span>؟</h2><div class="features-grid">${f.map(x=>`<div class="feature-card"><div class="feature-icon">${x.i}</div><h3>${x.t}</h3><p>${x.d}</p></div>`).join('')}</div></section><section class="section"><div class="section-badge">آراء العملاء</div><h2 class="section-title">ماذا يقول عملاؤنا</h2><div class="reviews-grid">${reviews.map(rv=>`<div class="review-card"><div class="review-stars">★★★★★</div><div class="review-text">"${rv.text}"</div><div class="review-author"><div class="review-avatar">${rv.name.charAt(0)}</div><div class="review-name">${rv.name}</div></div></div>`).join('')}</div></section>`}
-function rCont(){return`<section class="section"><div class="section-badge">تواصل معنا</div><h2 class="section-title">نسعد بتواصلكم</h2><div class="contact-grid"><div class="contact-card"><h3>معلومات التواصل</h3><div class="contact-item">${S.phone}<div class="contact-item-text"><span>واتساب</span><strong dir="ltr">+966552645082</strong></div></div><div class="contact-item">${S.mail}<div class="contact-item-text"><span>البريد الإلكتروني</span><strong dir="ltr">iBoardz@outlook.com</strong></div></div><div class="contact-item">${S.map}<div class="contact-item-text"><span>العنوان</span><strong>المملكة العربية السعودية</strong></div></div><a href="https://wa.me/966552645082" target="_blank" style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:20px;padding:14px;border-radius:14px;background:#25d366;color:#fff;font-weight:800;font-size:15px;text-decoration:none">${S.wa} تواصل عبر واتساب</a></div><div class="contact-card"><h3>أرسل رسالة</h3><form class="contact-form" onsubmit="sForm(event)"><input type="text" placeholder="الاسم الكامل" required><input type="email" placeholder="البريد الإلكتروني" required><input type="text" placeholder="الموضوع" required><textarea placeholder="رسالتك..." required></textarea><button type="submit" class="send-btn">إرسال الرسالة</button></form></div></div></section>`}
-function rFoot(){return`<footer class="footer"><div class="footer-top"><div class="footer-logo"><div class="logo-text" style="direction:ltr"><span class="io">i</span><span class="rest" style="color:#fff">Boardz</span></div><div class="logo-sub" style="margin-top:6px"><span class="w" style="color:#999">ARDUINO</span> <span class="o">FUTURE</span></div><p style="margin-top:12px">وجهتك الأولى لمكونات الإلكترونيات ولوحات Arduino في المملكة العربية السعودية</p></div><div class="footer-col"><h4>روابط سريعة</h4><a href="#" onclick="goTo('home');return false">الرئيسية</a><a href="#" onclick="goTo('products');return false">المنتجات</a><a href="#" onclick="goTo('features');return false">المميزات</a><a href="#" onclick="goTo('contact');return false">تواصل معنا</a></div><div class="footer-col"><h4>الأقسام</h4><a href="#" onclick="sFilt('microcontrollers');goTo('products');return false">المتحكمات الدقيقة</a><a href="#" onclick="sFilt('sensors');goTo('products');return false">الحساسات</a><a href="#" onclick="sFilt('displays');goTo('products');return false">الشاشات</a></div></div><div class="footer-bottom"><span dir="ltr" style="display:inline-block">© 2025 iBoardz</span> - جميع الحقوق محفوظة</div></footer>`}
-function rCart(){const t=cTotal(),sv=cSaved(),to=cTotalOrig();return`<div class="cart-overlay ${state.cartOpen?'show':''}" onclick="tCart()"></div><div class="cart-panel ${state.cartOpen?'show':''}"><div class="cart-header"><h2>سلة التسوق</h2><button class="cart-close" onclick="tCart()">${S.close}</button></div><div class="cart-items">${state.cart.length===0?`<div class="cart-empty">${S.cart}<p>السلة فارغة</p></div>`:state.cart.map(c=>{const p=products.find(x=>x.id===c.id);if(!p)return'';return`<div class="cart-item"><div class="cart-item-img"><img src="images/${p.image}" alt="${p.name}" onerror="this.src='${phSVG(p.category)}'"></div><div class="cart-item-info"><div class="cart-item-name">${p.name}</div><div class="cart-item-price">${p.price*c.qty} ر.س</div><div class="cart-item-qty"><button class="qty-btn" onclick="cQty(${p.id},1)">+</button><span>${c.qty}</span><button class="qty-btn" onclick="cQty(${p.id},-1)">−</button></div></div><button class="cart-item-remove" onclick="rmCart(${p.id})">×</button></div>`}).join('')}</div>${state.cart.length>0?`<div class="cart-footer"><div class="cart-totals"><div class="cart-total-row original"><span class="cart-total-label">الإجمالي قبل الخصم:</span><span class="cart-total-old">${to} ر.س</span></div><div class="cart-total-row discounted"><span class="cart-total-label">الإجمالي بعد الخصم:</span><span class="cart-total-new">${t} ر.س</span></div>${sv>0?`<div class="cart-savings-badge"><span style="font-size:18px">🎉</span><span class="savings-text">وفّرت ${sv} ر.س</span></div>`:''}</div><a href="https://wa.me/966552645082?text=${encodeURIComponent('مرحباً، أريد طلب:\n'+state.cart.map(c=>{const p=products.find(x=>x.id===c.id);return p?`- ${p.name} × ${c.qty} = ${p.price*c.qty} ر.س`:''}).join('\n')+'\nالمجموع: '+t+' ر.س')}" target="_blank" class="whatsapp-btn">${S.wa} اطلب عبر واتساب</a></div>`:''}</div>`}
-function rMod(){const p=products.find(x=>x.id===state.modalProduct);if(!p)return'';const d=disc(p),sv=p.originalPrice-p.price;return`<div class="modal-overlay show" onclick="if(event.target===this)cMod()"><div class="modal-content"><div class="modal-img"><img src="images/${p.image}" alt="${p.name}" onerror="this.src='${phSVG(p.category)}'"></div><div class="modal-body"><div class="modal-cat">${catNames[p.category]}</div><div class="modal-title">${p.name}</div><div class="modal-desc">${p.description}</div><div class="modal-prices"><span class="modal-old-price">${p.originalPrice} ر.س</span><span class="modal-new-price">${p.price}</span><span style="font-size:16px;font-weight:700;color:#ff9500">ر.س</span></div><div class="modal-saved">وفّرت ${sv} ر.س (-${d}%)</div><div class="modal-specs-title">المواصفات التقنية</div><div class="modal-specs">${p.specs.map(s=>`<div class="modal-spec">${S.check}<span>${s}</span></div>`).join('')}</div><button class="modal-add-btn" onclick="aCart(${p.id});cMod()">أضف إلى السلة - ${p.price} ر.س</button></div></div></div>`}
-function goTo(p){state.page=p;state.menuOpen=false;r();window.scrollTo(0,0)}
-function tMenu(){state.menuOpen=!state.menuOpen;r()}
-function tCart(){state.cartOpen=!state.cartOpen;r()}
-function sFilt(f){state.filter=f;r()}
-function oMod(id){state.modalProduct=id;r();document.body.style.overflow='hidden'}
-function cMod(){state.modalProduct=null;r();document.body.style.overflow=''}
-function aCart(id){const e=state.cart.find(c=>c.id===id);if(e)e.qty++;else state.cart.push({id,qty:1});saveCart();r()}
-function cQty(id,d){const i=state.cart.find(c=>c.id===id);if(i){i.qty+=d;if(i.qty<=0)state.cart=state.cart.filter(c=>c.id!==id)}saveCart();r()}
-function rmCart(id){state.cart=state.cart.filter(c=>c.id!==id);saveCart();r()}
-function pSlide(){state.carousel=(state.carousel-1+2)%2;r()}
-function nSlide(){state.carousel=(state.carousel+1)%2;r()}
-function gSlide(i){state.carousel=i;r()}
-function sForm(e){e.preventDefault();const f=e.target;window.open(`https://wa.me/966552645082?text=${encodeURIComponent('الاسم: '+f[0].value+'\nالإيميل: '+f[1].value+'\nالموضوع: '+f[2].value+'\nالرسالة: '+f[3].value)}`,'_blank')}
-function bindE(){clearInterval(window._ct);window._ct=setInterval(()=>{state.carousel=(state.carousel+1)%2;r()},5000)}
-document.addEventListener('DOMContentLoaded',function(){r();document.addEventListener('click',function(e){if(state.menuOpen&&!e.target.closest('.dropdown-menu')&&!e.target.closest('.menu-btn')){state.menuOpen=false;r()}})});
-    </script>
+// ===== DATA =====
+const products = [
+  { id:2, name:'ESP32 DEV MODEL', price:39, op:60, cat:'mcu', img:'esp32-dev-model.png', specs:['واي فاي + بلوتوث','USB Type-C','340KB SRAM','48MHz processor','18 GPIO pin'], desc:'نسخة مطورة من ESP32 مع منفذ USB-C', pop:true, badge:'مميز' },
+  { id:3, name:'ARDUINO UNO R3', price:32, op:50, cat:'mcu', img:'arduino-uno-r3.png', specs:['ATmega328P','16MHz clock','32KB Flash','14 Digital I/O','6 Analog Inputs'], desc:'المتحكم الأشهر في العالم، مثالي للمبتدئين', pop:true, badge:'الأكثر مبيعاً' },
+  { id:4, name:'ESP32 C3 MINI', price:29, op:45, cat:'mcu', img:'esp32-c3-mini.png', specs:['RISC-V 160MHz','400KB SRAM','WiFi 4 + BT5','22 GPIO pin','حجم صغير جداً'], desc:'متحكم صغير الحجم بكفاءة عالية' },
+  { id:5, name:'ESP8266 D1 BOARD', price:29, op:42, cat:'mcu', img:'esp8266-d1-board.png', specs:['ESP8266 WiFi','80MHz clock','11 GPIO pin','ADC مدمج','USB Micro'], desc:'لوحة تطوير اقتصادية مع واي فاي' },
+  { id:6, name:'ESP32 D1 BOARD', price:39, op:58, cat:'mcu', img:'esp32-d1-board.png', specs:['ESP32 Dual Core','WiFi + BLE','30 GPIO pin','520KB SRAM','USB Type-C'], desc:'لوحة D1 المطورة مع ESP32', pop:true, badge:'مميز' },
+  { id:7, name:'MAX 30102', price:25, op:40, cat:'sensor', img:'max-30102.png', specs:['مستشعر نبضات','IR + Red LED','I2C Interface','18-bit ADC','استهلاك منخفض'], desc:'مستشعر نبضات القلب والأكسجين في الدم' },
+  { id:8, name:'HC-SR04 ULTRASONIC', price:18, op:28, cat:'sensor', img:'hc-sr04-ultrasonic.png', specs:['قياس مسافة 2-400cm','دقة 3mm','Trigger + Echo','جهد عمل 5V','زاوية 15°'], desc:'مستشعر الموجات فوق الصوتية لقياس المسافة', pop:true, badge:'الأكثر طلباً' },
+  { id:9, name:'DHT11 SENSOR', price:16, op:25, cat:'sensor', img:'dht11-sensor.png', specs:['حرارة 0-50°C','رطوبة 20-90%','دقة ±2°C','Digital Output','جهد 3.3-5V'], desc:'مستشعر الحرارة والرطوبة', pop:true, badge:'الأكثر مبيعاً' },
+  { id:10, name:'Capacitive Moisture Sensor V2.0', price:20, op:32, cat:'sensor', img:'capacitive-moisture-sensor-v2.png', specs:['قياس رطوبة التربة','Analog Output','مقاوم للتآكل','جهد 3.3-5V','طراز V2.0'], desc:'مستشعر رطوبة التربة السعوي' },
+  { id:11, name:'MPU6050 SENSOR', price:23, op:36, cat:'sensor', img:'mpu6050-sensor.png', specs:['جيروسكوب 3 محاور','مقياس تسارع 3 محاور','I2C Interface','16-bit ADC','استهلاك منخفض'], desc:'مستشعر الحركة والتسارع' },
+  { id:12, name:'MATRIX KEYBOARD 3x4', price:14, op:22, cat:'sensor', img:'matrix-keypad-3x4.png', specs:['12 مفتاح','3 صفوف × 4 أعمدة','Flexible Film','سهل التوصيل','استهلاك منخفض'], desc:'لوحة مفاتيح مرنة 3×4' },
+  { id:14, name:'WATER PUMP', price:21, op:35, cat:'sensor', img:'water-pump.png', specs:['جهد 3-6V','تدفق 80-120 L/H','مقاوم للتآكل','صغير الحجم','DC Motor'], desc:'مضخة مياه صغيرة للمشاريع' },
+  { id:15, name:'SERVO MOTOR', price:16, op:25, cat:'sensor', img:'servo-motor.png', specs:['زاوية 0-180°','عزم 1.8kg/cm','جهد 4.8-6V','PWM Control','SG90 Micro'], desc:'محرك سيرفو صغير للتحكم بالزاوية', pop:true, badge:'الأكثر مبيعاً' },
+  { id:16, name:'MATRIX KEYBOARD 4x4', price:19, op:30, cat:'sensor', img:'matrix-keypad-4x4.png', specs:['16 مفتاح','4 صفوف × 4 أعمدة','Flexible Film','سهل التوصيل','استهلاك منخفض'], desc:'لوحة مفاتيح مرنة 4×4' },
+  { id:17, name:'TDS METER V1.0', price:39, op:55, cat:'sensor', img:'tds-meter-v1.png', specs:['قياس TDS','Analog Output','جهد 3.3-5V','دقة ±10%','مقاوم للماء'], desc:'مستشعر قياس جودة الماء' },
+  { id:18, name:'AHT20+BMP280', price:22, op:35, cat:'sensor', img:'aht20-bmp280.png', specs:['حرارة + رطوبة + ضغط','I2C Interface','دقة عالية','استهلاك منخفض','حجم صغير'], desc:'مستشعر حرارة ورطوبة وضغط جوي مدمج' },
+  { id:19, name:'L298N MOTOR DRIVER', price:19, op:30, cat:'sensor', img:'l298n-motor-driver.png', specs:['يتحكم بمحركين DC','جهد 5-35V','تيار 2A لكل محرك','PWM Control','حماية من الحرارة'], desc:'متحكم محركات DC و Stepper' },
+  { id:20, name:'MICRO SD CARD READER', price:16, op:25, cat:'sensor', img:'micro-sd-card-reader.png', specs:['SPI Interface','يدعم SD/SDHC','جهد 3.3-5V','سرعة عالية','حجم صغير'], desc:'قارئ بطاقات Micro SD للمشاريع' },
+  { id:21, name:'DS18B20 SENSOR', price:18, op:28, cat:'sensor', img:'ds18b20-sensor.png', specs:['حرارة -55°C إلى 125°C','1-Wire Interface','دقة ±0.5°C','مقاوم للماء','جهد 3-5.5V'], desc:'مستشعر حرارة رقمي مقاوم للماء' },
+  { id:22, name:'JUMPER WIRE', price:11, op:18, cat:'sensor', img:'jumper-wire.png', specs:['40 سلك','Male to Male','Male to Female','Female to Female','طول 20cm'], desc:'أسلاك توصيل متنوعة للمشاريع' },
+  { id:23, name:'ACS712 30A RANGE', price:30, op:45, cat:'sensor', img:'acs712-30a.png', specs:['قياس تيار ±30A','Analog Output','دقة 66mV/A','جهد 5V','عزل كهربائي'], desc:'مستشعر التيار الكهربائي حتى 30 أمبير' },
+  { id:24, name:'JOYSTICK', price:10, op:16, cat:'sensor', img:'joystick.png', specs:['محورين X/Y','زر ضغط','Analog Output','جهد 3.3-5V','سهل الاستخدام'], desc:'يد تحكم تناظرية للمشاريع' },
+  { id:25, name:'RELAY MODULE HIGH 5V', price:13, op:20, cat:'sensor', img:'relay-module-5v.png', specs:['4 قنوات','جهد 5V','حمولة 10A/250VAC','عزل ضوئي','LED مؤشر'], desc:'موديول ريليه 4 قنوات للتحكم بالأحمال', pop:true, badge:'الأكثر طلباً' },
+  { id:26, name:'SH1107 OLED DISPLAY', price:109, op:160, cat:'display', img:'sh1107-oled-display.png', specs:['شاشة OLED 1.3"','دقة 128×64','I2C Interface','تباين عالي جداً','استهلاك منخفض'], desc:'شاشة OLED 1.3 بوصة عالية الجودة للمشاريع', pop:true, badge:'مميز' },
+  { id:27, name:'LCD 1602 WITH I2C', price:27, op:40, cat:'display', img:'lcd-1602-i2c.png', specs:['16 حرف × 2 سطر','I2C Interface','إضاءة خلفية زرقاء','جهد 5V','تباين قابل للتعديل'], desc:'شاشة LCD مع واجهة I2C سهلة التوصيل' },
+  { id:28, name:'SSD1306 OLED 0.96"', price:35, op:52, cat:'display', img:'ssd1306-oled-096.png', specs:['شاشة OLED 0.96"','دقة 128×64','I2C Interface','أبيض وأزرق','استهلاك منخفض جداً'], desc:'شاشة OLED صغيرة ومثالية للمشاريع' },
+];
+
+const cats = [
+  { key:'all', label:'الكل' },
+  { key:'mcu', label:'المتحكمات الدقيقة' },
+  { key:'sensor', label:'الحساسات' },
+  { key:'display', label:'الشاشات' },
+];
+
+const reviews = [
+  { name:'mr.stornyt', text:'جاني المستشعرات وكل الجهاز مع بعض مغلف كويس وشرح لي كل التفاصيل، أنصحكم تتعاملون معه.' },
+  { name:'mr.stornyt', text:'تعاملت معه لأنه كان عندي هاكاثون ومشروع يبيله برمجة ومستشعرات طبية وشغلات كثيرة، ما قصّر أبداً اشتغل من ذمّته وهو وفّر كل القطع وبرمجها لي، وكان يجاوب على أسئلتي وكل ما أعطيه يضيف شيء إضافي للمشروع وشرح لي بذمّة وضمير، الله يجزاه خير أنصحكم فيه.' },
+  { name:'عميل', text:'شغله ما شاء الله رهيب.' },
+  { name:'m.ddddi', text:'صراحة الرجال متعاون جداً وشغله مضمون، سويت عنده مشروع تخرج أردوينو وما قصّر معي في شيء، أنصح بالتعامل معه.' },
+  { name:'عضو #15049', text:'بصراحة أنصح بالتعامل معه، الرجال خدوم في أيام قليلة وخلص المشروع.' },
+  { name:'أحمد هاني آل عمير', text:'الرجال واجد طيب وتعامله راقي، يستاهل 10/10 وفنّان في المشاريع.' },
+  { name:'store_nawaf', text:'الرجال ما قصّر، كان عندي مشروع حاولت تشغيله أكثر من مرّة وجا الرجال وعطاني الكود البرمجي واشتغل معي الحمد لله.' },
+];
+
+const features = [
+  { title:'جودة عالية', desc:'جميع منتجاتنا أصلية ومضمونة' },
+  { title:'أسعار تنافسية', desc:'أفضل الأسعار في السوق السعودي' },
+  { title:'شحن سريع', desc:'توصيل سريع لجميع مناطق المملكة' },
+  { title:'دعم فني 24/7', desc:'فريق دعم متخصص على مدار الساعة' },
+  { title:'ضمان كامل', desc:'ضمان على جميع المنتجات' },
+  { title:'موارد تعليمية', desc:'شروحات وأكواد جاهزة لكل منتج' },
+];
+
+const navItems = [
+  { key:'home', label:'الرئيسية' },
+  { key:'products', label:'المنتجات' },
+  { key:'features', label:'المميزات' },
+  { key:'contact', label:'تواصل معنا' },
+];
+
+const icons = {
+  home:'<path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+  box:'<path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>',
+  star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  envelope:'<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/>',
+  truck:'<rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>',
+  shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>',
+  headset:'<path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/>',
+  phone:'<path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>',
+  whatsapp:'<path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>',
+};
+
+function svgIcon(d, s=18, stroke='currentColor', fill='none') {
+  return `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="${fill}" stroke="${stroke}" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+}
+
+// ===== STATE =====
+let state = { page:'home', menuOpen:false, cartOpen:false, cart:[], filter:'all', ci:0, selProd:null };
+let carouselTimer = null;
+
+function loadCart() { try { const s=localStorage.getItem('iboardz-cart'); if(s) state.cart=JSON.parse(s); } catch{} }
+function saveCart() { try { localStorage.setItem('iboardz-cart',JSON.stringify(state.cart)); } catch{} }
+loadCart();
+
+// ===== HELPERS =====
+function disc(p) { return Math.round((1-p.price/p.op)*100); }
+function totalItems() { return state.cart.reduce((s,i)=>s+i.qty,0); }
+function totalPrice() { return state.cart.reduce((s,i)=>s+i.product.price*i.qty,0); }
+function totalOriginal() { return state.cart.reduce((s,i)=>s+i.product.op*i.qty,0); }
+function totalSaved() { return totalOriginal()-totalPrice(); }
+
+function nav(p) { state.page=p; state.menuOpen=false; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+function toggleMenu(e) { e.stopPropagation(); state.menuOpen=!state.menuOpen; renderMenu(); }
+function closeMenu() { state.menuOpen=false; renderMenu(); }
+function openCart() { state.cartOpen=true; renderCart(); }
+function closeCart() { state.cartOpen=false; renderCart(); }
+
+function addCart(prod) {
+  const ex=state.cart.find(i=>i.product.id===prod.id);
+  if(ex) ex.qty++; else state.cart.push({product:prod,qty:1});
+  saveCart(); updateBadge();
+  state.cartOpen=true; renderCart();
+  setTimeout(()=>{state.cartOpen=false; renderCart();},2000);
+}
+function removeCart(id) { state.cart=state.cart.filter(i=>i.product.id!==id); saveCart(); updateBadge(); renderCart(); }
+function updQty(id,d) {
+  const item=state.cart.find(i=>i.product.id===id);
+  if(item) item.qty=Math.max(1,item.qty+d);
+  saveCart(); renderCart();
+}
+
+function updateBadge() {
+  const b=document.getElementById('cartBadge');
+  const t=totalItems();
+  if(t>0) { b.style.display='flex'; b.textContent=t; }
+  else { b.style.display='none'; }
+}
+
+function showProduct(id) {
+  state.selProd=products.find(p=>p.id===id);
+  renderModal();
+}
+function closeModal() { state.selProd=null; renderModal(); }
+
+// ===== RENDER =====
+function render() {
+  renderMain();
+  renderMenu();
+  updateBadge();
+  startCarousel();
+}
+
+function renderMenu() {
+  const dd=document.getElementById('dropdown');
+  const bd=document.getElementById('menuBackdrop');
+  if(state.menuOpen) {
+    dd.style.display='block';
+    bd.style.display='block';
+    dd.innerHTML=navItems.map(n=>`<button class="${state.page===n.key?'active':''}" onclick="nav('${n.key}')">${svgIcon(icons[n.key==='home'?'home':n.key==='products'?'box':n.key==='features'?'star':'envelope'])} ${n.label}</button>`).join('');
+  } else {
+    dd.style.display='none';
+    bd.style.display='none';
+  }
+}
+
+function renderCart() {
+  const overlay=document.getElementById('cartOverlay');
+  const body=document.getElementById('cartBody');
+  const footer=document.getElementById('cartFooter');
+  const count=document.getElementById('cartCount');
+
+  overlay.className='cart-overlay'+(state.cartOpen?' open':'');
+  count.textContent=totalItems();
+
+  if(state.cart.length===0) {
+    body.innerHTML=`<div class="cart-empty">${svgIcon(icons.box,40,'#ccc')}<p style="font-size:16px;margin-top:12px">السلة فارغة</p><p style="font-size:13px">أضف منتجات للبدء</p></div>`;
+    footer.style.display='none';
+  } else {
+    body.innerHTML=state.cart.map(item=>`<div class="cart-item">
+      <div class="cart-item-img"><img src="images/${item.product.img}" alt="" onerror="this.style.display='none'"></div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.product.name}</div>
+        <div class="cart-item-prices"><span class="price" style="font-size:15px">${item.product.price} ر.س</span><span class="old-price">${item.product.op} ر.س</span></div>
+      </div>
+      <div class="cart-qty-controls">
+        <button class="qty-btn" onclick="updQty(${item.product.id},-1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        <span style="font-weight:800;min-width:20px;text-align:center;font-size:15px">${item.qty}</span>
+        <button class="qty-btn" onclick="updQty(${item.product.id},1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        <button class="cart-remove" onclick="removeCart(${item.product.id})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
+      </div>
+    </div>`).join('');
+
+    const tp=totalPrice(), top2=totalOriginal(), ts=totalSaved();
+    const waText=encodeURIComponent('مرحباً، أريد طلب:\n'+state.cart.map(i=>`${i.product.name} × ${i.qty} = ${i.product.price*i.qty} ر.س`).join('\n')+'\nالمجموع: '+tp+' ر.س');
+
+    footer.style.display='block';
+    footer.innerHTML=`<div class="cart-totals">
+      <div class="cart-total-row original"><span class="cart-total-label">الإجمالي قبل الخصم:</span><span class="cart-total-old">${top2} ر.س</span></div>
+      <div class="cart-total-row discounted"><span class="cart-total-label">الإجمالي بعد الخصم:</span><span class="cart-total-new">${tp} ر.س</span></div>
+      ${ts>0?`<div class="cart-savings-badge"><span class="savings-icon">🎉</span><span class="savings-text">وفّرت ${ts} ر.س</span></div>`:''}
+    </div>
+    <a href="https://wa.me/966552645082?text=${waText}" target="_blank" rel="noopener noreferrer"><button class="whatsapp-btn">${svgIcon(icons.whatsapp,20,'#25D366','#25D366')} اطلب عبر واتساب</button></a>`;
+  }
+}
+
+function renderModal() {
+  const m=document.getElementById('modalOverlay');
+  if(!state.selProd) { m.style.display='none'; return; }
+  const p=state.selProd;
+  const cat=cats.find(c=>c.key===p.cat);
+  m.style.display='flex';
+  m.innerHTML=`<div class="modal-backdrop" onclick="closeModal()"></div>
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      <div class="modal-img"><img src="images/${p.img}" alt="${p.name}" onerror="this.style.display='none'"></div>
+      <div class="modal-body">
+        <div class="modal-badges">
+          <span class="badge badge-orange">${cat?.label||''}</span>
+          ${p.badge?`<span class="badge badge-red">${p.badge}</span>`:''}
+          <span class="badge badge-gray">-${disc(p)}%</span>
+        </div>
+        <h2 class="modal-title">${p.name}</h2>
+        <p class="modal-desc">${p.desc}</p>
+        <div class="modal-prices"><span class="modal-new-price">${p.price} ر.س</span><span class="modal-old-price">${p.op} ر.س</span></div>
+        <div class="modal-specs"><h3>المواصفات التقنية:</h3>${p.specs.map(s=>`<div class="spec-item"><div class="spec-dot"></div><span class="spec-text">${s}</span></div>`).join('')}</div>
+        <button class="modal-add-btn" onclick="addCart(products.find(x=>x.id===${p.id}));closeModal()">أضف إلى السلة <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+      </div>
+    </div>`;
+}
+
+function productCard(p, large) {
+  return `<div class="product-card">
+    <div class="product-img${large?' product-img-large':''}" onclick="showProduct(${p.id})">
+      <img src="images/${p.img}" alt="${p.name}" onerror="this.style.display='none'">
+      ${p.badge?`<span class="product-badge badge-primary">${p.badge}</span>`:''}
+      <span class="discount-badge">-${disc(p)}%</span>
+    </div>
+    <div class="product-info">
+      <h3 class="product-name" onclick="showProduct(${p.id})">${p.name}</h3>
+      <div class="product-bottom">
+        <div class="product-prices">
+          <span class="price">${p.price} ر.س</span>
+          <span class="old-price">${p.op} ر.س</span>
+        </div>
+        <button class="add-btn" onclick="event.stopPropagation();addCart(products.find(x=>x.id===${p.id}))"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderMain() {
+  const main=document.getElementById('mainContent');
+  const fl=document.getElementById('footerLinks');
+  fl.innerHTML=navItems.map(n=>`<button onclick="nav('${n.key}')">${n.label}</button>`).join('');
+
+  if(state.page==='home') {
+    main.innerHTML=renderHome();
+  } else if(state.page==='products') {
+    main.innerHTML=renderProducts();
+  } else if(state.page==='features') {
+    main.innerHTML=renderFeatures();
+  } else if(state.page==='contact') {
+    main.innerHTML=renderContact();
+  }
+}
+
+function renderHome() {
+  return `
+  <div class="carousel">
+    <img src="images/add.png" alt="" style="opacity:${state.ci===0?1:0}" onerror="this.style.display='none'">
+    <img src="images/add1.png" alt="" style="opacity:${state.ci===1?1:0}" onerror="this.style.display='none'">
+    <div class="carousel-overlay">
+      <h1 class="carousel-title"><span class="i">i</span><span class="boardz">Boardz</span></h1>
+      <p class="carousel-subtitle">ARDUINO <span class="future">FUTURE</span></p>
+    </div>
+    <button class="carousel-arrow prev" onclick="setCi(${(state.ci-1+2)%2})">${svgIcon('<polyline points="9 18 15 12 9 6"/>',22)}</button>
+    <button class="carousel-arrow next" onclick="setCi(${(state.ci+1)%2})">${svgIcon('<polyline points="15 18 9 12 15 6"/>',22)}</button>
+    <div class="carousel-dots">
+      <button class="carousel-dot${state.ci===0?' active':''}" onclick="setCi(0)"></button>
+      <button class="carousel-dot${state.ci===1?' active':''}" onclick="setCi(1)"></button>
+    </div>
+  </div>
+  <div class="quick-features">
+    <div class="quick-features-inner">
+      <div class="quick-feature"><div class="quick-feature-icon">${svgIcon(icons.truck,28,'#ff9500')}</div><div><h3>شحن سريع</h3><p>توصيل لجميع مناطق المملكة</p></div></div>
+      <div class="quick-feature"><div class="quick-feature-icon">${svgIcon(icons.shield,28,'#ff9500')}</div><div><h3>ضمان كامل</h3><p>ضمان على جميع المنتجات</p></div></div>
+      <div class="quick-feature"><div class="quick-feature-icon">${svgIcon(icons.headset,28,'#ff9500')}</div><div><h3>دعم فني</h3><p>+966 552 645 082</p></div></div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="section-header">
+      <div class="section-badge">الأكثر مبيعاً</div>
+      <h2 class="section-title">الأكثر رواجاً</h2>
+      <p class="section-subtitle">المنتجات الأكثر طلباً من عملائنا</p>
+    </div>
+    <div class="products-grid">${products.filter(p=>p.pop).map(p=>productCard(p)).join('')}</div>
+    <div style="text-align:center;margin-top:40px"><button class="show-all-btn" onclick="nav('products')">عرض جميع المنتجات ${svgIcon('<polyline points="15 18 9 12 15 6"/>',22)}</button></div>
+  </div>`;
+}
+
+function renderProducts() {
+  const filtered=state.filter==='all'?products:products.filter(p=>p.cat===state.filter);
+  return `<div class="section">
+    <div style="margin-bottom:32px"><h1 style="font-size:34px;font-weight:900;margin:0 0 4px">المنتجات</h1><p style="color:#999;font-size:15px;margin:0">جميع الأسعار هي أسعار بعد الخصم</p></div>
+    <div class="filter-bar">${cats.map(c=>`<button class="filter-btn${state.filter===c.key?' active':''}" onclick="setFilter('${c.key}')">${c.label}</button>`).join('')}</div>
+    <div class="products-grid-large">${filtered.map(p=>productCard(p,true)).join('')}</div>
+  </div>`;
+}
+
+function renderFeatures() {
+  return `<div class="section-narrow">
+    <div class="section-header">
+      <div class="section-badge">لماذا نحن؟</div>
+      <h1 class="section-title">لماذا <span style="direction:ltr;display:inline-block">iBoardz</span>؟</h1>
+      <p class="section-subtitle">مميزات تجعلنا الخيار الأول لعشاق الإلكترونيات</p>
+    </div>
+    <div class="features-grid">${features.map((f,i)=>`<div class="feature-card"><div class="feature-num">${i+1}</div><h3>${f.title}</h3><p>${f.desc}</p></div>`).join('')}</div>
+    <div class="section-header" style="margin-bottom:32px">
+      <h2 style="font-size:28px;font-weight:900;margin:0 0 6px">آراء عملائنا</h2>
+      <p style="color:#999;font-size:15px">ماذا يقول عملاؤنا عن تجربتهم</p>
+    </div>
+    <div class="reviews-grid">${reviews.map(r=>`<div class="review-card">
+      <div class="review-stars">${'<span>★</span>'.repeat(5)}</div>
+      <p class="review-text">"${r.text}"</p>
+      <div class="review-author"><div class="review-avatar">${r.name.charAt(0)}</div><span class="review-name">${r.name}</span></div>
+    </div>`).join('')}</div>
+  </div>`;
+}
+
+function renderContact() {
+  return `<div class="section-contact">
+    <div class="section-header">
+      <div class="section-badge">نحن هنا لمساعدتك</div>
+      <h1 class="section-title">تواصل معنا</h1>
+      <p class="section-subtitle">نرحب بتواصلك في أي وقت</p>
+    </div>
+    <div class="contact-cards">
+      <a href="https://wa.me/966552645082" target="_blank" rel="noopener noreferrer" class="contact-card whatsapp">
+        <div class="contact-icon whatsapp-icon">${svgIcon(icons.phone,20,'#fff')}</div>
+        <div><div class="contact-label">واتساب</div><div class="contact-value">+966 552 645 082</div></div>
+      </a>
+      <a href="mailto:iBoardz@outlook.com" class="contact-card email">
+        <div class="contact-icon email-icon">${svgIcon(icons.envelope,20,'#fff')}</div>
+        <div><div class="contact-label">البريد الإلكتروني</div><div class="contact-value">iBoardz@outlook.com</div></div>
+      </a>
+    </div>
+    <div class="contact-form">
+      <h2>أرسل لنا رسالة</h2>
+      <form onsubmit="event.preventDefault()">
+        <div class="form-group"><label>الاسم</label><input type="text" class="form-input" placeholder="اسمك الكامل"></div>
+        <div class="form-group"><label>البريد الإلكتروني</label><input type="email" class="form-input" placeholder="email@example.com" style="direction:ltr;text-align:right"></div>
+        <div class="form-group"><label>الرسالة</label><textarea rows="5" class="form-input" placeholder="اكتب رسالتك هنا..."></textarea></div>
+        <button type="submit" class="submit-btn">إرسال الرسالة</button>
+      </form>
+    </div>
+    <div class="work-hours"><h3>ساعات العمل</h3><p>السبت - الخميس: 9 صباحاً - 11 مساءً</p><p style="margin-bottom:0">الجمعة: 4 مساءً - 11 مساءً</p></div>
+  </div>`;
+}
+
+function setCi(i) { state.ci=i; document.querySelector('.carousel')?.parentElement && renderMain(); startCarousel(); }
+function setFilter(f) { state.filter=f; renderMain(); }
+
+function startCarousel() {
+  if(carouselTimer) clearInterval(carouselTimer);
+  carouselTimer=setInterval(()=>{
+    state.ci=(state.ci+1)%2;
+    const imgs=document.querySelectorAll('.carousel>img');
+    const dots=document.querySelectorAll('.carousel-dot');
+    imgs.forEach((img,i)=>img.style.opacity=i===state.ci?1:0);
+    dots.forEach((dot,i)=>{dot.className='carousel-dot'+(i===state.ci?' active':'');});
+  },4000);
+}
+
+// ===== INIT =====
+render();
+renderCart();
+</script>
 </body>
 </html>
