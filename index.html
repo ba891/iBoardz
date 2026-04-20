@@ -21,12 +21,12 @@ button { font-family: 'Tajawal', sans-serif; }
 img { max-width: 100%; display: block; }
 
 .header {
-  position: fixed; top: 0; right: 0; left: 0; height: 70px;
-  background: #fff; border-bottom: 1px solid #eee;
+  position: fixed; top: 0; right: 0; left: 0; height: 72px;
+  background: rgba(255,255,255,0.97); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(0,0,0,0.06);
   display: flex; align-items: center; justify-content: space-between;
-  padding: 0 24px; z-index: 1000;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.05);
-  direction: ltr;
+  padding: 0 28px; z-index: 1000; direction: ltr;
+  box-shadow: 0 1px 20px rgba(0,0,0,0.06);
 }
 .logo { display: flex; align-items: center; cursor: pointer; flex-shrink: 0; }
 .logo-text {
@@ -154,7 +154,7 @@ img { max-width: 100%; display: block; }
 .modal-badges { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
 .modal-badges .badge { display: inline-block; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 6px; }
 .badge-orange { background: #fff5e6; color: #ff9500; }
-.badge-red { background: #fff0f0; color: #e74c3c; }
+.badge-red { background: linear-gradient(135deg, #ff3b3b, #e74c3c); color: #fff; box-shadow: 0 2px 8px rgba(231,76,60,0.3); }
 .badge-gray { background: #f0f0f0; color: #666; }
 .modal-title { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
 .modal-desc { color: #666; font-size: 15px; line-height: 1.7; margin-bottom: 20px; }
@@ -257,10 +257,11 @@ img { max-width: 100%; display: block; }
   display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px;
 }
 .product-card {
-  background: #fff; border-radius: 16px; border: 1px solid #f0f0f0;
-  overflow: hidden; transition: all 0.3s ease;
+  background: #fff; border-radius: 18px; border: 1px solid #f0f0f0;
+  overflow: hidden; transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
 }
-.product-card:hover { transform: translateY(-6px); box-shadow: 0 12px 32px rgba(0,0,0,0.1); }
+.product-card:hover { transform: translateY(-8px); box-shadow: 0 16px 40px rgba(0,0,0,0.12); border-color: transparent; }
 .product-img {
   position: relative; background: linear-gradient(135deg, #f8f9fa, #fff);
   padding: 20px; display: flex; align-items: center; justify-content: center;
@@ -276,8 +277,9 @@ img { max-width: 100%; display: block; }
 .badge-primary { background: #ff9500; color: #fff; }
 .discount-badge {
   position: absolute; top: 10px; left: 10px;
-  background: #fff0f0; color: #e74c3c; font-size: 11px; font-weight: 700;
-  padding: 3px 10px; border-radius: 6px;
+  background: linear-gradient(135deg, #ff3b3b, #e74c3c); color: #fff; font-size: 11px; font-weight: 800;
+  padding: 5px 11px; border-radius: 20px; letter-spacing: 0.3px;
+  box-shadow: 0 3px 10px rgba(231,76,60,0.4);
 }
 .product-info { padding: 14px 16px; }
 .product-name {
@@ -732,7 +734,7 @@ function renderModal() {
         <div class="modal-badges">
           <span class="badge badge-orange">${cat?.label||''}</span>
           ${p.badge?`<span class="badge badge-red">${p.badge}</span>`:''}
-          <span class="badge badge-gray">-${disc(p)}%</span>
+          <span class="badge badge-orange">-${disc(p)}%</span>
         </div>
         <h2 class="modal-title">${p.name}</h2>
         <p class="modal-desc">${p.desc}</p>
@@ -784,10 +786,6 @@ function renderHome() {
   <div class="carousel">
     <img src="images/add.png" alt="" style="opacity:${state.ci===0?1:0}" onerror="this.style.display='none'">
     <img src="images/add1.png" alt="" style="opacity:${state.ci===1?1:0}" onerror="this.style.display='none'">
-    <div class="carousel-overlay">
-      <h1 class="carousel-title"><span class="i">i</span><span class="boardz">Boardz</span></h1>
-      <p class="carousel-subtitle">ARDUINO <span class="future">FUTURE</span></p>
-    </div>
     <button class="carousel-arrow prev" onclick="setCi(${(state.ci-1+2)%2})">${svgIcon('<polyline points="9 18 15 12 9 6"/>',22)}</button>
     <button class="carousel-arrow next" onclick="setCi(${(state.ci+1)%2})">${svgIcon('<polyline points="15 18 9 12 15 6"/>',22)}</button>
     <div class="carousel-dots">
