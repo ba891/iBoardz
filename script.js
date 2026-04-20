@@ -1,483 +1,578 @@
-// ==================== iBoardz - Main Script ====================
+// ==================== iBoardz - script.js ====================
 
-// ==================== DATA ====================
-const PRODUCTS = [
-  // المتحكمات الدقيقة
-  { id:1, name:'ESP32', price:41, oldPrice:65, category:'microcontrollers', image:'images/esp32.png', description:'متكامل مع Wi-Fi و Bluetooth مدمج', specs:['معالج: Dual-core 240MHz','ذاكرة: 520KB SRAM','Wi-Fi: 802.11 b/g/n','Bluetooth: 4.2 + BLE','GPIO: 36 pin','Flash: 4MB'] },
-  { id:2, name:'ESP32 DEV MODEL', price:39, oldPrice:60, category:'microcontrollers', image:'images/esp32-dev-model.png', description:'لوحة تطوير ESP32 كاملة', specs:['معالج: Dual-core 240MHz','ذاكرة: 520KB SRAM','USB: Type-C','GPIO: 36 pin','Flash: 4MB','مناسب للمشاريع المتقدمة'] },
-  { id:3, name:'ARDUINO UNO R3', price:32, oldPrice:50, category:'microcontrollers', image:'images/arduino-uno-r3.png', description:'اللوحة الأشهر في عالم الأردوينو', specs:['معالج: ATmega328P','سرعة: 16MHz','ذاكرة Flash: 32KB','GPIO: 14 Digital + 6 Analog','USB: Type-B','مثالي للمبتدئين'] },
-  { id:4, name:'ESP32 C3 MINI', price:29, oldPrice:45, category:'microcontrollers', image:'images/esp32-c3-mini.png', description:'نسخة مصغرة وعصرية من ESP32', specs:['معالج: RISC-V 160MHz','Wi-Fi + Bluetooth 5','حجم صغير جداً','Flash: 4MB','USB: Type-C','مثالي للمشاريع المدمجة'] },
-  { id:5, name:'ESP8266 D1 BOARD', price:29, oldPrice:45, category:'microcontrollers', image:'images/esp8266-d1-board.png', description:'لوحة Wi-Fi اقتصادية', specs:['معالج: ESP8266 80MHz','Wi-Fi: 802.11 b/g/n','GPIO: 11 pin','Flash: 4MB','متوافق مع Arduino IDE','سعر اقتصادي'] },
-  { id:6, name:'ESP32 D1 BOARD', price:39, oldPrice:60, category:'microcontrollers', image:'images/esp32-d1-board.png', description:'لوحة D1 محسّنة مع ESP32', specs:['معالج: Dual-core 240MHz','Wi-Fi + Bluetooth','GPIO: 30 pin','Flash: 4MB','تصميم D1 compatible','أداء ممتاز'] },
-  // الحساسات
-  { id:7, name:'MAX 30102', price:25, oldPrice:40, category:'sensors', image:'images/max-30102.png', description:'حساس نبضات القلب والأكسجين', specs:['نوع: Pulse Oximeter','قياس: SpO2 + نبض','واجهة: I2C','جهد: 1.8V - 3.3V','LED: Red + IR','مثالي للمشاريع الطبية'] },
-  { id:8, name:'HC-SR04 ULTRASONIC', price:18, oldPrice:28, category:'sensors', image:'images/hc-sr04-ultrasonic.png', description:'حساس الموجات فوق الصوتية لقياس المسافة', specs:['نطاق: 2cm - 400cm','دقة: 3mm','جهد: 5V DC','زمن الاستجابة: سريع','واجهة: Digital','مثالي للروبوتات'] },
-  { id:9, name:'DHT11 SENSOR', price:16, oldPrice:25, category:'sensors', image:'images/dht11-sensor.png', description:'حساس الحرارة والرطوبة', specs:['حرارة: 0°C - 50°C','رطوبة: 20% - 90%','دقة: ±2°C','جهد: 3.3V - 5V','واجهة: Digital','استخدام سهل'] },
-  { id:10, name:'CAPACITIVE MOISTURE SENSOR V2.0', price:20, oldPrice:32, category:'sensors', image:'images/capacitive-moisture-sensor-v2.png', description:'حساس رطوبة التربة السعوي', specs:['نوع: Capacitive','جهد: 3.3V - 5.5V','خرج: Analog','مقاوم للتآكل','عمر أطول','مثالي للزراعة الذكية'] },
-  { id:11, name:'MPU6050 SENSOR', price:23, oldPrice:35, category:'sensors', image:'images/mpu6050-sensor.png', description:'حساس التسارع والجيروسكوب', specs:['مقياس تسارع: 3-axis','جيروسكوب: 3-axis','واجهة: I2C','جهد: 3.3V - 5V','دقة عالية','مثالي للطائرات والروبوتات'] },
-  { id:12, name:'MATRIX KEYBOARD 3x4', price:14, oldPrice:22, category:'sensors', image:'images/matrix-keypad-3x4.png', description:'لوحة مفاتيح مصفوفية 3x4', specs:['نوع: 3x4 Matrix','عدد الأزرار: 12','واجهة: 7 pin','أزرار: 0-9 + * + #','سهل البرمجة','مناسب للمشاريع البسيطة'] },
-  { id:13, name:'V2.0 CAPACITIVE SOIL MOISTURE', price:19, oldPrice:30, category:'sensors', image:'images/capacitive-soil-moisture-v2.png', description:'حساس رطوبة التربة السعوي V2.0', specs:['إصدار: V2.0 محسّن','نوع: Capacitive','جهد: 3.3V - 5.5V','خرج: Analog','مقاوم للتآكل','دقة أعلى'] },
-  { id:14, name:'WATER PUMP', price:21, oldPrice:33, category:'sensors', image:'images/water-pump.png', description:'مضخة مياه صغيرة للمشاريع', specs:['جهد: 3V - 6V','تدفق: 80-120 L/H','ارتفاع: 40-110cm','حجم صغير','استهلاك طاقة منخفض','مثالي للزراعة الذكية'] },
-  { id:15, name:'SERVO MOTOR', price:16, oldPrice:25, category:'sensors', image:'images/servo-motor.png', description:'محرك سيرفو للتحكم بالزاوية', specs:['زاوية: 0° - 180°','عزم: 1.8 kg/cm','جهد: 4.8V - 6V','سرعة: 0.1s/60°','وزن: 9g','مثالي للروبوتات'] },
-  { id:16, name:'MATRIX KEYBOARD 4x4', price:19, oldPrice:30, category:'sensors', image:'images/matrix-keypad-4x4.png', description:'لوحة مفاتيح مصفوفية 4x4', specs:['نوع: 4x4 Matrix','عدد الأزرار: 16','واجهة: 8 pin','أزرار: 0-9 + A-D + * + #','مناسب للمشاريع المعقدة','جودة عالية'] },
-  { id:17, name:'TDS METER V1.0', price:39, oldPrice:58, category:'sensors', image:'images/tds-meter-v1.png', description:'حساس قياس نقاء الماء', specs:['قياس: TDS','نطاق: 0 - 1000 ppm','جهد: 3.3V - 5V','خرج: Analog','مثالي لمشاريع الماء','دقة عالية'] },
-  { id:18, name:'AHT20 + BMP280', price:22, oldPrice:35, category:'sensors', image:'images/aht20-bmp280.png', description:'حساس حرارة ورطوبة وضغط جوي مدمج', specs:['AHT20: حرارة + رطوبة','BMP280: ضغط جوي','واجهة: I2C','جهد: 3.3V - 5V','دقة عالية جداً','مثالي لمحطات الطقس'] },
-  { id:19, name:'L298N MOTOR DRIVER', price:19, oldPrice:30, category:'sensors', image:'images/l298n-motor-driver.png', description:'دريف محرك ثنائي لتحريك محركات DC', specs:['عدد المحركات: 2','جهد: 5V - 35V','تيار: 2A لكل محرك','تحكم باتجاه وسرعة','حماية من الحرارة','مثالي للسيارات والروبوتات'] },
-  { id:20, name:'MICRO SD CARD READER', price:16, oldPrice:25, category:'sensors', image:'images/micro-sd-card-reader.png', description:'وحدة قراءة بطاقات SD', specs:['دعم: Micro SD','واجهة: SPI','جهد: 3.3V - 5V','سرعة قراءة عالية','حجم صغير','مثالي لتخزين البيانات'] },
-  { id:21, name:'DS18B20 SENSOR', price:18, oldPrice:28, category:'sensors', image:'images/ds18b20-sensor.png', description:'حساس حرارة رقمي عالي الدقة', specs:['نطاق: -55°C to +125°C','دقة: ±0.5°C','واجهة: 1-Wire','جهد: 3.0V - 5.5V','مقاوم للماء','مثالي للمشاريع الخارجية'] },
-  { id:22, name:'JUMPER WIRE', price:11, oldPrice:18, category:'sensors', image:'images/jumper-wire.png', description:'أسلاك توصيل متنوعة', specs:['نوع: Male-Male + Male-Female','عدد: 40 سلك','أطوال متنوعة','جودة عالية','ألوان متعددة للتمييز','أساسية لأي مشروع'] },
-  { id:23, name:'ACS712 30A RANGE', price:30, oldPrice:48, category:'sensors', image:'images/acs712-30a.png', description:'حساس تيار كهربائي حتى 30 أمبير', specs:['نطاق: ±30A','حساسية: 66mV/A','جهد: 5V','خرج: Analog','عزل كهربائي كامل','مثالي لمشاريع الطاقة'] },
-  { id:24, name:'JOYSTICK', price:10, oldPrice:16, category:'sensors', image:'images/joystick.png', description:'جويستيك للتحكم باتجاهين', specs:['محاور: X + Y','زر: مضمن','خرج: Analog','جهد: 3.3V - 5V','سهل الاستخدام','مثالي للألعاب والتحكم'] },
-  { id:25, name:'RELAY MODULE HIGH 5V', price:13, oldPrice:20, category:'sensors', image:'images/relay-module-5v.png', description:'موديول ريلي 5V للتحكم بالأحمال', specs:['جهد: 5V','تيار: 10A','قنوات: 1','تحكم: Digital','عزل كهربائي','مثالي للتحكم بالأجهزة'] },
-  // الشاشات
-  { id:26, name:'SH1107 OLED DISPLAY', price:109, oldPrice:160, category:'displays', image:'images/sh1107-oled-display.png', description:'شاشة OLED عالية الدقة', specs:['دقة: 128x64','واجهة: I2C','لون: أبيض وأزرق','جهد: 3.3V - 5V','تباين عالي','مثالية لعرض البيانات'] },
-  { id:27, name:'LCD 1602 WITH I2C', price:27, oldPrice:42, category:'displays', image:'images/lcd-1602-i2c.png', description:'شاشة LCD 1602 مع واجهة I2C', specs:['دقة: 16x2 حرف','واجهة: I2C','إضاءة: خلفية زرقاء','جهد: 5V','سهلة البرمجة','الأكثر استخداماً'] },
-  { id:28, name:'SH1107 OLED SCREEN', price:109, oldPrice:160, category:'displays', image:'images/sh1107-oled-screen.png', description:'شاشة SH1107 OLED احترافية', specs:['دقة: 128x64','واجهة: I2C','مقاس: 1.3 بوصة','جهد: 3.3V - 5V','جودة عرض ممتازة','مناسبة للمشاريع المتقدمة'] },
+// ===== DATA =====
+const products = [
+  // MICROCONTROLLERS
+  { id:1, name:'ESP32', price:41, originalPrice:65, category:'microcontrollers', image:'esp32.png', specs:['واي فاي مدمج','بلوتوث مدمج','240MHz dual-core','520KB SRAM','34 GPIO pin'], description:'متحكم دقيق قوي مع واي فاي وبلوتوث مدمجين', popular:true, badge:'الأكثر طلباً' },
+  { id:2, name:'ESP32 DEV MODEL', price:39, originalPrice:60, category:'microcontrollers', image:'esp32-dev-model.png', specs:['واي فاي + بلوتوث','USB Type-C','340KB SRAM','48MHz processor','18 GPIO pin'], description:'نسخة مطورة من ESP32 مع منفذ USB-C', popular:true, badge:'مميز' },
+  { id:3, name:'ARDUINO UNO R3', price:32, originalPrice:50, category:'microcontrollers', image:'arduino-uno-r3.png', specs:['ATmega328P','16MHz clock','32KB Flash','14 Digital I/O','6 Analog Inputs'], description:'المتحكم الأشهر في العالم، مثالي للمبتدئين', popular:true, badge:'الأكثر مبيعاً' },
+  { id:4, name:'ESP32 C3 MINI', price:29, originalPrice:45, category:'microcontrollers', image:'esp32-c3-mini.png', specs:['RISC-V 160MHz','400KB SRAM','WiFi 4 + BT5','22 GPIO pin','حجم صغير جداً'], description:'متحكم صغير الحجم بكفاءة عالية' },
+  { id:5, name:'ESP8266 D1 BOARD', price:29, originalPrice:42, category:'microcontrollers', image:'esp8266-d1-board.png', specs:['ESP8266 WiFi','80MHz clock','11 GPIO pin','ADC مدمج','USB Micro'], description:'لوحة تطوير اقتصادية مع واي فاي' },
+  { id:6, name:'ESP32 D1 BOARD', price:39, originalPrice:58, category:'microcontrollers', image:'esp32-d1-board.png', specs:['ESP32 Dual Core','WiFi + BLE','30 GPIO pin','520KB SRAM','USB Type-C'], description:'لوحة D1 المطورة مع ESP32', popular:true, badge:'مميز' },
+
+  // SENSORS
+  { id:7, name:'MAX 30102', price:25, originalPrice:40, category:'sensors', image:'max-30102.png', specs:['مستشعر نبضات','IR + Red LED','I2C Interface','18-bit ADC','استهلاك منخفض'], description:'مستشعر نبضات القلب والأكسجين في الدم' },
+  { id:8, name:'HC-SR04 ULTRASONIC', price:18, originalPrice:28, category:'sensors', image:'hc-sr04-ultrasonic.png', specs:['قياس مسافة 2-400cm','دقة 3mm','Trigger + Echo','جهد عمل 5V','زاوية 15°'], description:'مستشعر الموجات فوق الصوتية لقياس المسافة', popular:true, badge:'الأكثر طلباً' },
+  { id:9, name:'DHT11 SENSOR', price:16, originalPrice:25, category:'sensors', image:'dht11-sensor.png', specs:['حرارة 0-50°C','رطوبة 20-90%','دقة ±2°C','Digital Output','جهد 3.3-5V'], description:'مستشعر الحرارة والرطوبة', popular:true, badge:'الأكثر مبيعاً' },
+  { id:10, name:'Capacitive Moisture Sensor V2.0', price:20, originalPrice:32, category:'sensors', image:'capacitive-moisture-sensor-v2.png', specs:['قياس رطوبة التربة','Analog Output','مقاوم للتآكل','جهد 3.3-5V','طراز V2.0'], description:'مستشعر رطوبة التربة السعوي' },
+  { id:11, name:'MPU6050 SENSOR', price:23, originalPrice:36, category:'sensors', image:'mpu6050-sensor.png', specs:['جيروسكوب 3 محاور','مقياس تسارع 3 محاور','I2C Interface','16-bit ADC','استهلاك منخفض'], description:'مستشعر الحركة والتسارع' },
+  { id:12, name:'MATRIX KEYBOARD 3x4', price:14, originalPrice:22, category:'sensors', image:'matrix-keypad-3x4.png', specs:['12 مفتاح','3 صفوف × 4 أعمدة','Flexible Film','سهل التوصيل','استهلاك منخفض'], description:'لوحة مفاتيح مرنة 3×4' },
+  { id:13, name:'V2.0 CAPACITIVE SOIL MOISTURE', price:19, originalPrice:30, category:'sensors', image:'capacitive-soil-moisture-v2.png', specs:['قياس رطوبة التربة','Analog Output','طراز V2.0','مقاوم للتآكل','جهد 3.3-5V'], description:'مستشعر رطوبة التربة السعوي V2.0' },
+  { id:14, name:'WATER PUMP', price:21, originalPrice:35, category:'sensors', image:'water-pump.png', specs:['جهد 3-6V','تدفق 80-120 L/H','مقاوم للتآكل','صغير الحجم','DC Motor'], description:'مضخة مياه صغيرة للمشاريع' },
+  { id:15, name:'SERVO MOTOR', price:16, originalPrice:25, category:'sensors', image:'servo-motor.png', specs:['زاوية 0-180°','عزم 1.8kg/cm','جهد 4.8-6V','PWM Control','SG90 Micro'], description:'محرك سيرفو صغير للتحكم بالزاوية', popular:true, badge:'الأكثر مبيعاً' },
+  { id:16, name:'MATRIX KEYBOARD 4x4', price:19, originalPrice:30, category:'sensors', image:'matrix-keypad-4x4.png', specs:['16 مفتاح','4 صفوف × 4 أعمدة','Flexible Film','سهل التوصيل','استهلاك منخفض'], description:'لوحة مفاتيح مرنة 4×4' },
+  { id:17, name:'TDS METER V1.0', price:39, originalPrice:55, category:'sensors', image:'tds-meter-v1.png', specs:['قياس TDS','Analog Output','جهد 3.3-5V','دقة ±10%','مقاوم للماء'], description:'مستشعر قياس جودة الماء' },
+  { id:18, name:'AHT20+BMP280', price:22, originalPrice:35, category:'sensors', image:'aht20-bmp280.png', specs:['حرارة + رطوبة + ضغط','I2C Interface','دقة عالية','استهلاك منخفض','حجم صغير'], description:'مستشعر حرارة ورطوبة وضغط جوي مدمج' },
+  { id:19, name:'L298N MOTOR DRIVER', price:19, originalPrice:30, category:'sensors', image:'l298n-motor-driver.png', specs:['يتحكم بمحركين DC','جهد 5-35V','تيار 2A لكل محرك','PWM Control','حماية من الحرارة'], description:'متحكم محركات DC و Stepper' },
+  { id:20, name:'MICRO SD CARD READER', price:16, originalPrice:25, category:'sensors', image:'micro-sd-card-reader.png', specs:['SPI Interface','يدعم SD/SDHC','جهد 3.3-5V','سرعة عالية','حجم صغير'], description:'قارئ بطاقات Micro SD للمشاريع' },
+  { id:21, name:'DS18B20 SENSOR', price:18, originalPrice:28, category:'sensors', image:'ds18b20-sensor.png', specs:['حرارة -55°C إلى 125°C','1-Wire Interface','دقة ±0.5°C','مقاوم للماء','جهد 3-5.5V'], description:'مستشعر حرارة رقمي مقاوم للماء' },
+  { id:22, name:'JUMPER WIRE', price:11, originalPrice:18, category:'sensors', image:'jumper-wire.png', specs:['40 سلك','Male to Male','Male to Female','Female to Female','طول 20cm'], description:'أسلاك توصيل متنوعة للمشاريع' },
+  { id:23, name:'ACS712 30A RANGE', price:30, originalPrice:45, category:'sensors', image:'acs712-30a.png', specs:['قياس تيار ±30A','Analog Output','دقة 66mV/A','جهد 5V','عزل كهربائي'], description:'مستشعر التيار الكهربائي حتى 30 أمبير' },
+  { id:24, name:'JOYSTICK', price:10, originalPrice:16, category:'sensors', image:'joystick.png', specs:['محورين X/Y','زر ضغط','Analog Output','جهد 3.3-5V','سهل الاستخدام'], description:'يد تحكم تناظرية للمشاريع' },
+  { id:25, name:'RELAY MODULE HIGH 5V', price:13, originalPrice:20, category:'sensors', image:'relay-module-5v.png', specs:['4 قنوات','جهد 5V','حمولة 10A/250VAC','عزل ضوئي','LED مؤشر'], description:'موديول ريليه 4 قنوات للتحكم بالأحمال' },
+
+  // DISPLAYS
+  { id:26, name:'SH1107 OLED DISPLAY', price:109, originalPrice:160, category:'displays', image:'sh1107-oled-display.png', specs:['شاشة OLED 1.3"','دقة 128×64','I2C Interface','تباين عالي جداً','استهلاك منخفض'], description:'شاشة OLED 1.3 بوصة عالية الجودة', popular:true, badge:'مميز' },
+  { id:27, name:'LCD 1602 WITH I2C', price:27, originalPrice:40, category:'displays', image:'lcd-1602-i2c.png', specs:['16 حرف × 2 سطر','I2C Interface','إضاءة خلفية زرقاء','جهد 5V','تباين قابل للتعديل'], description:'شاشة LCD مع واجهة I2C سهلة التوصيل' },
+  { id:28, name:'SSD1306 OLED 0.96"', price:35, originalPrice:52, category:'displays', image:'ssd1306-oled-096.png', specs:['شاشة OLED 0.96"','دقة 128×64','I2C Interface','أبيض وأزرق','استهلاك منخفض جداً'], description:'شاشة OLED صغيرة ومثالية للمشاريع' },
 ];
 
-const CATEGORIES = [
+const categories = [
   { key:'all', label:'الكل' },
   { key:'microcontrollers', label:'المتحكمات الدقيقة' },
   { key:'sensors', label:'الحساسات' },
   { key:'displays', label:'الشاشات' },
 ];
 
-const POPULAR_IDS = [3,1,9,8,2,15,26,25];
-
-const REVIEWS = [
-  { name:'mr.stornyt', stars:5, text:'جاني المستشعرات وكل الجهاز مع بعض مغلف كويس وشرح لي كل التفاصيل، أنصحكم تتعاملون معه.' },
-  { name:'mr.stornyt', stars:5, text:'تعاملت معه لأنه كان عندي هاكاثون ومشروع يبيله برمجة ومستشعرات طبية وشغلات كثيرة، ما قصّر أبداً اشتغل من ذمّته وهو وفّر كل القطع وبرمجها لي، وبرضو كان يجاوب على أسئلتي وكل ما أعطيه يضيف شيء إضافي للمشروع وشرح لي بذمّة وضمير، الله يجزاه خير أنصحكم فيه.' },
-  { name:'عميل', stars:5, text:'شغله ما شاء الله رهيب.' },
-  { name:'m.ddddi', stars:5, text:'صراحة الرجال متعاون جداً وشغله مضمون، سويت عنده مشروع تخرج أردوينو وما قصّر معي في شيء، أنصح بالتعامل معه.' },
-  { name:'عضو #15049', stars:5, text:'بصراحة أنصح بالتعامل معه، الرجال خدوم في أيام قليلة وخلص المشروع.' },
-  { name:'أحمد هاني آل عمير', stars:5, text:'الرجال واجد طيب وتعامله راقي، يستاهل 10/10 وفنّان في المشاريع.' },
-  { name:'store_nawaf', stars:5, text:'الرجال ما قصّر، كان عندي مشروع حاولت تشغيله أكثر من مرّة وجا الرجال وعطاني الكود البرمجي واشتغل معي الحمد لله.' },
+const reviews = [
+  { name:'mr.stornyt', text:'جاني المستشعرات وكل الجهاز مع بعض مغلف كويس وشرح لي كل التفاصيل، أنصحكم تتعاملون معه.' },
+  { name:'mr.stornyt', text:'تعاملت معه لأنه كان عندي هاكاثون ومشروع يبيله برمجة ومستشعرات طبية وشغلات كثيرة، ما قصّر أبداً اشتغل من ذمّته وهو وفّر كل القطع وبرمجها لي، وكان يجاوب على أسئلتي وكل ما أعطيه يضيف شيء إضافي للمشروع وشرح لي بذمّة وضمير، الله يجزاه خير أنصحكم فيه.' },
+  { name:'عميل', text:'شغله ما شاء الله رهيب.' },
+  { name:'m.ddddi', text:'صراحة الرجال متعاون جداً وشغله مضمون، سويت عنده مشروع تخرج أردوينو وما قصّر معي في شيء، أنصح بالتعامل معه.' },
+  { name:'عضو #15049', text:'بصراحة أنصح بالتعامل معه، الرجال خدوم في أيام قليلة وخلص المشروع.' },
+  { name:'أحمد هاني آل عمير', text:'الرجال واجد طيب وتعامله راقي، يستاهل 10/10 وفنّان في المشاريع.' },
+  { name:'store_nawaf', text:'الرجال ما قصّر، كان عندي مشروع حاولت تشغيله أكثر من مرّة وجا الرجال وعطاني الكود البرمجي واشتغل معي الحمد لله.' },
 ];
 
-const FEATURES = [
-  { icon:'trophy', title:'جودة عالية', desc:'جميع منتجاتنا أصلية ومعتمدة', color:'#eab308' },
-  { icon:'wallet', title:'أسعار تنافسية', desc:'أفضل الأسعار في السوق مع خصومات مستمرة', color:'#22c55e' },
-  { icon:'truck', title:'شحن سريع', desc:'توصيل سريع لجميع مناطق المملكة', color:'#3b82f6' },
-  { icon:'headphones', title:'دعم فني متواصل', desc:'فريق دعم متخصص متاح على مدار الساعة', color:'#a855f7' },
-  { icon:'shield', title:'ضمان كامل', desc:'ضمان على جميع المنتجات', color:'#14b8a6' },
-  { icon:'book', title:'موارد تعليمية', desc:'شروحات وأكواد جاهزة لكل منتج', color:'#ef4444' },
+const featuresData = [
+  { title:'جودة عالية', desc:'جميع منتجاتنا أصلية ومضمونة' },
+  { title:'أسعار تنافسية', desc:'أفضل الأسعار في السوق السعودي' },
+  { title:'شحن سريع', desc:'توصيل سريع لجميع مناطق المملكة' },
+  { title:'دعم فني 24/7', desc:'فريق دعم متخصص على مدار الساعة' },
+  { title:'ضمان كامل', desc:'ضمان على جميع المنتجات' },
+  { title:'موارد تعليمية', desc:'شروحات وأكواد جاهزة لكل منتج' },
 ];
 
-const GRADIENTS = {
-  microcontrollers: ['grad-mc1','grad-mc2','grad-mc3'],
-  sensors: ['grad-sn1','grad-sn2','grad-sn3'],
-  displays: ['grad-dp1','grad-dp2','grad-dp3'],
-};
-
-// ==================== STATE ====================
+// ===== STATE =====
 let currentPage = 'home';
+let menuOpen = false;
+let cartOpen = false;
+let cart = [];
 let currentFilter = 'all';
 let carouselIdx = 0;
-let cart = [];
-let menuOpen = false;
-let toastTimeout = null;
+const carouselImgs = ['add.png', 'add1.png'];
+let carouselTimer = null;
 
-// Load cart from localStorage
-try {
-  const saved = localStorage.getItem('iboardz_cart');
-  if (saved) cart = JSON.parse(saved);
-} catch(e) {}
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded', () => {
+  loadCart();
+  renderPage();
+  startCarousel();
+  document.addEventListener('click', handleOutsideClick);
+});
 
-// ==================== NAVIGATION ====================
-function navigate(page) {
-  currentPage = page;
-  // Hide all pages
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  // Show target page
-  const target = document.getElementById('page-' + page);
-  if (target) target.classList.add('active');
-  // Update nav buttons
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.page === page);
-  });
-  // Close mobile menu
-  closeMenu();
-  // Scroll to top
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  // Render products if on products page
-  if (page === 'products') renderProducts();
-  if (page === 'features') renderFeatures();
+// ===== CART PERSISTENCE =====
+function loadCart() {
+  try {
+    const saved = localStorage.getItem('iboardz-cart');
+    if (saved) cart = JSON.parse(saved);
+  } catch(e) {}
+  updateCartCount();
 }
 
+function saveCart() {
+  localStorage.setItem('iboardz-cart', JSON.stringify(cart));
+  updateCartCount();
+}
+
+function updateCartCount() {
+  const count = cart.reduce((s, i) => s + i.qty, 0);
+  const el = document.getElementById('cart-count');
+  if (el) {
+    el.textContent = count;
+    el.style.display = count > 0 ? 'flex' : 'none';
+  }
+}
+
+// ===== CART OPERATIONS =====
+function addToCart(productId) {
+  const product = products.find(p => p.id === productId);
+  if (!product) return;
+  const existing = cart.find(i => i.id === productId);
+  if (existing) {
+    existing.qty++;
+  } else {
+    cart.push({ id: product.id, name: product.name, price: product.price, originalPrice: product.originalPrice, image: product.image, qty: 1 });
+  }
+  saveCart();
+  renderCartItems();
+  openCart();
+}
+
+function removeFromCart(productId) {
+  cart = cart.filter(i => i.id !== productId);
+  saveCart();
+  renderCartItems();
+}
+
+function updateQty(productId, delta) {
+  const item = cart.find(i => i.id === productId);
+  if (!item) return;
+  item.qty = Math.max(1, item.qty + delta);
+  saveCart();
+  renderCartItems();
+}
+
+function getTotalItems() { return cart.reduce((s, i) => s + i.qty, 0); }
+function getTotalPrice() { return cart.reduce((s, i) => s + i.price * i.qty, 0); }
+function getTotalSaved() { return cart.reduce((s, i) => s + (i.originalPrice - i.price) * i.qty, 0); }
+
+// ===== CART UI =====
+function toggleCart() {
+  cartOpen = !cartOpen;
+  const overlay = document.getElementById('cart-overlay');
+  const sidebar = document.getElementById('cart-sidebar');
+  if (cartOpen) {
+    overlay.classList.add('open');
+    sidebar.classList.add('open');
+    renderCartItems();
+  } else {
+    overlay.classList.remove('open');
+    sidebar.classList.remove('open');
+  }
+}
+
+function openCart() {
+  if (!cartOpen) {
+    cartOpen = true;
+    document.getElementById('cart-overlay').classList.add('open');
+    document.getElementById('cart-sidebar').classList.add('open');
+    renderCartItems();
+  }
+}
+
+function renderCartItems() {
+  const container = document.getElementById('cart-items');
+  const footer = document.getElementById('cart-footer');
+  
+  if (cart.length === 0) {
+    container.innerHTML = '<div class="cart-empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#ccc" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg><p>السلة فارغة</p><small>أضف منتجات للبدء</small></div>';
+    footer.style.display = 'none';
+    return;
+  }
+
+  container.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <div class="cart-item-img">
+        <img src="images/${item.image}" alt="${item.name}" onerror="this.style.display='none'">
+      </div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.name}</div>
+        <div class="cart-item-prices">
+          <span class="price-new" style="font-size:14px">${item.price} ر.س</span>
+          <span class="price-old" style="font-size:11px">${item.originalPrice} ر.س</span>
+        </div>
+      </div>
+      <div class="cart-item-qty">
+        <button class="qty-btn" onclick="updateQty(${item.id}, -1)">−</button>
+        <span class="qty-num">${item.qty}</span>
+        <button class="qty-btn" onclick="updateQty(${item.id}, 1)">+</button>
+        <button class="remove-btn" onclick="removeFromCart(${item.id})">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+  const saved = getTotalSaved();
+  const savedEl = document.getElementById('cart-saved');
+  if (saved > 0) {
+    savedEl.innerHTML = `<span>🎉 وفّرت ${saved} ر.س بفضل الخصومات!</span>`;
+    savedEl.style.display = 'flex';
+  } else {
+    savedEl.style.display = 'none';
+  }
+
+  document.getElementById('cart-total-items').textContent = getTotalItems();
+  document.getElementById('cart-total-price').textContent = getTotalPrice() + ' ر.س';
+
+  const msg = 'مرحباً، أريد طلب:\n' + cart.map(i => `${i.name} × ${i.qty} = ${i.price * i.qty} ر.س`).join('\n') + '\nالمجموع: ' + getTotalPrice() + ' ر.س';
+  document.getElementById('whatsapp-link').href = `https://wa.me/966552645082?text=${encodeURIComponent(msg)}`;
+
+  footer.style.display = 'block';
+}
+
+// ===== MENU =====
 function toggleMenu() {
   menuOpen = !menuOpen;
-  document.getElementById('mobile-menu').classList.toggle('hidden', !menuOpen);
-}
-function closeMenu() {
-  menuOpen = false;
-  document.getElementById('mobile-menu').classList.add('hidden');
+  const menu = document.getElementById('dropdown-menu');
+  if (menuOpen) {
+    menu.classList.add('open');
+    updateMenuActive();
+  } else {
+    menu.classList.remove('open');
+  }
 }
 
-// ==================== CAROUSEL ====================
-function updateCarousel() {
-  const img = document.getElementById('carousel-img');
-  const placeholder = document.querySelector('.carousel-placeholder');
-  const src = carouselIdx === 0 ? 'images/add.png' : 'images/add1.png';
-  
-  const testImg = new Image();
-  testImg.onload = function() {
-    img.src = src;
-    img.classList.remove('hidden');
-    placeholder.style.opacity = '0';
-  };
-  testImg.onerror = function() {
-    img.classList.add('hidden');
-    placeholder.style.opacity = '1';
-  };
-  testImg.src = src;
-  
-  document.querySelectorAll('.dot').forEach((dot, i) => {
-    dot.classList.toggle('active', i === carouselIdx);
+function updateMenuActive() {
+  document.querySelectorAll('.dropdown-menu button').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.page === currentPage);
   });
 }
 
-function nextSlide() { carouselIdx = (carouselIdx + 1) % 2; updateCarousel(); }
-function prevSlide() { carouselIdx = (carouselIdx - 1 + 2) % 2; updateCarousel(); }
-
-// Auto-advance carousel
-setInterval(nextSlide, 4000);
-
-// ==================== PRODUCT RENDERING ====================
-function getDiscount(old, cur) {
-  return Math.round((1 - cur / old) * 100);
+function handleOutsideClick(e) {
+  const menu = document.getElementById('dropdown-menu');
+  const menuBtn = document.querySelector('.menu-btn');
+  if (menuOpen && !menu.contains(e.target) && !menuBtn.contains(e.target)) {
+    menuOpen = false;
+    menu.classList.remove('open');
+  }
 }
 
-function getGradient(category, idx) {
-  const grads = GRADIENTS[category] || GRADIENTS.sensors;
-  return grads[idx % grads.length];
+// ===== NAVIGATION =====
+function navigate(page) {
+  currentPage = page;
+  menuOpen = false;
+  document.getElementById('dropdown-menu').classList.remove('open');
+  updateMenuActive();
+  renderPage();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-function renderProductCard(product, idx) {
-  const disc = getDiscount(product.oldPrice, product.price);
-  const grad = getGradient(product.category, idx);
-  const catLabel = CATEGORIES.find(c => c.key === product.category)?.label || '';
+// ===== PRODUCT MODAL =====
+function openProductModal(productId) {
+  const p = products.find(pr => pr.id === productId);
+  if (!p) return;
   
+  const catLabel = categories.find(c => c.key === p.category)?.label || '';
+  const discount = Math.round((1 - p.price / p.originalPrice) * 100);
+
+  const modal = document.getElementById('product-modal');
+  const body = document.getElementById('modal-body');
+
+  body.innerHTML = `
+    <div class="modal-img-area">
+      <img src="images/${p.image}" alt="${p.name}" onerror="this.style.display='none'">
+    </div>
+    <div class="modal-body-inner">
+      <div class="modal-badges">
+        <span class="modal-cat-badge">${catLabel}</span>
+        ${p.badge ? `<span class="modal-badge-tag">${p.badge}</span>` : ''}
+        <span class="modal-disc-badge">-${discount}%</span>
+      </div>
+      <h2 class="modal-title">${p.name}</h2>
+      <p class="modal-desc">${p.description}</p>
+      <div class="modal-prices">
+        <span class="modal-new-price">${p.price} ر.س</span>
+        <span class="modal-old-price">${p.originalPrice} ر.س</span>
+      </div>
+      <div class="modal-specs">
+        <h3>المواصفات التقنية:</h3>
+        ${p.specs.map(spec => `<div class="modal-spec-item"><div class="modal-spec-dot"></div><span>${spec}</span></div>`).join('')}
+      </div>
+      <button class="modal-add-btn" onclick="addToCart(${p.id}); closeProductModal();">
+        أضف إلى السلة
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      </button>
+    </div>
+  `;
+
+  modal.classList.add('open');
+}
+
+function closeProductModal() {
+  document.getElementById('product-modal').classList.remove('open');
+}
+
+// ===== CAROUSEL =====
+function startCarousel() {
+  if (carouselTimer) clearInterval(carouselTimer);
+  carouselTimer = setInterval(() => {
+    carouselIdx = (carouselIdx + 1) % carouselImgs.length;
+    updateCarousel();
+  }, 4000);
+}
+
+function updateCarousel() {
+  const imgs = document.querySelectorAll('.carousel img');
+  const dots = document.querySelectorAll('.carousel-dot');
+  imgs.forEach((img, i) => img.classList.toggle('active', i === carouselIdx));
+  dots.forEach((dot, i) => {
+    dot.classList.toggle('active', i === carouselIdx);
+    dot.style.width = i === carouselIdx ? '28px' : '10px';
+  });
+}
+
+function prevSlide() {
+  carouselIdx = (carouselIdx - 1 + carouselImgs.length) % carouselImgs.length;
+  updateCarousel();
+  startCarousel();
+}
+
+function nextSlide() {
+  carouselIdx = (carouselIdx + 1) % carouselImgs.length;
+  updateCarousel();
+  startCarousel();
+}
+
+function goToSlide(i) {
+  carouselIdx = i;
+  updateCarousel();
+  startCarousel();
+}
+
+// ===== RENDER PAGES =====
+function renderPage() {
+  const main = document.getElementById('main-content');
+  switch(currentPage) {
+    case 'home': main.innerHTML = renderHome(); break;
+    case 'products': main.innerHTML = renderProducts(); break;
+    case 'features': main.innerHTML = renderFeatures(); break;
+    case 'contact': main.innerHTML = renderContact(); break;
+    default: main.innerHTML = renderHome();
+  }
+}
+
+function getDiscount(p) { return Math.round((1 - p.price / p.originalPrice) * 100); }
+
+function renderProductCard(p, showBadge) {
   return `
     <div class="product-card">
-      <div class="product-image-wrap no-img ${grad}" onclick="openModal(${product.id})">
-        <img src="${product.image}" alt="${product.name}"
-          onerror="this.style.display='none'; this.parentElement.classList.remove('has-img'); this.parentElement.classList.add('no-img','${grad}');"
-          onload="this.parentElement.classList.remove('no-img'); this.parentElement.classList.add('has-img'); this.parentElement.className='product-image-wrap has-img';"
-          style="width:100%;height:100%;object-fit:contain;padding:16px;">
-        <span class="discount-badge">-${disc}%</span>
+      <div class="product-img-area" onclick="openProductModal(${p.id})">
+        <img src="images/${p.image}" alt="${p.name}" onerror="this.style.display='none'">
+        <span class="product-badge badge-discount">-${getDiscount(p)}%</span>
+        ${showBadge && p.badge ? `<span class="product-badge badge-popular">${p.badge}</span>` : ''}
       </div>
       <div class="product-info">
-        <div class="product-name" onclick="openModal(${product.id})">${product.name}</div>
-        <div class="product-price-row">
-          <span class="product-price">${product.price}</span>
-          <span class="product-currency">ر.س</span>
-          <span class="product-old-price">${product.oldPrice}</span>
+        <h3 class="product-name" onclick="openProductModal(${p.id})">${p.name}</h3>
+        <div class="product-bottom">
+          <div class="product-prices">
+            <span class="price-new">${p.price} ر.س</span>
+            <span class="price-old">${p.originalPrice} ر.س</span>
+          </div>
+          <button class="add-btn" onclick="event.stopPropagation(); addToCart(${p.id})">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
         </div>
-        <button class="add-btn" onclick="addToCart(${product.id})">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-          أضف للسلة
-        </button>
       </div>
     </div>
   `;
 }
 
-function renderPopularProducts() {
-  const grid = document.getElementById('popular-grid');
-  const products = PRODUCTS.filter(p => POPULAR_IDS.includes(p.id));
-  grid.innerHTML = products.map((p, i) => renderProductCard(p, i)).join('');
+function renderHome() {
+  const popular = products.filter(p => p.popular);
+  
+  return `
+    <!-- CAROUSEL -->
+    <div class="carousel">
+      ${carouselImgs.map(img => `<img src="images/${img}" alt="" onerror="this.style.display='none'">`).join('')}
+      <div class="carousel-overlay">
+        <h1 class="carousel-title" dir="ltr"><span style="color:#ff9500">i</span><span style="color:#fff">Boardz</span></h1>
+        <p class="carousel-sub" dir="ltr">ARDUINO <span style="color:#ff9500;font-weight:700">FUTURE</span></p>
+      </div>
+      <button class="carousel-arrow prev" onclick="prevSlide()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+      <button class="carousel-arrow next" onclick="nextSlide()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#333" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="carousel-dots">
+        ${carouselImgs.map((_, i) => `<button class="carousel-dot ${i === 0 ? 'active' : ''}" style="width:${i === 0 ? '28px' : '10px'}" onclick="goToSlide(${i})"></button>`).join('')}
+      </div>
+    </div>
+
+    <!-- QUICK FEATURES -->
+    <div class="quick-features">
+      <div class="quick-features-inner">
+        <div class="qf-item">
+          <div class="qf-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff9500" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+          </div>
+          <div>
+            <h3>شحن سريع</h3>
+            <p>توصيل لجميع مناطق المملكة</p>
+          </div>
+        </div>
+        <div class="qf-item">
+          <div class="qf-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff9500" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>
+          </div>
+          <div>
+            <h3>ضمان كامل</h3>
+            <p>ضمان على جميع المنتجات</p>
+          </div>
+        </div>
+        <div class="qf-item">
+          <div class="qf-icon">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff9500" stroke-width="1.5"><path d="M3 18v-6a9 9 0 0118 0v6"/><path d="M21 19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-3a2 2 0 012-2h3zM3 19a2 2 0 002 2h1a2 2 0 002-2v-3a2 2 0 00-2-2H3z"/></svg>
+          </div>
+          <div>
+            <h3>دعم فني</h3>
+            <p>+966 552 645 082</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- POPULAR -->
+    <div class="section">
+      <div class="text-center" style="margin-bottom:36px">
+        <div class="section-label" style="display:inline-block">الأكثر مبيعاً</div>
+        <h2 class="section-title">الأكثر رواجاً</h2>
+        <p class="section-sub">المنتجات الأكثر طلباً من عملائنا</p>
+      </div>
+      <div class="products-grid">
+        ${popular.map(p => renderProductCard(p, true)).join('')}
+      </div>
+      <div class="text-center" style="margin-top:36px">
+        <button class="btn" onclick="navigate('products')">عرض جميع المنتجات</button>
+      </div>
+    </div>
+  `;
 }
 
 function renderProducts() {
-  const grid = document.getElementById('products-grid');
-  const noProducts = document.getElementById('no-products');
-  const filtered = currentFilter === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.category === currentFilter);
+  const filtered = currentFilter === 'all' ? products : products.filter(p => p.category === currentFilter);
   
-  grid.innerHTML = filtered.map((p, i) => renderProductCard(p, i)).join('');
-  noProducts.classList.toggle('hidden', filtered.length > 0);
-}
+  return `
+    <div class="section">
+      <div style="margin-bottom:32px">
+        <h1 style="font-size:34px;font-weight:900;margin:0 0 4px">المنتجات</h1>
+        <p style="color:#999;font-size:15px;margin:0">جميع الأسعار هي أسعار بعد الخصم</p>
+      </div>
 
-function renderFilters() {
-  const container = document.getElementById('filters');
-  container.innerHTML = CATEGORIES.map(c =>
-    `<button class="filter-btn ${c.key === currentFilter ? 'active' : ''}" onclick="setFilter('${c.key}')">${c.label}</button>`
-  ).join('');
+      <!-- FILTER -->
+      <div class="filter-pills">
+        ${categories.map(cat => `
+          <button class="filter-pill ${currentFilter === cat.key ? 'active' : ''}" onclick="setFilter('${cat.key}')">
+            ${cat.label}
+          </button>
+        `).join('')}
+      </div>
+
+      <!-- PRODUCTS -->
+      <div class="products-grid">
+        ${filtered.map(p => renderProductCard(p, true)).join('')}
+      </div>
+    </div>
+  `;
 }
 
 function setFilter(key) {
   currentFilter = key;
-  renderFilters();
-  renderProducts();
+  renderPage();
 }
 
-// ==================== FEATURES & REVIEWS ====================
 function renderFeatures() {
-  const grid = document.getElementById('features-grid');
-  grid.innerHTML = FEATURES.map(f => `
-    <div class="feature-card">
-      <div class="feature-icon" style="color:${f.color}">
-        ${getFeatureIcon(f.icon)}
+  return `
+    <div class="section" style="max-width:1000px">
+      <div class="text-center" style="margin-bottom:40px">
+        <div class="section-label" style="display:inline-block">لماذا نحن؟</div>
+        <h1 class="section-title">لماذا <span dir="ltr" style="display:inline-block">iBoardz</span>؟</h1>
+        <p class="section-sub">مميزات تجعلنا الخيار الأول لعشاق الإلكترونيات</p>
       </div>
-      <div class="feature-title">${f.title}</div>
-      <div class="feature-desc">${f.desc}</div>
+
+      <!-- FEATURES -->
+      <div class="features-grid">
+        ${featuresData.map((f, i) => `
+          <div class="feature-card">
+            <div class="feature-num">${i + 1}</div>
+            <h3>${f.title}</h3>
+            <p>${f.desc}</p>
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- REVIEWS -->
+      <div class="text-center" style="margin-bottom:32px">
+        <h2 style="font-size:28px;font-weight:900;margin:0 0 6px">آراء عملائنا</h2>
+        <p style="color:#999;font-size:15px">ماذا يقول عملاؤنا عن تجربتهم</p>
+      </div>
+      <div class="reviews-grid">
+        ${reviews.map(r => `
+          <div class="review-card">
+            <div class="review-stars">
+              ${[1,2,3,4,5].map(() => '<span>★</span>').join('')}
+            </div>
+            <p class="review-text">"${r.text}"</p>
+            <div class="review-author">
+              <div class="review-avatar">${r.name.charAt(0)}</div>
+              <span class="review-name">${r.name}</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
     </div>
-  `).join('');
-  
-  const reviewsGrid = document.getElementById('reviews-grid');
-  reviewsGrid.innerHTML = REVIEWS.map(r => `
-    <div class="review-card">
-      <div class="review-header">
-        <div class="review-avatar">${r.name.charAt(0)}</div>
-        <div>
-          <div class="review-name">${r.name}</div>
-          <div class="review-stars">
-            ${Array(r.stars).fill('<svg viewBox="0 0 24 24" fill="#ff9500" class="review-star"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>').join('')}
-          </div>
-        </div>
+  `;
+}
+
+function renderContact() {
+  return `
+    <div class="section" style="max-width:800px">
+      <div class="text-center" style="margin-bottom:36px">
+        <div class="section-label" style="display:inline-block">نحن هنا لمساعدتك</div>
+        <h1 class="section-title">تواصل معنا</h1>
+        <p class="section-sub">نرحب بتواصلك في أي وقت</p>
       </div>
-      <p class="review-text">${r.text}</p>
+
+      <!-- CONTACT CARDS -->
+      <div class="contact-cards">
+        <a href="https://wa.me/966552645082" target="_blank" class="contact-card whatsapp">
+          <div class="contact-icon green">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+          </div>
+          <div>
+            <h4>واتساب</h4>
+            <p dir="ltr">+966 552 645 082</p>
+          </div>
+        </a>
+        <a href="mailto:iBoardz@outlook.com" class="contact-card email">
+          <div class="contact-icon blue">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
+          </div>
+          <div>
+            <h4>البريد الإلكتروني</h4>
+            <p dir="ltr">iBoardz@outlook.com</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- FORM -->
+      <div class="contact-form">
+        <h2>أرسل لنا رسالة</h2>
+        <form onsubmit="event.preventDefault(); alert('تم إرسال رسالتك بنجاح!');">
+          <div class="form-group">
+            <label>الاسم</label>
+            <input type="text" class="form-input" placeholder="اسمك الكامل">
+          </div>
+          <div class="form-group">
+            <label>البريد الإلكتروني</label>
+            <input type="email" class="form-input" placeholder="email@example.com" dir="ltr" style="text-align:right">
+          </div>
+          <div class="form-group">
+            <label>الرسالة</label>
+            <textarea rows="5" class="form-input" placeholder="اكتب رسالتك هنا..."></textarea>
+          </div>
+          <button type="submit" class="submit-btn">إرسال الرسالة</button>
+        </form>
+      </div>
+
+      <!-- WORK HOURS -->
+      <div class="work-hours">
+        <h3>ساعات العمل</h3>
+        <p>السبت - الخميس: 9 صباحاً - 11 مساءً</p>
+        <p>الجمعة: 4 مساءً - 11 مساءً</p>
+      </div>
     </div>
-  `).join('');
-}
-
-function getFeatureIcon(name) {
-  const icons = {
-    trophy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>',
-    wallet: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 10h20"/><circle cx="16" cy="14" r="1"/></svg>',
-    truck: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>',
-    headphones: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>',
-    shield: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>',
-    book: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:32px;height:32px;"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>',
-  };
-  return icons[name] || '';
-}
-
-// ==================== MODAL ====================
-function openModal(productId) {
-  const p = PRODUCTS.find(x => x.id === productId);
-  if (!p) return;
-  
-  const disc = getDiscount(p.oldPrice, p.price);
-  const catLabel = CATEGORIES.find(c => c.key === p.category)?.label || '';
-  const grad = getGradient(p.category, 0);
-  
-  document.getElementById('modal-image').innerHTML = `
-    <img src="${p.image}" alt="${p.name}" style="width:128px;height:128px;object-fit:contain;"
-      onerror="this.style.display='none'; this.parentElement.classList.add('${grad}'); this.parentElement.style.width='50%';">
   `;
-  document.getElementById('modal-category').textContent = catLabel;
-  document.getElementById('modal-name').textContent = p.name;
-  document.getElementById('modal-desc').textContent = p.description;
-  document.getElementById('modal-price').textContent = p.price;
-  document.getElementById('modal-old-price').textContent = p.oldPrice + ' ر.س';
-  document.getElementById('modal-discount').textContent = '-' + disc + '%';
-  document.getElementById('modal-saved').innerHTML = `
-    <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><polyline points="20 6 9 17 4 12"/></svg>
-    وفّرت ${p.oldPrice - p.price} ر.س
-  `;
-  document.getElementById('modal-specs').innerHTML = p.specs.map(s => `<li>${s}</li>`).join('');
-  
-  const addBtn = document.getElementById('modal-add-btn');
-  addBtn.onclick = function() { addToCart(p.id); closeModal(); };
-  
-  document.getElementById('product-modal').classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
 }
-
-function closeModal() {
-  document.getElementById('product-modal').classList.add('hidden');
-  document.body.style.overflow = '';
-}
-
-// ==================== CART ====================
-function addToCart(productId) {
-  const p = PRODUCTS.find(x => x.id === productId);
-  if (!p) return;
-  
-  const existing = cart.find(c => c.id === productId);
-  if (existing) {
-    existing.qty++;
-  } else {
-    cart.push({ id: productId, qty: 1 });
-  }
-  
-  saveCart();
-  updateCartCount();
-  showToast(p.name);
-}
-
-function removeFromCart(productId) {
-  cart = cart.filter(c => c.id !== productId);
-  saveCart();
-  updateCartCount();
-  renderCart();
-}
-
-function updateQty(productId, delta) {
-  const item = cart.find(c => c.id === productId);
-  if (!item) return;
-  item.qty += delta;
-  if (item.qty <= 0) {
-    removeFromCart(productId);
-    return;
-  }
-  saveCart();
-  updateCartCount();
-  renderCart();
-}
-
-function saveCart() {
-  try { localStorage.setItem('iboardz_cart', JSON.stringify(cart)); } catch(e) {}
-}
-
-function updateCartCount() {
-  const count = cart.reduce((sum, c) => sum + c.qty, 0);
-  const badge = document.getElementById('cart-count');
-  if (count > 0) {
-    badge.textContent = count;
-    badge.style.display = 'flex';
-  } else {
-    badge.style.display = 'none';
-  }
-}
-
-function getCartTotal() {
-  return cart.reduce((sum, c) => {
-    const p = PRODUCTS.find(x => x.id === c.id);
-    return sum + (p ? p.price * c.qty : 0);
-  }, 0);
-}
-
-function getCartSaved() {
-  return cart.reduce((sum, c) => {
-    const p = PRODUCTS.find(x => x.id === c.id);
-    return sum + (p ? (p.oldPrice - p.price) * c.qty : 0);
-  }, 0);
-}
-
-function renderCart() {
-  const itemsEl = document.getElementById('cart-items');
-  const emptyEl = document.getElementById('cart-empty');
-  const footerEl = document.getElementById('cart-footer');
-  
-  if (cart.length === 0) {
-    itemsEl.classList.add('hidden');
-    emptyEl.classList.remove('hidden');
-    footerEl.classList.add('hidden');
-    return;
-  }
-  
-  itemsEl.classList.remove('hidden');
-  emptyEl.classList.add('hidden');
-  footerEl.classList.remove('hidden');
-  
-  itemsEl.innerHTML = cart.map(c => {
-    const p = PRODUCTS.find(x => x.id === c.id);
-    if (!p) return '';
-    return `
-      <div class="cart-item">
-        <div class="cart-item-img">
-          <img src="${p.image}" alt="${p.name}" onerror="this.style.display='none';">
-        </div>
-        <div class="cart-item-info">
-          <div class="cart-item-name">${p.name}</div>
-          <div class="cart-item-price-row">
-            <span class="cart-item-price">${p.price} ر.س</span>
-            <span class="cart-item-old">${p.oldPrice}</span>
-          </div>
-          <div class="cart-item-actions">
-            <button class="qty-btn" onclick="updateQty(${c.id}, -1)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            </button>
-            <span class="cart-item-qty">${c.qty}</span>
-            <button class="qty-btn" onclick="updateQty(${c.id}, 1)">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            </button>
-            <button class="cart-item-delete" onclick="removeFromCart(${c.id})">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    `;
-  }).join('');
-  
-  const total = getCartTotal();
-  const saved = getCartSaved();
-  
-  document.getElementById('cart-total').textContent = total + ' ر.س';
-  
-  const savedEl = document.getElementById('cart-saved');
-  if (saved > 0) {
-    savedEl.textContent = 'وفّرت ' + saved + ' ر.س بفضل الخصومات!';
-    savedEl.classList.remove('hidden');
-  } else {
-    savedEl.classList.add('hidden');
-  }
-  
-  // WhatsApp link
-  const msg = 'مرحباً، أريد طلب:\n' + cart.map(c => {
-    const p = PRODUCTS.find(x => x.id === c.id);
-    return p ? '- ' + p.name + ' x' + c.qty + ' = ' + (p.price * c.qty) + ' ر.س' : '';
-  }).join('\n') + '\nالمجموع: ' + total + ' ر.س';
-  
-  document.getElementById('whatsapp-link').href = 'https://wa.me/966552645082?text=' + encodeURIComponent(msg);
-}
-
-function openCart() {
-  document.getElementById('cart-sidebar').classList.remove('hidden');
-  document.body.style.overflow = 'hidden';
-  renderCart();
-}
-
-function closeCart() {
-  document.getElementById('cart-sidebar').classList.add('hidden');
-  document.body.style.overflow = '';
-}
-
-// ==================== TOAST ====================
-function showToast(name) {
-  const toast = document.getElementById('toast');
-  document.getElementById('toast-name').textContent = name;
-  toast.classList.remove('hidden');
-  
-  if (toastTimeout) clearTimeout(toastTimeout);
-  toastTimeout = setTimeout(() => {
-    toast.classList.add('hidden');
-  }, 2000);
-}
-
-// ==================== INIT ====================
-function init() {
-  // Nav button listeners
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('click', () => navigate(btn.dataset.page));
-  });
-  document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
-    btn.addEventListener('click', () => navigate(btn.dataset.page));
-  });
-  
-  // Carousel dot listeners
-  document.querySelectorAll('.dot').forEach(dot => {
-    dot.addEventListener('click', () => {
-      carouselIdx = parseInt(dot.dataset.idx);
-      updateCarousel();
-    });
-  });
-  
-  // Initial renders
-  updateCarousel();
-  renderPopularProducts();
-  renderFilters();
-  renderFeatures();
-  updateCartCount();
-  
-  // Check URL hash
-  const hash = window.location.hash.replace('#', '');
-  if (['home','products','features','contact'].includes(hash)) {
-    navigate(hash);
-  }
-}
-
-// Run on DOM ready
-document.addEventListener('DOMContentLoaded', init);
