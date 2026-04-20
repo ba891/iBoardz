@@ -20,6 +20,7 @@ img { max-width: 100%; }
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 20px; z-index: 1000;
   box-shadow: 0 2px 12px rgba(0,0,0,0.05);
+  direction: ltr;
 }
 .logo { display: flex; align-items: center; cursor: pointer; flex-shrink: 0; }
 .logo-text {
@@ -30,7 +31,7 @@ img { max-width: 100%; }
 .logo-i { color: #ff9500; }
 .logo-boardz { color: #1a1a2e; }
 .logo-img { height: 42px; object-fit: contain; margin-right: 8px; display: none; }
-.header-actions { display: flex; align-items: center; gap: 8px; }
+.header-actions { display: flex; align-items: center; gap: 8px; direction: rtl; }
 
 .cart-btn {
   position: relative; background: none; border: none;
@@ -48,7 +49,7 @@ img { max-width: 100%; }
 
 /* ===== DROPDOWN MENU ===== */
 .dropdown-menu {
-  position: fixed; top: 72px; left: 20px; background: #fff;
+  position: fixed; top: 72px; right: 20px; background: #fff;
   border-radius: 14px; box-shadow: 0 12px 40px rgba(0,0,0,0.15);
   z-index: 999; min-width: 220px; overflow: hidden;
   display: none; animation: fadeIn 0.2s ease;
