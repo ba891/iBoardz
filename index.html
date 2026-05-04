@@ -2,6 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+  <meta name="google-site-verification" content="rUh8ykv_vIzU685Or2IQuoZ0yGBAgkvGj_S1K0MEL9k" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>iBoardz - ARDUINO FUTURE</title>
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
@@ -551,6 +552,22 @@ textarea.form-input { resize: vertical; }
 .terms-cta-btn.primary:hover { background: #1fb855; transform: translateY(-2px); }
 .terms-cta-btn.secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
 .terms-cta-btn.secondary:hover { background: rgba(255,255,255,0.2); transform: translateY(-2px); }
+
+/* ===== HOME REVIEWS ===== */
+.reviews-grid-home { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
+.review-card-home { background: #fff; padding: 28px; border-radius: 16px; border: 1px solid #f0f0f0; transition: all 0.3s; box-shadow: 0 4px 16px rgba(0,0,0,0.04); }
+.review-card-home:hover { transform: translateY(-4px); box-shadow: 0 8px 24px rgba(0,0,0,0.08); border-color: transparent; }
+.review-stars-home { display: flex; gap: 2px; margin-bottom: 14px; }
+.review-text-home { color: #555; font-size: 14px; line-height: 1.8; margin-bottom: 18px; min-height: 80px; }
+.review-author-home { display: flex; align-items: center; gap: 12px; padding-top: 16px; border-top: 1px solid #f5f5f5; }
+.review-avatar-home { width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #ff9500, #ffb14d); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px; }
+.review-name-home { font-weight: 700; font-size: 14px; color: #1a1a2e; }
+.review-role-home { color: #999; font-size: 12px; }
+
+@media (max-width: 768px) {
+  .reviews-grid-home { grid-template-columns: 1fr; }
+  .review-text-home { min-height: auto; }
+}
 </style>
 </head>
 <body>
@@ -654,13 +671,13 @@ const cats = [
 ];
 
 const reviews = [
-  { name:'mr.stornyt', text:'جاني المستشعرات وكل الجهاز مع بعض مغلف كويس وشرح لي كل التفاصيل، أنصحكم تتعاملون معه.' },
-  { name:'mr.stornyt', text:'تعاملت معه لأنه كان عندي هاكاثون ومشروع يبيله برمجة ومستشعرات طبية وشغلات كثيرة، ما قصّر أبداً اشتغل من ذمّته وهو وفّر كل القطع وبرمجها لي، وكان يجاوب على أسئلتي وكل ما أعطيه يضيف شيء إضافي للمشروع وشرح لي بذمّة وضمير، الله يجزاه خير أنصحكم فيه.' },
-  { name:'عميل', text:'شغله ما شاء الله رهيب.' },
-  { name:'m.ddddi', text:'صراحة الرجال متعاون جداً وشغله مضمون، سويت عنده مشروع تخرج أردوينو وما قصّر معي في شيء، أنصح بالتعامل معه.' },
-  { name:'عضو #15049', text:'بصراحة أنصح بالتعامل معه، الرجال خدوم في أيام قليلة وخلص المشروع.' },
-  { name:'أحمد هاني آل عمير', text:'الرجال واجد طيب وتعامله راقي، يستاهل 10/10 وفنّان في المشاريع.' },
-  { name:'store_nawaf', text:'الرجال ما قصّر، كان عندي مشروع حاولت تشغيله أكثر من مرّة وجا الرجال وعطاني الكود البرمجي واشتغل معي الحمد لله.' },
+  { name:'mr.stornyt', role:'عميل', text:'جاني المستشعرات وكل الجهاز مع بعض مغلف كويس وشرح لي كل التفاصيل، أنصحكم تتعاملون معه.' },
+  { name:'mr.stornyt', role:'عميل - هاكاثون', text:'تعاملت معه لأنه كان عندي هاكاثون ومشروع يبيله برمجة ومستشعرات طبية وشغلات كثيرة، ما قصّر أبداً اشتغل من ذمّته وهو وفّر كل القطع وبرمجها لي، وكان يجاوب على أسئلتي وكل ما أعطيه يضيف شيء إضافي للمشروع وشرح لي بذمّة وضمير، الله يجزاه خير أنصحكم فيه.' },
+  { name:'عميل', role:'قبل 6 أشهر', text:'شغله ما شاء الله رهيب.' },
+  { name:'m.ddddi', role:'مشروع تخرج', text:'صراحة الرجال متعاون جداً وشغله مضمون، سويت عنده مشروع تخرج أردوينو وما قصّر معي في شيء، أنصح بالتعامل معه.' },
+  { name:'عضو #15049', role:'عميل', text:'بصراحة أنصح بالتعامل معه، الرجال خدوم في أيام قليلة وخلص المشروع.' },
+  { name:'أحمد هاني آل عمير', role:'عميل', text:'الرجال واجد طيب وتعامله راقي، يستاهل 10/10 وفنّان في المشاريع.' },
+  { name:'store_nawaf', role:'عميل', text:'الرجال ما قصّر، كان عندي مشروع حاولت تشغيله أكثر من مرّة وجا الرجال وعطاني الكود البرمجي واشتغل معي الحمد لله.' },
 ];
 
 const features = [
@@ -895,6 +912,33 @@ function renderHome() {
     </div>
     <div class="products-grid">${products.filter(p=>p.pop).map(p=>productCard(p)).join('')}</div>
     <div style="text-align:center;margin-top:40px"><button class="show-all-btn" onclick="nav('products')">عرض جميع المنتجات ${svgIcon('<polyline points="15 18 9 12 15 6"/>',22)}</button></div>
+  </div>
+
+  <!-- Reviews Section -->
+  <div class="section" style="background:#fafafa">
+    <div class="section-header">
+      <div class="section-badge">آراء العملاء</div>
+      <h2 class="section-title">ماذا يقول عملاؤنا</h2>
+      <p class="section-subtitle">تقييمات حقيقية من عملائنا الكرام</p>
+    </div>
+    <div class="reviews-grid-home">
+      ${reviews.slice(0,3).map(r=>`
+        <div class="review-card-home">
+          <div class="review-stars-home">
+            ${'<svg width="18" height="18" viewBox="0 0 24 24" fill="#ff9500" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'.repeat(5)}
+          </div>
+          <p class="review-text-home">"${r.text}"</p>
+          <div class="review-author-home">
+            <div class="review-avatar-home">${r.name.charAt(0)}</div>
+            <div>
+              <div class="review-name-home">${r.name}</div>
+              <div class="review-role-home">${r.role}</div>
+            </div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+    <div style="text-align:center;margin-top:40px"><button class="show-all-btn" onclick="nav('features')">عرض جميع التقييمات ${svgIcon('<polyline points="15 18 9 12 15 6"/>',22)}</button></div>
   </div>`;
 }
 
