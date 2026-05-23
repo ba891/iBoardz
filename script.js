@@ -79,7 +79,7 @@ function svgIcon(d, s=18, stroke='currentColor', fill='none') {
 }
 
 // ===== STATE =====
-let state = { page:'home', menuOpen:false, cartOpen:false, cart:[], filter:'all', ci:0, selProd:null };
+let state = { page:'home', menuOpen:false, cartOpen:false, cart:[], filter:'all', search:'', ci:0, selProd:null };
 let carouselTimer = null;
 
 function loadCart() { try { const s=localStorage.getItem('iboardz-cart'); if(s) state.cart=JSON.parse(s); } catch{} }
@@ -93,7 +93,20 @@ function totalPrice() { return state.cart.reduce((s,i)=>s+i.product.price*i.qty,
 function totalOriginal() { return state.cart.reduce((s,i)=>s+i.product.op*i.qty,0); }
 function totalSaved() { return totalOriginal()-totalPrice(); }
 
-function nav(p) { state.page=p; state.menuOpen=false; render(); window.scrollTo({top:0,behavior:'smooth'}); }
+function nav(p) {
+  state.page=p; state.menuOpen=false; state.filter='all'; state.search='';
+  const main=document.getElementById('mainContent');
+  main.style.opacity='0'; main.style.transform='translateY(12px)';
+  setTimeout(()=>{
+    render();
+    requestAnimationFrame(() => {
+      main.style.transition='opacity 0.35s ease, transform 0.35s ease';
+      main.style.opacity='1'; main.style.transform='translateY(0)';
+      setTimeout(() => { main.style.transition=''; }, 400);
+    });
+    window.scrollTo({top:0,behavior:'smooth'});
+  }, 180);
+}
 function toggleMenu(e) { e.stopPropagation(); state.menuOpen=!state.menuOpen; renderMenu(); }
 function closeMenu() { state.menuOpen=false; renderMenu(); }
 function openCart() { state.cartOpen=true; renderCart(); }
@@ -101,10 +114,9 @@ function closeCart() { state.cartOpen=false; renderCart(); }
 
 function addCart(prod) {
   const ex=state.cart.find(i=>i.product.id===prod.id);
-  if(ex) ex.qty++; else state.cart.push({product:prod,qty:1});
-  saveCart(); updateBadge();
-  state.cartOpen=true; renderCart();
-  setTimeout(()=>{state.cartOpen=false; renderCart();},2000);
+  if(ex) { ex.qty++; showToast(`تم زيادة الكمية: ${prod.name} ×${ex.qty}`); }
+  else { state.cart.push({product:prod,qty:1}); showToast(`تمت الإضافة: ${prod.name}`); }
+  saveCart(); updateBadge(); renderCart();
 }
 function removeCart(id) { state.cart=state.cart.filter(i=>i.product.id!==id); saveCart(); updateBadge(); renderCart(); }
 function updQty(id,d) {
@@ -120,11 +132,72 @@ function updateBadge() {
   else { b.style.display='none'; }
 }
 
+function handleContact(e) {
+  e.preventDefault();
+  const name=document.getElementById('contactName').value.trim();
+  const email=document.getElementById('contactEmail').value.trim();
+  const msg=document.getElementById('contactMsg').value.trim();
+  if(!name||!msg) return;
+  const text=encodeURIComponent(`الاسم: ${name}\nالبريد: ${email||'غير مذكور'}\n\nالرسالة:\n${msg}`);
+  const btn=document.getElementById('contactSubmitBtn');
+  btn.textContent='جاري الإرسال...'; btn.disabled=true;
+  window.open(`https://wa.me/966552645082?text=${text}`, '_blank');
+  setTimeout(()=>{ btn.textContent='إرسال الرسالة'; btn.disabled=false; }, 2000);
+  showToast('تم تحويلك إلى واتساب لإتمام الإرسال', 'info');
+}
+
 function showProduct(id) {
   state.selProd=products.find(p=>p.id===id);
   renderModal();
 }
 function closeModal() { state.selProd=null; renderModal(); }
+
+// ===== TOAST =====
+function showToast(msg, type='success') {
+  const container = document.getElementById('toastContainer');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  const icons = { success:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>', error:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>', info:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' };
+  el.innerHTML = `${icons[type]||icons.success} ${msg}`;
+  container.appendChild(el);
+  setTimeout(() => { el.classList.add('out'); setTimeout(() => el.remove(), 300); }, 3000);
+}
+
+// ===== IMAGE TAG =====
+function imgTag(src, alt, minH=60) {
+  return `<img src="${src}" alt="${alt}" loading="lazy" onerror="this.style.display='none'" style="background:linear-gradient(135deg,#f0f0f0,#e0e0e0);min-height:${minH}px">`;
+}
+
+// ===== BACK TO TOP =====
+let backToTopSetup = false;
+function setupBackToTop() {
+  if (backToTopSetup) return;
+  backToTopSetup = true;
+  const btn = document.getElementById('backToTop');
+  if (!btn) return;
+  window.addEventListener('scroll', () => { btn.classList.toggle('visible', window.scrollY > 400); }, { passive: true });
+  btn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+}
+
+// ===== SCROLL REVEAL =====
+let revealObserver = null;
+function setupScrollReveal() {
+  if (revealObserver) { revealObserver.disconnect(); }
+  revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('visible'); revealObserver.unobserve(entry.target); }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+}
+
+// ===== KEYBOARD HANDLER =====
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    if (state.selProd) closeModal();
+    else if (state.cartOpen) closeCart();
+  }
+});
 
 // ===== RENDER =====
 function render() {
@@ -132,6 +205,7 @@ function render() {
   renderMenu();
   updateBadge();
   startCarousel();
+  setupBackToTop();
 }
 
 function renderMenu() {
@@ -161,7 +235,7 @@ function renderCart() {
     footer.style.display='none';
   } else {
     body.innerHTML=state.cart.map(item=>`<div class="cart-item">
-      <div class="cart-item-img"><img src="images/${item.product.img}" alt="" onerror="this.style.display='none'"></div>
+      <div class="cart-item-img">${imgTag(`images/${item.product.img}`, item.product.name, 40)}</div>
       <div class="cart-item-info">
         <div class="cart-item-name">${item.product.name}</div>
         <div class="cart-item-prices"><span class="price" style="font-size:15px">${item.product.price} ر.س</span><span class="old-price">${item.product.op} ر.س</span></div>
@@ -196,7 +270,7 @@ function renderModal() {
   m.innerHTML=`<div class="modal-backdrop" onclick="closeModal()"></div>
     <div class="modal-content">
       <button class="modal-close" onclick="closeModal()"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      <div class="modal-img"><img src="images/${p.img}" alt="${p.name}" onerror="this.style.display='none'"></div>
+      <div class="modal-img">${imgTag(`images/${p.img}`, p.name, 160)}</div>
       <div class="modal-body">
         <div class="modal-badges">
           <span class="badge badge-orange">${cat?.label||''}</span>
@@ -215,7 +289,7 @@ function renderModal() {
 function productCard(p, large) {
   return `<div class="product-card">
     <div class="product-img${large?' product-img-large':''}" onclick="showProduct(${p.id})">
-      <img src="images/${p.img}" alt="${p.name}" onerror="this.style.display='none'">
+      ${imgTag(`images/${p.img}`, p.name, 100)}
       ${p.badge?`<span class="product-badge badge-primary">${p.badge}</span>`:''}
       <span class="discount-badge">-${disc(p)}%</span>
     </div>
@@ -226,7 +300,7 @@ function productCard(p, large) {
           <span class="price">${p.price} ر.س</span>
           <span class="old-price">${p.op} ر.س</span>
         </div>
-        <button class="add-btn" onclick="event.stopPropagation();addCart(products.find(x=>x.id===${p.id}))"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+        <button class="add-btn" onclick="event.stopPropagation();addCart(products.find(x=>x.id===${p.id}))" aria-label="أضف للسلة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
       </div>
     </div>
   </div>`;
@@ -243,18 +317,20 @@ function renderMain() {
     main.innerHTML=renderProducts();
   } else if(state.page==='features') {
     main.innerHTML=renderFeatures();
-  } else if(state.page==='contact') {
-    main.innerHTML=renderContact();
   } else if(state.page==='terms') {
     main.innerHTML=renderTerms();
+  } else if(state.page==='contact') {
+    main.innerHTML=renderContact();
   }
+
+  setTimeout(setupScrollReveal, 100);
 }
 
 function renderHome() {
   return `
   <div class="carousel">
-    <img src="images/add.png" alt="" style="opacity:${state.ci===0?1:0}" onerror="this.style.display='none'">
-    <img src="images/add1.png" alt="" style="opacity:${state.ci===1?1:0}" onerror="this.style.display='none'">
+    <img src="images/add.png" alt="iBoardz" style="opacity:${state.ci===0?1:0}" loading="lazy">
+    <img src="images/add1.png" alt="iBoardz" style="opacity:${state.ci===1?1:0}" loading="lazy">
     <button class="carousel-arrow prev" onclick="setCi(${(state.ci-1+2)%2})">${svgIcon('<polyline points="9 18 15 12 9 6"/>',22)}</button>
     <button class="carousel-arrow next" onclick="setCi(${(state.ci+1)%2})">${svgIcon('<polyline points="15 18 9 12 15 6"/>',22)}</button>
     <div class="carousel-dots">
@@ -262,14 +338,14 @@ function renderHome() {
       <button class="carousel-dot${state.ci===1?' active':''}" onclick="setCi(1)"></button>
     </div>
   </div>
-  <div class="quick-features">
+  <div class="quick-features reveal">
     <div class="quick-features-inner">
       <div class="quick-feature"><div class="quick-feature-icon">${svgIcon(icons.truck,28,'#ff9500')}</div><div><h3>شحن سريع</h3><p>توصيل لجميع مناطق المملكة</p></div></div>
       <div class="quick-feature"><div class="quick-feature-icon">${svgIcon(icons.shield,28,'#ff9500')}</div><div><h3>ضمان كامل</h3><p>ضمان على جميع المنتجات</p></div></div>
       <div class="quick-feature"><div class="quick-feature-icon">${svgIcon(icons.headset,28,'#ff9500')}</div><div><h3>دعم فني</h3><p>+966 552 645 082</p></div></div>
     </div>
   </div>
-  <div class="section">
+  <div class="section reveal">
     <div class="section-header">
       <div class="section-badge">الأكثر مبيعاً</div>
       <h2 class="section-title">الأكثر رواجاً</h2>
@@ -280,7 +356,7 @@ function renderHome() {
   </div>
 
   <!-- Reviews Section -->
-  <div class="section" style="background:#fafafa">
+  <div class="section reveal" style="background:#fafafa">
     <div class="section-header">
       <div class="section-badge">آراء العملاء</div>
       <h2 class="section-title">ماذا يقول عملاؤنا</h2>
@@ -308,27 +384,35 @@ function renderHome() {
 }
 
 function renderProducts() {
-  const filtered=state.filter==='all'?products:products.filter(p=>p.cat===state.filter);
+  let filtered=state.filter==='all'?products:products.filter(p=>p.cat===state.filter);
+  if(state.search) filtered=filtered.filter(p=>p.name.toLowerCase().includes(state.search)||p.desc.includes(state.search));
   return `<div class="section">
-    <div style="margin-bottom:32px"><h1 style="font-size:34px;font-weight:900;margin:0 0 4px">المنتجات</h1><p style="color:#999;font-size:15px;margin:0">جميع الأسعار هي أسعار بعد الخصم</p></div>
+    <div class="reveal" style="margin-bottom:24px"><h1 style="font-size:34px;font-weight:900;margin:0 0 4px">المنتجات</h1><p style="color:#999;font-size:15px;margin:0">جميع الأسعار هي أسعار بعد الخصم</p></div>
+    <div class="search-bar">
+      <input type="text" placeholder="ابحث عن منتج..." value="${state.search}" oninput="setSearch(this.value)" autocomplete="off">
+      <span class="search-icon">${svgIcon('<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',20)}</span>
+    </div>
     <div class="filter-bar">${cats.map(c=>`<button class="filter-btn${state.filter===c.key?' active':''}" onclick="setFilter('${c.key}')">${c.label}</button>`).join('')}</div>
-    <div class="products-grid-large">${filtered.map(p=>productCard(p,true)).join('')}</div>
+    ${filtered.length===0
+      ? `<div style="text-align:center;padding:60px 20px;color:#bbb"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p style="margin-top:12px;font-size:16px">لا توجد منتجات مطابقة</p><p style="font-size:13px">حاول تغيير معايير البحث</p></div>`
+      : `<div class="products-grid-large">${filtered.map(p=>productCard(p,true)).join('')}</div>`
+    }
   </div>`;
 }
 
 function renderFeatures() {
   return `<div class="section-narrow">
-    <div class="section-header">
+    <div class="section-header reveal">
       <div class="section-badge">لماذا نحن؟</div>
       <h1 class="section-title">لماذا <span style="direction:ltr;display:inline-block">iBoardz</span>؟</h1>
       <p class="section-subtitle">مميزات تجعلنا الخيار الأول لعشاق الإلكترونيات</p>
     </div>
-    <div class="features-grid">${features.map((f,i)=>`<div class="feature-card"><div class="feature-num">${i+1}</div><h3>${f.title}</h3><p>${f.desc}</p></div>`).join('')}</div>
-    <div class="section-header" style="margin-bottom:32px">
+    <div class="features-grid">${features.map((f,i)=>`<div class="feature-card reveal"><div class="feature-num">${i+1}</div><h3>${f.title}</h3><p>${f.desc}</p></div>`).join('')}</div>
+    <div class="section-header reveal" style="margin-bottom:32px">
       <h2 style="font-size:28px;font-weight:900;margin:0 0 6px">آراء عملائنا</h2>
       <p style="color:#999;font-size:15px">ماذا يقول عملاؤنا عن تجربتهم</p>
     </div>
-    <div class="reviews-grid">${reviews.map(r=>`<div class="review-card">
+    <div class="reviews-grid">${reviews.map(r=>`<div class="review-card reveal">
       <div class="review-stars">${'<span>★</span>'.repeat(5)}</div>
       <p class="review-text">"${r.text}"</p>
       <div class="review-author"><div class="review-avatar">${r.name.charAt(0)}</div><span class="review-name">${r.name}</span></div>
@@ -338,12 +422,12 @@ function renderFeatures() {
 
 function renderContact() {
   return `<div class="section-contact">
-    <div class="section-header">
+    <div class="section-header reveal">
       <div class="section-badge">نحن هنا لمساعدتك</div>
       <h1 class="section-title">تواصل معنا</h1>
       <p class="section-subtitle">نرحب بتواصلك في أي وقت</p>
     </div>
-    <div class="contact-cards">
+    <div class="contact-cards reveal">
       <a href="https://wa.me/966552645082" target="_blank" rel="noopener noreferrer" class="contact-card whatsapp">
         <div class="contact-icon whatsapp-icon">${svgIcon(icons.phone,20,'#fff')}</div>
         <div><div class="contact-label">واتساب</div><div class="contact-value">+966 552 645 082</div></div>
@@ -353,16 +437,16 @@ function renderContact() {
         <div><div class="contact-label">البريد الإلكتروني</div><div class="contact-value">iBoardz@outlook.com</div></div>
       </a>
     </div>
-    <div class="contact-form">
+    <div class="contact-form reveal">
       <h2>أرسل لنا رسالة</h2>
-      <form onsubmit="event.preventDefault()">
-        <div class="form-group"><label>الاسم</label><input type="text" class="form-input" placeholder="اسمك الكامل"></div>
-        <div class="form-group"><label>البريد الإلكتروني</label><input type="email" class="form-input" placeholder="email@example.com" style="direction:ltr;text-align:right"></div>
-        <div class="form-group"><label>الرسالة</label><textarea rows="5" class="form-input" placeholder="اكتب رسالتك هنا..."></textarea></div>
-        <button type="submit" class="submit-btn">إرسال الرسالة</button>
+      <form onsubmit="return handleContact(event)">
+        <div class="form-group"><label>الاسم</label><input type="text" id="contactName" class="form-input" placeholder="اسمك الكامل" required></div>
+        <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="contactEmail" class="form-input" placeholder="email@example.com" style="direction:ltr;text-align:right"></div>
+        <div class="form-group"><label>الرسالة</label><textarea rows="5" id="contactMsg" class="form-input" placeholder="اكتب رسالتك هنا..." required></textarea></div>
+        <button type="submit" class="submit-btn" id="contactSubmitBtn">إرسال الرسالة</button>
       </form>
     </div>
-    <div class="work-hours"><h3>ساعات العمل</h3><p>السبت - الخميس: 9 صباحاً - 11 مساءً</p><p style="margin-bottom:0">الجمعة: 4 مساءً - 11 مساءً</p></div>
+    <div class="work-hours reveal"><h3>ساعات العمل</h3><p>السبت - الخميس: 9 صباحاً - 11 مساءً</p><p style="margin-bottom:0">الجمعة: 4 مساءً - 11 مساءً</p></div>
   </div>`;
 }
 
@@ -478,7 +562,8 @@ function renderTerms() {
 }
 
 function setCi(i) { state.ci=i; document.querySelector('.carousel')?.parentElement && renderMain(); startCarousel(); }
-function setFilter(f) { state.filter=f; renderMain(); }
+function setFilter(f) { state.filter=f; renderMain(); setTimeout(setupScrollReveal,50); }
+function setSearch(v) { state.search=v.trim().toLowerCase(); renderMain(); setTimeout(setupScrollReveal,50); }
 
 function startCarousel() {
   if(carouselTimer) clearInterval(carouselTimer);
@@ -494,3 +579,4 @@ function startCarousel() {
 // ===== INIT =====
 render();
 renderCart();
+setTimeout(setupScrollReveal, 200);

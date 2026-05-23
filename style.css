@@ -3,22 +3,59 @@ html { scroll-behavior: smooth; }
 body {
   font-family: 'Tajawal', sans-serif;
   direction: rtl;
-  background: #fafafa;
-  color: #1a1a2e;
+  background: var(--bg);
+  color: var(--text);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 a { text-decoration: none; color: inherit; }
-button { font-family: 'Tajawal', sans-serif; }
+button { font-family: 'Tajawal', sans-serif; cursor: pointer; }
 img { max-width: 100%; display: block; }
 
+:root {
+  --primary: #ff9500;
+  --primary-dark: #e68600;
+  --primary-light: #fff5e6;
+  --dark: #1a1a2e;
+  --surface: #fff;
+  --bg: #fafafa;
+  --border: #f0f0f0;
+  --border-strong: #e0e0e0;
+  --text: #1a1a2e;
+  --text-secondary: #444;
+  --text-muted: #888;
+  --text-light: #999;
+  --success: #22c55e;
+  --success-light: #f0fdf4;
+  --danger: #e74c3c;
+  --danger-light: #fff9f9;
+  --info: #3b82f6;
+  --info-light: #eff6ff;
+  --whatsapp: #25D366;
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+  --shadow-lg: 0 12px 40px rgba(0,0,0,0.12);
+  --shadow-xl: 0 24px 64px rgba(0,0,0,0.2);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --header-height: 72px;
+  --transition: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@media (max-width: 768px) {
+  :root { --header-height: 60px; }
+}
+
 .header {
-  position: fixed; top: 0; right: 0; left: 0; height: 72px;
+  position: fixed; top: 0; right: 0; left: 0; height: var(--header-height);
   background: rgba(255,255,255,0.97); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(0,0,0,0.06);
   display: flex; align-items: center; justify-content: space-between;
   padding: 0 28px; z-index: 1000; direction: ltr;
-  box-shadow: 0 1px 20px rgba(0,0,0,0.06);
+  box-shadow: var(--shadow-md);
 }
 .logo { display: flex; align-items: center; cursor: pointer; flex-shrink: 0; }
 .logo-text {
@@ -171,7 +208,7 @@ img { max-width: 100%; display: block; }
 }
 .modal-add-btn:hover { background: #e68600; }
 
-.main { padding-top: 70px; }
+.main { padding-top: var(--header-height); min-height: 100vh; transition: opacity 0.2s ease, transform 0.2s ease; }
 
 .carousel {
   position: relative; width: 100%; max-width: 1100px; margin: 0 auto;
@@ -428,6 +465,97 @@ textarea.form-input { resize: vertical; }
   text-align: center; color: #555; font-size: 13px;
 }
 .footer-bottom span { direction: ltr; display: inline-block; }
+
+/* ===== TOAST NOTIFICATIONS ===== */
+.toast-container {
+  position: fixed; top: calc(var(--header-height) + 16px); left: 50%;
+  transform: translateX(-50%); z-index: 9999;
+  display: flex; flex-direction: column; gap: 8px;
+  pointer-events: none;
+}
+.toast {
+  background: var(--dark); color: #fff; padding: 14px 24px;
+  border-radius: var(--radius-md); font-size: 14px; font-weight: 600;
+  box-shadow: var(--shadow-lg); white-space: nowrap;
+  animation: toastIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  display: flex; align-items: center; gap: 10px;
+  pointer-events: auto;
+}
+.toast.out { animation: toastOut 0.3s ease forwards; }
+.toast.success { background: #065f46; }
+.toast.error { background: #7f1d1d; }
+.toast.info { background: #1e3a5f; }
+@keyframes toastIn {
+  from { opacity: 0; transform: translateY(-20px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(-20px) scale(0.95); }
+}
+
+/* ===== BACK TO TOP ===== */
+.back-to-top {
+  position: fixed; bottom: 28px; right: 28px; z-index: 500;
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--primary); color: #fff; border: none;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(255,149,0,0.35);
+  cursor: pointer; opacity: 0; visibility: hidden;
+  transform: translateY(16px);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+.back-to-top:hover { background: var(--primary-dark); transform: translateY(-3px); box-shadow: 0 6px 20px rgba(255,149,0,0.45); }
+@media (max-width: 768px) {
+  .back-to-top { bottom: 16px; right: 16px; width: 42px; height: 42px; }
+}
+
+/* ===== SEARCH BAR ===== */
+.search-bar {
+  position: relative; margin-bottom: 24px; max-width: 480px;
+}
+.search-bar input {
+  width: 100%; padding: 14px 20px 14px 48px;
+  border-radius: var(--radius-md); border: 1.5px solid var(--border-strong);
+  font-size: 15px; outline: none; transition: border-color 0.2s;
+  font-family: 'Tajawal', sans-serif; background: var(--surface);
+}
+.search-bar input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(255,149,0,0.1); }
+.search-bar input::placeholder { color: var(--text-light); }
+.search-icon {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  right: 16px; color: var(--text-light); pointer-events: none;
+}
+
+/* ===== PAGE TRANSITIONS ===== */
+.page-enter { opacity: 0; transform: translateY(12px); }
+.page-enter-active { opacity: 1; transform: translateY(0); transition: all 0.35s ease; }
+
+/* ===== SCROLL REVEAL ===== */
+.reveal { opacity: 0; transform: translateY(24px); transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+/* ===== CART PANEL ANIMATION ===== */
+.cart-panel { transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+.cart-overlay.open .cart-panel { transform: translateX(0); }
+.cart-backdrop { opacity: 0; transition: opacity 0.35s ease; }
+.cart-overlay.open .cart-backdrop { opacity: 1; }
+
+/* ===== IMAGE PLACEHOLDER ===== */
+.img-placeholder {
+  background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+  display: flex; align-items: center; justify-content: center;
+  color: #ccc; font-size: 32px;
+}
+
+/* ===== PRODUCT CARD TOUCH FEEDBACK ===== */
+.product-card { cursor: default; }
+
+/* ===== FOCUS STYLES ===== */
+button:focus-visible, a:focus-visible, input:focus-visible {
+  outline: 2px solid var(--primary); outline-offset: 2px;
+}
 
 @keyframes fadeIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
 @keyframes slideIn { from { transform: translateX(-100%); } to { transform: none; } }
