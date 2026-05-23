@@ -238,7 +238,7 @@ function renderMenu() {
   if(state.menuOpen) {
     dd.classList.add('open');
     bd.style.display='block';
-    if(!dd.innerHTML) dd.innerHTML=navItems.map(n=>`<button class="${state.page===n.key?'active':''}" onclick="nav('${n.key}')">${svgIcon(icons[n.key==='home'?'home':n.key==='products'?'box':n.key==='features'?'star':'envelope'])} ${n.label}</button>`).join('');
+    if(!dd.innerHTML) dd.innerHTML=navItems.map(n=>{const m={home:'home',products:'box',features:'star',contact:'envelope',terms:'shield'};return `<button class="${state.page===n.key?'active':''}" onclick="nav('${n.key}')">${svgIcon(icons[m[n.key]||'envelope'])} ${n.label}</button>`}).join('');
   } else {
     dd.classList.remove('open');
     bd.style.display='none';
