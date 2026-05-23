@@ -36,13 +36,13 @@ const cats = [
 ];
 
 const reviews = [
-  { name:'mr.stornyt', role:'عميل', text:'جاني المستشعرات وكل الجهاز مع بعض مغلف كويس وشرح لي كل التفاصيل، أنصحكم تتعاملون معه.' },
-  { name:'mr.stornyt', role:'عميل - هاكاثون', text:'تعاملت معه لأنه كان عندي هاكاثون ومشروع يبيله برمجة ومستشعرات طبية وشغلات كثيرة، ما قصّر أبداً اشتغل من ذمّته وهو وفّر كل القطع وبرمجها لي، وكان يجاوب على أسئلتي وكل ما أعطيه يضيف شيء إضافي للمشروع وشرح لي بذمّة وضمير، الله يجزاه خير أنصحكم فيه.' },
-  { name:'عميل', role:'قبل 6 أشهر', text:'شغله ما شاء الله رهيب.' },
-  { name:'m.ddddi', role:'مشروع تخرج', text:'صراحة الرجال متعاون جداً وشغله مضمون، سويت عنده مشروع تخرج أردوينو وما قصّر معي في شيء، أنصح بالتعامل معه.' },
-  { name:'عضو #15049', role:'عميل', text:'بصراحة أنصح بالتعامل معه، الرجال خدوم في أيام قليلة وخلص المشروع.' },
-  { name:'أحمد هاني آل عمير', role:'عميل', text:'الرجال واجد طيب وتعامله راقي، يستاهل 10/10 وفنّان في المشاريع.' },
-  { name:'store_nawaf', role:'عميل', text:'الرجال ما قصّر، كان عندي مشروع حاولت تشغيله أكثر من مرّة وجا الرجال وعطاني الكود البرمجي واشتغل معي الحمد لله.' },
+  { name:'mr.stornyt', role:'عميل', text:'جاني المستشعرات وكل الجهاز مع بعض مغلف كويس وشرح لي كل التفاصيل، أنصحكم تتعاملون معه.', stars:5 },
+  { name:'mr.stornyt', role:'عميل - هاكاثون', text:'تعاملت معه لأنه كان عندي هاكاثون ومشروع يبيله برمجة ومستشعرات طبية وشغلات كثيرة، ما قصّر أبداً اشتغل من ذمّته وهو وفّر كل القطع وبرمجها لي، وكان يجاوب على أسئلتي وكل ما أعطيه يضيف شيء إضافي للمشروع وشرح لي بذمّة وضمير، الله يجزاه خير أنصحكم فيه.', stars:5 },
+  { name:'عميل', role:'قبل 6 أشهر', text:'شغله ما شاء الله رهيب.', stars:5 },
+  { name:'m.ddddi', role:'مشروع تخرج', text:'صراحة الرجال متعاون جداً وشغله مضمون، سويت عنده مشروع تخرج أردوينو وما قصّر معي في شيء، أنصح بالتعامل معه.', stars:5 },
+  { name:'عضو #15049', role:'عميل', text:'بصراحة أنصح بالتعامل معه، الرجال خدوم في أيام قليلة وخلص المشروع.', stars:5 },
+  { name:'أحمد هاني آل عمير', role:'عميل', text:'الرجال واجد طيب وتعامله راقي، يستاهل 10/10 وفنّان في المشاريع.', stars:5 },
+  { name:'store_nawaf', role:'عميل', text:'الرجال ما قصّر، كان عندي مشروع حاولت تشغيله أكثر من مرّة وجا الرجال وعطاني الكود البرمجي واشتغل معي الحمد لله.', stars:5 },
 ];
 
 const features = [
@@ -365,10 +365,8 @@ function renderHome() {
     <div class="reviews-grid-home">
       ${reviews.slice(0,3).map(r=>`
         <div class="review-card-home">
-          <div class="review-stars-home">
-            ${'<svg width="18" height="18" viewBox="0 0 24 24" fill="#ff9500" stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'.repeat(5)}
-          </div>
-          <p class="review-text-home">"${r.text}"</p>
+          <div class="review-stars-home">${renderStars(r.stars||5)}</div>
+          <p class="review-text-home">${r.text}</p>
           <div class="review-author-home">
             <div class="review-avatar-home">${r.name.charAt(0)}</div>
             <div>
@@ -400,7 +398,36 @@ function renderProducts() {
   </div>`;
 }
 
+const avatarGradients = [
+  'linear-gradient(135deg,#ff9500,#ffb14d)',
+  'linear-gradient(135deg,#8b5cf6,#a78bfa)',
+  'linear-gradient(135deg,#3b82f6,#60a5fa)',
+  'linear-gradient(135deg,#ec4899,#f472b6)',
+  'linear-gradient(135deg,#22c55e,#4ade80)',
+  'linear-gradient(135deg,#f59e0b,#fbbf24)',
+  'linear-gradient(135deg,#ef4444,#f87171)',
+];
+
+const reviewIcons = {
+  thumbs:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M14 9V5a3 3 0 00-3-3l-4 9v11h11.28a2 2 0 002-1.7l1.38-9a2 2 0 00-2-2.3H14zM7 22H4a2 2 0 01-2-2v-7a2 2 0 012-2h3"/></svg>',
+  project:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
+};
+
+function starSVG(fill, size=18) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="${fill}" stroke="${fill==='#ff9500'?'none':'#ddd'}" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+}
+
+function renderStars(n, size=18) {
+  return Array(5).fill(0).map((_,i)=>i<n?starSVG('#ff9500',size):starSVG('none',size)).join('');
+}
+
 function renderFeatures() {
+  const total = reviews.length;
+  const avg = (reviews.reduce((s,r)=>s+(r.stars||5),0)/total).toFixed(1);
+  const dist = [0,0,0,0,0];
+  reviews.forEach(r => { const s=r.stars||5; if(s>=1&&s<=5) dist[s-1]++; });
+  const distData = dist.map((c,i) => ({ label:`${i+1} ${'★'}`, count:c, pct:Math.round(c/total*100) })).reverse();
+
   return `<div class="section-narrow">
     <div class="section-header reveal">
       <div class="section-badge">لماذا نحن؟</div>
@@ -408,15 +435,44 @@ function renderFeatures() {
       <p class="section-subtitle">مميزات تجعلنا الخيار الأول لعشاق الإلكترونيات</p>
     </div>
     <div class="features-grid">${features.map((f,i)=>`<div class="feature-card reveal"><div class="feature-num">${i+1}</div><h3>${f.title}</h3><p>${f.desc}</p></div>`).join('')}</div>
-    <div class="section-header reveal" style="margin-bottom:32px">
-      <h2 style="font-size:28px;font-weight:900;margin:0 0 6px">آراء عملائنا</h2>
-      <p style="color:#999;font-size:15px">ماذا يقول عملاؤنا عن تجربتهم</p>
+
+    <div class="section-header reveal" style="margin-top:48px;margin-bottom:32px">
+      <div class="section-badge">آراء العملاء</div>
+      <h2 style="font-size:28px;font-weight:900;margin:0 0 6px">ماذا يقول عملاؤنا</h2>
+      <p style="color:#999;font-size:15px">تجارب حقيقية من عملاء <strong style="direction:ltr;display:inline-block;color:#ff9500">iBoardz</strong></p>
     </div>
-    <div class="reviews-grid">${reviews.map(r=>`<div class="review-card reveal">
-      <div class="review-stars">${'<span>★</span>'.repeat(5)}</div>
-      <p class="review-text">"${r.text}"</p>
-      <div class="review-author"><div class="review-avatar">${r.name.charAt(0)}</div><span class="review-name">${r.name}</span></div>
-    </div>`).join('')}</div>
+
+    <div class="reviews-pro reveal">
+      <!-- Stats -->
+      <div class="reviews-stats">
+        <div class="reviews-stats-main">
+          <div class="reviews-stats-rating">${avg}</div>
+          <div class="reviews-stats-stars">${renderStars(Math.round(avg),24)}</div>
+          <div class="reviews-stats-label">${total} تقييمات</div>
+        </div>
+        <div class="reviews-stats-dist">
+          ${distData.map(d => `<div class="reviews-stat-bar">
+            <span class="reviews-stat-bar-label">${d.label}</span>
+            <div class="reviews-stat-bar-track"><div class="reviews-stat-bar-fill" style="width:${d.pct}%"></div></div>
+            <span class="reviews-stat-bar-label" style="min-width:30px">${d.count}</span>
+          </div>`).join('')}
+        </div>
+      </div>
+      <!-- Cards -->
+      <div class="reviews-pro-grid">${reviews.map((r,i)=>`<div class="review-pro-card reveal">
+        <div class="review-pro-quote">"</div>
+        <div class="review-pro-stars">${renderStars(r.stars||5)}</div>
+        <p class="review-pro-text">${r.text}</p>
+        <div class="review-pro-divider"></div>
+        <div class="review-pro-author">
+          <div class="review-pro-avatar" style="background:${avatarGradients[i%avatarGradients.length]}">${r.name.charAt(0)}</div>
+          <div class="review-pro-info">
+            <div class="review-pro-name">${r.name} <span class="review-pro-badge">${reviewIcons.thumbs} موثّق</span></div>
+            <div class="review-pro-role">${r.role}</div>
+          </div>
+        </div>
+      </div>`).join('')}</div>
+    </div>
   </div>`;
 }
 
