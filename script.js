@@ -101,7 +101,12 @@ function setTheme(t) {
   const meta=document.querySelector('meta[name="theme-color"]');
   if(meta) meta.content=t==='dark'?'#0a0a14':'#ff9500';
 }
-function toggleTheme() { setTheme(getTheme()==='dark'?'light':'dark'); }
+function toggleTheme() {
+  const next=getTheme()==='dark'?'light':'dark';
+  setTheme(next);
+  const btn=document.getElementById('themeToggle');
+  if(btn) { btn.style.transform='rotate(360deg) scale(0.8)'; setTimeout(()=>{ btn.style.transform=''; }, 400); }
+}
 // Init theme on load
 setTheme(getTheme());
 
@@ -231,11 +236,11 @@ function renderMenu() {
   const dd=document.getElementById('dropdown');
   const bd=document.getElementById('menuBackdrop');
   if(state.menuOpen) {
-    dd.style.display='block';
+    dd.classList.add('open');
     bd.style.display='block';
-    dd.innerHTML=navItems.map(n=>`<button class="${state.page===n.key?'active':''}" onclick="nav('${n.key}')">${svgIcon(icons[n.key==='home'?'home':n.key==='products'?'box':n.key==='features'?'star':'envelope'])} ${n.label}</button>`).join('');
+    if(!dd.innerHTML) dd.innerHTML=navItems.map(n=>`<button class="${state.page===n.key?'active':''}" onclick="nav('${n.key}')">${svgIcon(icons[n.key==='home'?'home':n.key==='products'?'box':n.key==='features'?'star':'envelope'])} ${n.label}</button>`).join('');
   } else {
-    dd.style.display='none';
+    dd.classList.remove('open');
     bd.style.display='none';
   }
 }
