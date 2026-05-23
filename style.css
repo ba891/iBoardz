@@ -700,29 +700,6 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 /* ===== PROFESSIONAL REVIEWS SECTION ===== */
 .reviews-pro { max-width: 1000px; margin: 0 auto; }
 
-/* Stats Banner */
-.reviews-stats {
-  display: grid; grid-template-columns: 1fr 2fr; gap: 24px;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-  border-radius: 20px; padding: 36px; margin-bottom: 40px;
-  position: relative; overflow: hidden;
-}
-.reviews-stats::before {
-  content: ''; position: absolute; inset: 0;
-  background: radial-gradient(circle at 80% 30%, rgba(255,149,0,0.12) 0%, transparent 60%);
-}
-.reviews-stats > * { position: relative; z-index: 1; }
-.reviews-stats-main { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.reviews-stats-rating { font-size: 56px; font-weight: 900; color: #fff; line-height: 1; }
-.reviews-stats-stars { display: flex; gap: 4px; margin: 8px 0 4px; }
-.reviews-stats-stars svg { width: 24px; height: 24px; }
-.reviews-stats-label { color: rgba(255,255,255,0.5); font-size: 13px; font-weight: 500; }
-.reviews-stats-dist { display: flex; flex-direction: column; gap: 8px; justify-content: center; }
-.reviews-stat-bar { display: flex; align-items: center; gap: 10px; }
-.reviews-stat-bar-label { color: rgba(255,255,255,0.7); font-size: 13px; min-width: 60px; text-align: left; direction: ltr; font-weight: 600; }
-.reviews-stat-bar-track { flex: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
-.reviews-stat-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #ff9500, #ffb14d); transition: width 1s ease; }
-
 /* Review Cards */
 .reviews-pro-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(420px, 1fr)); gap: 20px; }
 .review-pro-card {
@@ -774,9 +751,6 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 @media (max-width: 768px) {
   .reviews-grid-home { grid-template-columns: 1fr; }
   .review-text-home { min-height: auto; }
-  .reviews-stats { grid-template-columns: 1fr; text-align: center; padding: 28px 20px; }
-  .reviews-stats-rating { font-size: 44px; }
-  .reviews-stat-bar-label { min-width: 50px; }
   .reviews-pro-grid { grid-template-columns: 1fr; }
   .review-pro-card { padding: 22px; }
 }

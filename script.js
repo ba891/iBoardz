@@ -425,12 +425,6 @@ function renderStars(n, size=18) {
 }
 
 function renderFeatures() {
-  const total = reviews.length;
-  const avg = (reviews.reduce((s,r)=>s+(r.stars||5),0)/total).toFixed(1);
-  const dist = [0,0,0,0,0];
-  reviews.forEach(r => { const s=r.stars||5; if(s>=1&&s<=5) dist[s-1]++; });
-  const distData = dist.map((c,i) => ({ label:`${i+1} ${'★'}`, count:c, pct:Math.round(c/total*100) })).reverse();
-
   return `<div class="section-full">
     <div class="section-header reveal">
       <div class="section-badge">لماذا نحن؟</div>
@@ -460,15 +454,6 @@ function renderFeatures() {
           </div>
         </div>
       </div>`).join('')}</div>
-      <!-- Distribution Bars at Bottom -->
-      <div class="reviews-dist-bottom reveal">
-        <h3 style="font-size:18px;font-weight:800;margin:0 0 16px;text-align:center;color:var(--text)">توزيع التقييمات</h3>
-        <div style="max-width:400px;margin:0 auto">${distData.map(d => `<div class="reviews-stat-bar">
-          <span class="reviews-stat-bar-label" style="color:var(--text-muted)">${d.label}</span>
-          <div class="reviews-stat-bar-track" style="background:#eee"><div class="reviews-stat-bar-fill" style="width:${d.pct}%"></div></div>
-          <span class="reviews-stat-bar-label" style="min-width:30px;color:var(--text-muted)">${d.count}</span>
-        </div>`).join('')}</div>
-      </div>
     </div>
   </div>`;
 }
