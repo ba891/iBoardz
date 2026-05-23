@@ -741,13 +741,6 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 }
 .review-pro-role { color: #999; font-size: 12px; margin-top: 2px; }
 
-/* Reviews Distribution Bottom */
-.reviews-dist-bottom {
-  margin-top: 36px; padding: 28px; background: #fff;
-  border-radius: 18px; border: 1px solid #f0f0f0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
-}
-
 @media (max-width: 768px) {
   .reviews-grid-home { grid-template-columns: 1fr; }
   .review-text-home { min-height: auto; }
