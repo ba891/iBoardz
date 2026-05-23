@@ -900,6 +900,40 @@ button:focus-visible, a:focus-visible, input:focus-visible {
 [data-theme="dark"] .contact-card.email { background: #0a1a2e; border-color: #1a2a4a; }
 [data-theme="dark"] .terms-intro-icon svg { opacity: 0.8; }
 
+/* Home reviews section alt bg */
+[data-theme="dark"] .section-alt-bg { background: #12121e !important; }
+/* Products empty state */
+.products-empty { text-align: center; padding: 60px 20px; color: var(--text-muted); }
+.products-subtitle { color: #999; }
+/* Image tag placeholder */
+.img-tag { background: linear-gradient(135deg, var(--border), var(--border-strong)); }
+[data-theme="dark"] .img-tag { background: linear-gradient(135deg, #1a1a30, #2a2a3e); }
+/* Star empty color variable */
+[data-theme="dark"] { --star-empty: #3a3a4e; }
+/* Discount badge dark mode */
+[data-theme="dark"] .discount-badge { box-shadow: 0 3px 10px rgba(231,76,60,0.2); }
+/* Old price dark mode */
+[data-theme="dark"] .old-price { color: #666; }
+/* Cart remove button */
+[data-theme="dark"] .cart-remove { color: #ef4444; }
+/* Terms timeline dots */
+[data-theme="dark"] .terms-timeline-dot { border-color: #0a0a14; }
+/* Terms section icon classes */
+.terms-section-icon.icon-orange { background: #fff5e6; }
+.terms-section-icon.icon-blue { background: #eff6ff; }
+.terms-section-icon.icon-green { background: #f0fdf4; }
+.terms-section-icon.icon-purple { background: #faf5ff; }
+[data-theme="dark"] .terms-section-icon.icon-orange { background: #2a1f0a; }
+[data-theme="dark"] .terms-section-icon.icon-blue { background: #0a1a2e; }
+[data-theme="dark"] .terms-section-icon.icon-green { background: #0a2e1a; }
+[data-theme="dark"] .terms-section-icon.icon-purple { background: #1a0a2e; }
+/* Product name hover */
+[data-theme="dark"] .product-name:hover { color: var(--primary); }
+/* Products page subtitle */
+[data-theme="dark"] .products-subtitle { color: var(--text-muted) !important; }
+/* reviewIcons */
+[data-theme="dark"] .review-pro-badge svg { opacity: 0.9; }
+
 /* Theme toggle button */
 .theme-toggle {
   background: none; border: none; cursor: pointer; padding: 8px;

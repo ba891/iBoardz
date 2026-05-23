@@ -184,7 +184,7 @@ function showToast(msg, type='success') {
 
 // ===== IMAGE TAG =====
 function imgTag(src, alt, minH=60) {
-  return `<img src="${src}" alt="${alt}" loading="lazy" onerror="this.style.display='none'" style="background:linear-gradient(135deg,#f0f0f0,#e0e0e0);min-height:${minH}px">`;
+  return `<img src="${src}" alt="${alt}" loading="lazy" onerror="this.style.display='none'" class="img-tag" style="min-height:${minH}px">`;
 }
 
 // ===== BACK TO TOP =====
@@ -250,7 +250,7 @@ function renderCart() {
   count.textContent=totalItems();
 
   if(state.cart.length===0) {
-    body.innerHTML=`<div class="cart-empty">${svgIcon(icons.box,40,'#ccc')}<p style="font-size:16px;margin-top:12px">السلة فارغة</p><p style="font-size:13px">أضف منتجات للبدء</p></div>`;
+    body.innerHTML=`<div class="cart-empty">${svgIcon(icons.box,40,'var(--text-muted,#ccc)')}<p style="font-size:16px;margin-top:12px">السلة فارغة</p><p style="font-size:13px">أضف منتجات للبدء</p></div>`;
     footer.style.display='none';
   } else {
     body.innerHTML=state.cart.map(item=>`<div class="cart-item">
@@ -375,7 +375,7 @@ function renderHome() {
   </div>
 
   <!-- Reviews Section -->
-  <div class="section reveal" style="background:#fafafa">
+  <div class="section reveal section-alt-bg">
     <div class="section-header">
       <div class="section-badge">آراء العملاء</div>
       <h2 class="section-title">ماذا يقول عملاؤنا</h2>
@@ -404,14 +404,14 @@ function renderProducts() {
   let filtered=state.filter==='all'?products:products.filter(p=>p.cat===state.filter);
   if(state.search) filtered=filtered.filter(p=>p.name.toLowerCase().includes(state.search)||p.desc.includes(state.search));
   return `<div class="section">
-    <div class="reveal" style="margin-bottom:24px"><h1 style="font-size:34px;font-weight:900;margin:0 0 4px">المنتجات</h1><p style="color:#999;font-size:15px;margin:0">جميع الأسعار هي أسعار بعد الخصم</p></div>
+    <div class="reveal" style="margin-bottom:24px"><h1 style="font-size:34px;font-weight:900;margin:0 0 4px">المنتجات</h1><p class="products-subtitle" style="font-size:15px;margin:0">جميع الأسعار هي أسعار بعد الخصم</p></div>
     <div class="search-bar">
       <input type="text" placeholder="ابحث عن منتج..." value="${state.search}" oninput="setSearch(this.value)" autocomplete="off">
       <span class="search-icon">${svgIcon('<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',20)}</span>
     </div>
     <div class="filter-bar">${cats.map(c=>`<button class="filter-btn${state.filter===c.key?' active':''}" onclick="setFilter('${c.key}')">${c.label}</button>`).join('')}</div>
     ${filtered.length===0
-      ? `<div style="text-align:center;padding:60px 20px;color:#bbb"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p style="margin-top:12px;font-size:16px">لا توجد منتجات مطابقة</p><p style="font-size:13px">حاول تغيير معايير البحث</p></div>`
+      ? `<div class="products-empty"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p style="margin-top:12px;font-size:16px">لا توجد منتجات مطابقة</p><p style="font-size:13px">حاول تغيير معايير البحث</p></div>`
       : `<div class="products-grid-large">${filtered.map(p=>productCard(p,true)).join('')}</div>`
     }
   </div>`;
@@ -432,12 +432,12 @@ const reviewIcons = {
   project:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>',
 };
 
-function starSVG(fill, size=18) {
-  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="${fill}" stroke="${fill==='#ff9500'?'none':'#ddd'}" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
+function starSVG(filled, size=18) {
+  return `<svg width="${size}" height="${size}" viewBox="0 0 24 24" fill="${filled?'#ff9500':'none'}" stroke="${filled?'none':'var(--star-empty,#ddd)'}" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>`;
 }
 
 function renderStars(n, size=18) {
-  return Array(5).fill(0).map((_,i)=>i<n?starSVG('#ff9500',size):starSVG('none',size)).join('');
+  return Array(5).fill(0).map((_,i)=>starSVG(i<n,size)).join('');
 }
 
 function renderFeatures() {
@@ -525,7 +525,7 @@ function renderTerms() {
       <!-- Section 1 -->
       <div class="terms-section">
         <div class="terms-section-header">
-          <div class="terms-section-icon" style="background:#fff5e6"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff9500" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/></svg></div>
+          <div class="terms-section-icon icon-orange"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff9500" stroke-width="1.5"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/></svg></div>
           <div><span class="terms-section-num">01</span><h2>المنتجات</h2></div>
         </div>
         <div class="terms-items">
@@ -538,7 +538,7 @@ function renderTerms() {
       <!-- Section 2 -->
       <div class="terms-section">
         <div class="terms-section-header">
-          <div class="terms-section-icon" style="background:#eff6ff"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
+          <div class="terms-section-icon icon-blue"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="1.5"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg></div>
           <div><span class="terms-section-num">02</span><h2>الشحن والتوصيل</h2></div>
         </div>
         <div class="terms-grid-2">
@@ -551,7 +551,7 @@ function renderTerms() {
       <!-- Section 3 -->
       <div class="terms-section">
         <div class="terms-section-header">
-          <div class="terms-section-icon" style="background:#f0fdf4"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></div>
+          <div class="terms-section-icon icon-green"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="1.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></div>
           <div><span class="terms-section-num">03</span><h2>سياسة الاستبدال والاسترجاع</h2></div>
         </div>
         <div class="terms-highlight-box green"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><div><strong>إثبات عملية الشراء مطلوب</strong><p>يجب إبراز الفاتورة الأصلية للاستفادة من خدمات الاستبدال أو الاسترجاع.</p></div></div>
@@ -570,7 +570,7 @@ function renderTerms() {
       <!-- Section 4 -->
       <div class="terms-section">
         <div class="terms-section-header">
-          <div class="terms-section-icon" style="background:#faf5ff"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
+          <div class="terms-section-icon icon-purple"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
           <div><span class="terms-section-num">04</span><h2>الضمان على المنتجات</h2></div>
         </div>
         <div class="terms-warranty-cards">
@@ -587,7 +587,7 @@ function renderTerms() {
       <!-- Section 5 -->
       <div class="terms-section terms-general">
         <div class="terms-section-header">
-          <div class="terms-section-icon" style="background:#fff5e6"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff9500" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
+          <div class="terms-section-icon icon-orange"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ff9500" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg></div>
           <div><span class="terms-section-num">05</span><h2>الأحكام العامة</h2></div>
         </div>
         <div class="terms-general-content">
