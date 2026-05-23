@@ -43,6 +43,9 @@ const reviews = [
   { name:'عضو #15049', role:'عميل', text:'بصراحة أنصح بالتعامل معه، الرجال خدوم في أيام قليلة وخلص المشروع.', stars:5 },
   { name:'أحمد هاني آل عمير', role:'عميل', text:'الرجال واجد طيب وتعامله راقي، يستاهل 10/10 وفنّان في المشاريع.', stars:5 },
   { name:'store_nawaf', role:'عميل', text:'الرجال ما قصّر، كان عندي مشروع حاولت تشغيله أكثر من مرّة وجا الرجال وعطاني الكود البرمجي واشتغل معي الحمد لله.', stars:5 },
+  { name:'تقييم العميل 1', role:'عميل', text:'Perfect 👌🏼', stars:5 },
+  { name:'تقييم العميل 2', role:'عميل', text:'ممتازه جداً', stars:5 },
+  { name:'تقييم العميل 3', role:'عميل', text:'احترام يجيب بسرعه', stars:5 },
 ];
 
 const features = [
@@ -428,7 +431,7 @@ function renderFeatures() {
   reviews.forEach(r => { const s=r.stars||5; if(s>=1&&s<=5) dist[s-1]++; });
   const distData = dist.map((c,i) => ({ label:`${i+1} ${'★'}`, count:c, pct:Math.round(c/total*100) })).reverse();
 
-  return `<div class="section-narrow">
+  return `<div class="section-full">
     <div class="section-header reveal">
       <div class="section-badge">لماذا نحن؟</div>
       <h1 class="section-title">لماذا <span style="direction:ltr;display:inline-block">iBoardz</span>؟</h1>
@@ -442,20 +445,13 @@ function renderFeatures() {
       <p style="color:#999;font-size:15px">تجارب حقيقية من عملاء <strong style="direction:ltr;display:inline-block;color:#ff9500">iBoardz</strong></p>
     </div>
 
-    <div class="reviews-pro reveal">
-      <!-- Stats -->
-      <div class="reviews-stats">
+    <div class="reviews-pro reveal" style="max-width:1100px;margin:0 auto">
+      <!-- Stats Banner (rating only) -->
+      <div class="reviews-stats" style="grid-template-columns:1fr">
         <div class="reviews-stats-main">
           <div class="reviews-stats-rating">${avg}</div>
           <div class="reviews-stats-stars">${renderStars(Math.round(avg),24)}</div>
           <div class="reviews-stats-label">${total} تقييمات</div>
-        </div>
-        <div class="reviews-stats-dist">
-          ${distData.map(d => `<div class="reviews-stat-bar">
-            <span class="reviews-stat-bar-label">${d.label}</span>
-            <div class="reviews-stat-bar-track"><div class="reviews-stat-bar-fill" style="width:${d.pct}%"></div></div>
-            <span class="reviews-stat-bar-label" style="min-width:30px">${d.count}</span>
-          </div>`).join('')}
         </div>
       </div>
       <!-- Cards -->
@@ -472,6 +468,15 @@ function renderFeatures() {
           </div>
         </div>
       </div>`).join('')}</div>
+      <!-- Distribution Bars at Bottom -->
+      <div class="reviews-dist-bottom reveal">
+        <h3 style="font-size:18px;font-weight:800;margin:0 0 16px;text-align:center;color:var(--text)">توزيع التقييمات</h3>
+        <div style="max-width:400px;margin:0 auto">${distData.map(d => `<div class="reviews-stat-bar">
+          <span class="reviews-stat-bar-label" style="color:var(--text-muted)">${d.label}</span>
+          <div class="reviews-stat-bar-track" style="background:#eee"><div class="reviews-stat-bar-fill" style="width:${d.pct}%"></div></div>
+          <span class="reviews-stat-bar-label" style="min-width:30px;color:var(--text-muted)">${d.count}</span>
+        </div>`).join('')}</div>
+      </div>
     </div>
   </div>`;
 }
