@@ -446,14 +446,6 @@ function renderFeatures() {
     </div>
 
     <div class="reviews-pro reveal" style="max-width:1100px;margin:0 auto">
-      <!-- Stats Banner (rating only) -->
-      <div class="reviews-stats" style="grid-template-columns:1fr">
-        <div class="reviews-stats-main">
-          <div class="reviews-stats-rating">${avg}</div>
-          <div class="reviews-stats-stars">${renderStars(Math.round(avg),24)}</div>
-          <div class="reviews-stats-label">${total} تقييمات</div>
-        </div>
-      </div>
       <!-- Cards -->
       <div class="reviews-pro-grid">${reviews.map((r,i)=>`<div class="review-pro-card reveal">
         <div class="review-pro-quote">"</div>
