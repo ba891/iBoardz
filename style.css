@@ -800,8 +800,8 @@ textarea.form-input { resize: vertical; min-height: 100px; }
 .carousel img { mix-blend-mode: unset; filter: none; }
 .modal-img { background: transparent; }
 [data-theme="dark"] .product-img img, [data-theme="dark"] .modal-img img, [data-theme="dark"] .cart-item-img img {
-  mix-blend-mode: screen;
-  filter: brightness(1.3) contrast(1.15) drop-shadow(0 2px 6px rgba(0,0,0,0.2));
+  mix-blend-mode: unset;
+  filter: brightness(1.2) contrast(1.1);
 }
 
 /* ===== FOCUS ===== */
