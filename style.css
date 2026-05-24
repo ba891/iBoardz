@@ -179,7 +179,7 @@ img { max-width: 100%; display: block; }
   position: fixed; top: 74px; right: 24px; background: var(--surface);
   border-radius: 14px; border: 1px solid var(--border);
   box-shadow: var(--shadow-lg);
-  z-index: 9999; min-width: 220px;
+  z-index: 9999; min-width: 220px; overflow: hidden;
   opacity: 0; transform: translateY(-8px) scale(0.98);
   transition: opacity 0.25s var(--transition), transform 0.25s var(--transition);
   pointer-events: none;
@@ -187,13 +187,6 @@ img { max-width: 100%; display: block; }
 .dropdown-menu.open {
   opacity: 1; transform: translateY(0) scale(1);
   pointer-events: auto;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .dropdown-menu.open { animation: dropReveal 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-}
-@keyframes dropReveal {
-  from { opacity: 0; transform: translateY(-8px) scale(0.97); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 .dropdown-menu button {
   display: flex; align-items: center; gap: 12px; width: 100%;
@@ -896,16 +889,17 @@ body, .header, .dropdown-menu, .cart-panel, .modal-content,
   box-shadow: 0 20px 60px rgba(0,0,0,0.8);
 }
 [data-theme="dark"] .dropdown-menu button {
+  background: var(--darker);
   border-bottom-color: rgba(255,255,255,0.04);
   transition: all 0.2s ease, transform 0.15s ease;
   padding: 15px 22px;
 }
 [data-theme="dark"] .dropdown-menu button:not(.active) {
-  color: #f0f0ff;
+  color: var(--text-secondary);
   border-right: 2px solid transparent;
 }
 [data-theme="dark"] .dropdown-menu button:not(.active) svg {
-  color: #c8c8e0;
+  color: var(--text-secondary);
   transition: all 0.2s ease;
 }
 [data-theme="dark"] .dropdown-menu button:hover:not(.active) {
@@ -1041,7 +1035,6 @@ body, .header, .dropdown-menu, .cart-panel, .modal-content,
 [data-theme="dark"] .back-to-top { box-shadow: 0 4px 16px rgba(255,149,0,0.25); }
 [data-theme="dark"] .search-bar input { background: var(--surface); color: var(--text); }
 [data-theme="dark"] .review-pro-card::before { background: linear-gradient(135deg, rgba(255,149,0,0.08), transparent); }
-[data-theme="dark"] .menu-btn { box-shadow: 0 2px 8px rgba(255,149,0,0.2); }
 [data-theme="dark"] .marquee { background: var(--darker); }
 [data-theme="dark"] .preloader { background: var(--bg); }
 [data-theme="dark"] .preloader-logo .boardz { color: var(--text); }
