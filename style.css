@@ -888,37 +888,39 @@ body, .header, .dropdown-menu, .cart-panel, .modal-content,
   border: 1px solid rgba(255,255,255,0.08);
   box-shadow: 0 20px 60px rgba(0,0,0,0.8);
 }
-[data-theme="dark"] .dropdown-menu button {
-  background: var(--darker);
-  border-bottom-color: rgba(255,255,255,0.04);
-  transition: all 0.2s ease, transform 0.15s ease;
-  padding: 15px 22px;
+html[data-theme="dark"] .dropdown-menu {
+  background: #16162a !important;
+  border-color: rgba(255,255,255,0.08) !important;
 }
-[data-theme="dark"] .dropdown-menu button:not(.active) {
-  color: var(--text-secondary);
-  border-right: 2px solid transparent;
+html[data-theme="dark"] .dropdown-menu button {
+  background: #05050a !important;
+  color: #c0c0d0 !important;
+  border-bottom-color: rgba(255,255,255,0.04) !important;
 }
-[data-theme="dark"] .dropdown-menu button:not(.active) svg {
-  color: var(--text-secondary);
-  transition: all 0.2s ease;
+html[data-theme="dark"] .dropdown-menu button svg {
+  color: #c0c0d0 !important;
 }
-[data-theme="dark"] .dropdown-menu button:hover:not(.active) {
-  background: rgba(255,255,255,0.08);
-  color: #fff;
-  transform: translateX(-4px);
-  border-right-color: rgba(255,149,0,0.3);
+html[data-theme="dark"] .dropdown-menu button:not(.active) {
+  color: #c0c0d0 !important;
 }
-[data-theme="dark"] .dropdown-menu button:hover:not(.active) svg {
-  color: var(--primary);
-  transform: scale(1.15);
+html[data-theme="dark"] .dropdown-menu button:not(.active) svg {
+  color: #c0c0d0 !important;
 }
-[data-theme="dark"] .dropdown-menu button.active {
-  background: linear-gradient(90deg, rgba(255,149,0,0.2), transparent);
-  color: var(--primary);
-  border-right: 3px solid var(--primary);
-  font-weight: 800;
+html[data-theme="dark"] .dropdown-menu button:hover:not(.active) {
+  background: rgba(255,255,255,0.08) !important;
+  color: #e8e8f0 !important;
 }
-[data-theme="dark"] .dropdown-menu button.active svg { color: var(--primary); }
+html[data-theme="dark"] .dropdown-menu button:hover:not(.active) svg {
+  color: #ff9500 !important;
+}
+html[data-theme="dark"] .dropdown-menu button.active {
+  background: linear-gradient(90deg, rgba(255,149,0,0.2), transparent) !important;
+  color: #ff9500 !important;
+  border-right-color: #ff9500 !important;
+}
+html[data-theme="dark"] .dropdown-menu button.active svg {
+  color: #ff9500 !important;
+}
 [data-theme="dark"] .cart-panel { background: var(--surface); box-shadow: 8px 0 40px rgba(0,0,0,0.5); }
 [data-theme="dark"] .cart-header { border-bottom-color: var(--border-strong); }
 [data-theme="dark"] .cart-close { color: var(--text-secondary); }
