@@ -341,16 +341,17 @@ const App = {
     const bd = document.getElementById('menuBackdrop');
     const m = { home: 'home', products: 'box', features: 'star', contact: 'envelope', terms: 'shield' };
     if (this.state.menuOpen) {
-      dd.classList.add('open');
-      bd.style.display = 'block';
-      if (!dd.innerHTML) {
-        dd.innerHTML = this.navItems.map(n =>
-          `<button class="${this.state.page === n.key ? 'active' : ''}" onclick="App.nav('${n.key}')">${this.svgIcon(this.icons[m[n.key] || 'envelope'])} ${n.label}</button>`
-        ).join('');
-      }
+      dd.innerHTML = this.navItems.map(n =>
+        `<button class="${this.state.page === n.key ? 'active' : ''}" onclick="App.nav('${n.key}')">${this.svgIcon(this.icons[m[n.key] || 'envelope'])} ${n.label}</button>`
+      ).join('');
+      requestAnimationFrame(() => {
+        if (!this.state.menuOpen) return;
+        dd.classList.add('open');
+        bd.classList.add('open');
+      });
     } else {
       dd.classList.remove('open');
-      bd.style.display = 'none';
+      bd.classList.remove('open');
     }
   },
 
