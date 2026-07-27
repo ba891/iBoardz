@@ -403,7 +403,7 @@ const App = {
       </div>`).join('');
 
       const tp = this.totalPrice(), top2 = this.totalOriginal(), ts = this.totalSaved();
-      const waText = encodeURIComponent('مرحباً، أريد طلب:\n' + this.state.cart.map(i => `${i.product.name}${i.color ? ' - ' + i.color : ''} × ${i.qty} = ${i.product.price * i.qty} ر.س`).join('\n') + '\nالمجموع: ' + tp + ' ر.س\nطريقة الدفع: MADA');
+      const waText = encodeURIComponent('مرحباً، أريد طلب:\n' + this.state.cart.map(i => `${i.product.name}${i.color ? ' - ' + i.color : ''} × ${i.qty} = ${i.product.price * i.qty} ر.س`).join('\n') + '\nالمجموع: ' + tp + ' ر.س');
 
       footer.style.display = 'block';
       footer.innerHTML = `<div class="cart-totals">
@@ -411,7 +411,6 @@ const App = {
         <div class="cart-total-row discounted"><span class="cart-total-label">الإجمالي بعد الخصم:</span><span class="cart-total-new">${tp} ر.س</span></div>
         ${ts > 0 ? `<div class="cart-savings-badge"><span class="savings-icon">🎉</span><span class="savings-text">وفّرت ${ts} ر.س</span></div>` : ''}
       </div>
-      <div class="cart-payment"><span class="payment-label">طرق الدفع:</span><span class="payment-methods"><span class="payment-method mada">MADA</span> <span class="payment-method cash">نقداً</span></span></div>
       <a href="https://wa.me/966552645082?text=${waText}" target="_blank" rel="noopener noreferrer"><button class="whatsapp-btn">${this.svgIcon(this.icons.whatsapp, 20, '#25D366', '#25D366')} اطلب عبر واتساب</button></a>`;
     }
   },

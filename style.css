@@ -78,14 +78,12 @@ h1, h2, h3, h4, h5, h6,
 .review-pro-name,
 .review-name,
 .review-name-home,
-.payment-method,
 .footer-subtitle,
 .spec-item strong,
 .cart-total-label,
 .savings-text,
 .section-header h1,
 .section-header h2,
-.cart-payment .payment-label,
 .form-group label,
 .modal-color-label {
   font-family: 'Arabigram', 'Mada', sans-serif;
@@ -766,44 +764,6 @@ h1, h2, h3, h4, h5, h6,
   font-weight: 500;
   color: var(--text-muted);
   font-size: 12px;
-}
-
-.cart-payment {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 12px 0;
-  margin-bottom: 12px;
-  border-top: 1px solid var(--border);
-}
-
-.payment-label {
-  font-weight: 600;
-  font-size: 14px;
-  color: var(--text-muted);
-}
-
-.payment-methods {
-  display: flex;
-  gap: 8px;
-}
-
-.payment-method {
-  padding: 4px 14px;
-  border-radius: 6px;
-  font-size: 13px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-}
-
-.payment-method.mada {
-  background: #2d9cdb;
-  color: #fff;
-}
-
-.payment-method.cash {
-  background: var(--success);
-  color: #fff;
 }
 
 /* ===== MODAL ===== */
