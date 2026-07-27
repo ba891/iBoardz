@@ -27,6 +27,10 @@ const App = {
     { id:26, name:'SH1107 OLED DISPLAY', price:109, op:160, cat:'display', img:'sh1107-oled-display.png', specs:['شاشة OLED 1.3"','دقة 128×64','I2C Interface','تباين عالي جداً','استهلاك منخفض'], desc:'شاشة OLED 1.3 بوصة عالية الجودة للمشاريع', pop:true, badge:'مميز' },
     { id:27, name:'LCD 1602 WITH I2C', price:27, op:40, cat:'display', img:'lcd-1602-i2c.png', specs:['16 حرف × 2 سطر','I2C Interface','إضاءة خلفية زرقاء','جهد 5V','تباين قابل للتعديل'], desc:'شاشة LCD مع واجهة I2C سهلة التوصيل' },
     { id:28, name:'SSD1306 OLED 0.96"', price:35, op:52, cat:'display', img:'ssd1306-oled-096.png', specs:['شاشة OLED 0.96"','دقة 128×64','I2C Interface','أبيض وأزرق','استهلاك منخفض جداً'], desc:'شاشة OLED صغيرة ومثالية للمشاريع' },
+    { id:29, name:'LED صغيرة (جميع الألوان)', price:0.5, op:2, cat:'sensor', img:'led.png', specs:['ألوان متوفرة: أحمر، أخضر، أزرق، أصفر، أبيض','جهد 2-3V','تيار 20mA','قطر 5mm','اختر اللون من القائمة أعلاه'], desc:'LED صغيرة 5mm بجميع الألوان - اختر اللون المناسب لمشروعك', colorOptions:['أحمر','أخضر','أزرق','أصفر','أبيض'] },
+    { id:30, name:'RAIN WATER LEVEL DETECTION SENSOR MODULE 3-5VDC', price:14, op:22, cat:'sensor', img:'rainsensor.jpg', specs:['جهد 3.3-5V','مخرج Analog + Digital','مقاوم للماء','لوحة حساسة للماء','مقارن LM393'], desc:'مستشعر كشف المطر ومستوى المياه' },
+    { id:31, name:'DS1302 RTC Real Time Clock Module', price:17, op:25, cat:'sensor', img:'ds1302.jpg', specs:['RTC DS1302','واجهة SPI','بطارية احتياطية','حفظ الوقت وال تاريخ','جهد 3.3-5V'], desc:'وحدة الوقت الحقيقي RTC مع بطارية احتياطية' },
+    { id:32, name:'Piezo Buzzer (جرس صوتي)', price:5, op:8, cat:'sensor', img:'buzzer.jpg', specs:['جهد 3.5-5V','تردد 2300Hz','مستمر الصوت','حجم صغير','سهل التوصيل'], desc:'جرس بيزو كهربائي لإصدار صوت التنبيه في المشاريع' },
   ],
 
   cats: [
@@ -37,16 +41,16 @@ const App = {
   ],
 
   reviews: [
-    { name:'خالد', role:'عميل', text:'جاني المستشعرات وكل الجهاز مع بعض مغلف كويس وشرح لي كل التفاصيل، أنصحكم تتعاملون معه.', stars:5 },
-    { name:'سلطان', role:'عميل - هاكاثون', text:'تعاملت معه لأنه كان عندي هاكاثون ومشروع يبيله برمجة ومستشعرات طبية وشغلات كثيرة، ما قصّر أبداً اشتغل من ذمّته وهو وفّر كل القطع وبرمجها لي، وكان يجاوب على أسئلتي وكل ما أعطيه يضيف شيء إضافي للمشروع وشرح لي بذمّة وضمير، الله يجزاه خير أنصحكم فيه.', stars:5 },
-    { name:'مشاعل', role:'قبل 6 أشهر', text:'شغله ما شاء الله رهيب.', stars:5 },
-    { name:'عبدالله', role:'مشروع تخرج', text:'صراحة الرجال متعاون جداً وشغله مضمون، سويت عنده مشروع تخرج أردوينو وما قصّر معي في شيء، أنصح بالتعامل معه.', stars:5 },
-    { name:'ريم', role:'عميل', text:'بصراحة أنصح بالتعامل معه، الرجال خدوم في أيام قليلة وخلص المشروع.', stars:5 },
-    { name:'أحمد هاني آل عمير', role:'عميل', text:'الرجال واجد طيب وتعامله راقي، يستاهل 10/10 وفنّان في المشاريع.', stars:5 },
-    { name:'نواف', role:'عميل', text:'الرجال ما قصّر، كان عندي مشروع حاولت تشغيله أكثر من مرّة وجا الرجال وعطاني الكود البرمجي واشتغل معي الحمد لله.', stars:5 },
-    { name:'سارة', role:'عميل', text:'Perfect 👌🏼', stars:5 },
-    { name:'نورة', role:'عميل', text:'ممتازه جداً', stars:5 },
-    { name:'فيصل', role:'عميل', text:'احترام يجيب بسرعه', stars:5 },
+    { text:'جاني المستشعرات وكل الجهاز مع بعض مغلف كويس وشرح لي كل التفاصيل، أنصحكم تتعاملون معه.', stars:5 },
+    { text:'تعاملت معه لأنه كان عندي هاكاثون ومشروع يبيله برمجة ومستشعرات طبية وشغلات كثيرة، ما قصّر أبداً اشتغل من ذمّته وهو وفّر كل القطع وبرمجها لي، وكان يجاوب على أسئلتي وكل ما أعطيه يضيف شيء إضافي للمشروع وشرح لي بذمّة وضمير، الله يجزاه خير أنصحكم فيه.', stars:5 },
+    { text:'شغله ما شاء الله رهيب.', stars:5 },
+    { text:'صراحة الرجال متعاون جداً وشغله مضمون، سويت عنده مشروع تخرج أردوينو وما قصّر معي في شيء، أنصح بالتعامل معه.', stars:5 },
+    { text:'بصراحة أنصح بالتعامل معه، الرجال خدوم في أيام قليلة وخلص المشروع.', stars:5 },
+    { text:'الرجال واجد طيب وتعامله راقي، يستاهل 10/10 وفنّان في المشاريع.', stars:5 },
+    { text:'الرجال ما قصّر، كان عندي مشروع حاولت تشغيله أكثر من مرّة وجا الرجال وعطاني الكود البرمجي واشتغل معي الحمد لله.', stars:5 },
+    { text:'Perfect 👌🏼', stars:5 },
+    { text:'ممتازه جداً', stars:5 },
+    { text:'احترام يجيب بسرعه', stars:5 },
   ],
 
   features: [
@@ -211,18 +215,34 @@ const App = {
   },
 
   // ===== CART ACTIONS =====
-  addCart(prod) {
-    const ex = this.state.cart.find(i => i.product.id === prod.id);
+  addCart(prod, color) {
+    const ex = color
+      ? this.state.cart.find(i => i.product.id === prod.id && i.color === color)
+      : this.state.cart.find(i => i.product.id === prod.id);
     if (ex) {
       ex.qty++;
       this.showToast(`تم زيادة الكمية: ${prod.name} ×${ex.qty}`, 'success');
     } else {
-      this.state.cart.push({ product: prod, qty: 1 });
-      this.showToast(`تمت الإضافة: ${prod.name}`, 'success', true);
+      const item = { product: prod, qty: 1 };
+      if (color) item.color = color;
+      this.state.cart.push(item);
+      this.showToast(`تمت الإضافة: ${prod.name}${color ? ' - ' + color : ''}`, 'success', true);
     }
     this.saveCart();
     this.updateBadge();
     this.renderCart();
+  },
+
+  addCartWithColor(id) {
+    const prod = this.products.find(x => x.id === id);
+    const sel = document.querySelector('input[name="ledColor"]:checked');
+    const color = sel ? sel.value : null;
+    if (prod.colorOptions && !color) {
+      this.showToast('الرجاء اختيار اللون أولاً', 'error');
+      return;
+    }
+    this.addCart(prod, color);
+    this.closeModal();
   },
 
   removeCart(id) {
@@ -371,7 +391,7 @@ const App = {
       body.innerHTML = this.state.cart.map(item => `<div class="cart-item">
         <div class="cart-item-img">${this.imgTag(`images/${item.product.img}`, item.product.name, 40)}</div>
         <div class="cart-item-info">
-          <div class="cart-item-name">${item.product.name}</div>
+          <div class="cart-item-name">${item.product.name}${item.color ? `<span class="cart-item-color"> - ${item.color}</span>` : ''}</div>
           <div class="cart-item-prices"><span class="price" style="font-size:15px">${item.product.price} ر.س</span><span class="old-price">${item.product.op} ر.س</span></div>
         </div>
         <div class="cart-qty-controls">
@@ -383,7 +403,7 @@ const App = {
       </div>`).join('');
 
       const tp = this.totalPrice(), top2 = this.totalOriginal(), ts = this.totalSaved();
-      const waText = encodeURIComponent('مرحباً، أريد طلب:\n' + this.state.cart.map(i => `${i.product.name} × ${i.qty} = ${i.product.price * i.qty} ر.س`).join('\n') + '\nالمجموع: ' + tp + ' ر.س');
+      const waText = encodeURIComponent('مرحباً، أريد طلب:\n' + this.state.cart.map(i => `${i.product.name}${i.color ? ' - ' + i.color : ''} × ${i.qty} = ${i.product.price * i.qty} ر.س`).join('\n') + '\nالمجموع: ' + tp + ' ر.س\nطريقة الدفع: MADA');
 
       footer.style.display = 'block';
       footer.innerHTML = `<div class="cart-totals">
@@ -391,6 +411,7 @@ const App = {
         <div class="cart-total-row discounted"><span class="cart-total-label">الإجمالي بعد الخصم:</span><span class="cart-total-new">${tp} ر.س</span></div>
         ${ts > 0 ? `<div class="cart-savings-badge"><span class="savings-icon">🎉</span><span class="savings-text">وفّرت ${ts} ر.س</span></div>` : ''}
       </div>
+      <div class="cart-payment"><span class="payment-label">طرق الدفع:</span><span class="payment-methods"><span class="payment-method mada">MADA</span> <span class="payment-method cash">نقداً</span></span></div>
       <a href="https://wa.me/966552645082?text=${waText}" target="_blank" rel="noopener noreferrer"><button class="whatsapp-btn">${this.svgIcon(this.icons.whatsapp, 20, '#25D366', '#25D366')} اطلب عبر واتساب</button></a>`;
     }
   },
@@ -413,9 +434,10 @@ const App = {
           </div>
           <h2 class="modal-title">${p.name}</h2>
           <p class="modal-desc">${p.desc}</p>
+          ${p.colorOptions ? `<div class="modal-color-picker"><label class="modal-color-label">اختر اللون المناسب:</label><div class="modal-color-options">${p.colorOptions.map(c => `<label class="modal-color-option"><input type="radio" name="ledColor" value="${c}" class="modal-color-radio"><span class="modal-color-swatch" data-color="${c}">${c}</span></label>`).join('')}</div></div>` : ''}
           <div class="modal-prices"><span class="modal-new-price">${p.price} ر.س</span><span class="modal-old-price">${p.op} ر.س</span></div>
           <div class="modal-specs"><h3>المواصفات التقنية:</h3>${p.specs.map(s => `<div class="spec-item"><div class="spec-dot"></div><span class="spec-text">${s}</span></div>`).join('')}</div>
-          <button class="modal-add-btn" onclick="App.addCart(App.products.find(x=>x.id===${p.id}));App.closeModal()">أضف إلى السلة <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+          <button class="modal-add-btn" onclick="App.addCartWithColor(${p.id})">أضف إلى السلة <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
         </div>
       </div>`;
   },
@@ -519,20 +541,14 @@ const App = {
       <div class="section-header">
         <div class="section-badge">آراء العملاء</div>
         <h2 class="section-title">ماذا يقول عملاؤنا</h2>
-        <p class="section-subtitle">تقييمات حقيقية من عملائنا الكرام</p>
+
       </div>
       <div class="reviews-grid-home">
         ${this.reviews.slice(0, 3).map(r => `
           <div class="review-card-home">
             <div class="review-stars-home">${this.renderStars(r.stars || 5)}</div>
             <p class="review-text-home">${r.text}</p>
-            <div class="review-author-home">
-              <div class="review-avatar-home">${r.name.charAt(0)}</div>
-              <div>
-                <div class="review-name-home">${r.name}</div>
-                <div class="review-role-home">${r.role}</div>
-              </div>
-            </div>
+            <div class="review-decor-home"><span class="review-decor-dot"></span><span class="review-decor-dot"></span><span class="review-decor-dot"></span></div>
           </div>
         `).join('')}
       </div>
@@ -577,14 +593,7 @@ const App = {
           <div class="review-pro-quote">"</div>
           <div class="review-pro-stars">${this.renderStars(r.stars || 5)}</div>
           <p class="review-pro-text">${r.text}</p>
-          <div class="review-pro-divider"></div>
-          <div class="review-pro-author">
-            <div class="review-pro-avatar" style="background:${this.avatarGradients[i % this.avatarGradients.length]}">${r.name.charAt(0)}</div>
-            <div class="review-pro-info">
-              <div class="review-pro-name">${r.name} <span class="review-pro-badge">${this.reviewIcons.thumbs} موثّق</span></div>
-              <div class="review-pro-role">${r.role}</div>
-            </div>
-          </div>
+          <div class="review-decor-pro"><span class="review-decor-line"></span><span class="review-decor-icon">${this.svgIcon('<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>', 14, '#ff9500')}</span><span class="review-decor-line"></span></div>
         </div>`).join('')}</div>
       </div>
     </div>`;
@@ -769,15 +778,6 @@ const App = {
     window.addEventListener('scroll', () => { header.classList.toggle('scrolled', window.scrollY > 50); }, { passive: true });
   },
 
-  setupPreloader() {
-    window.addEventListener('load', () => {
-      const preloader = document.getElementById('preloader');
-      if (preloader) {
-        setTimeout(() => { preloader.classList.add('hidden'); }, 400);
-        setTimeout(() => { preloader.style.display = 'none'; }, 1000);
-      }
-    });
-  },
 
   setupReducedMotion() {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
@@ -825,7 +825,6 @@ const App = {
     this.render();
     this.renderCart();
     setTimeout(() => this.setupScrollReveal(), 200);
-    this.setupPreloader();
     this._setupKeyboard();
     this._setupClickOutside();
     this._setupResize();
