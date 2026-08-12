@@ -173,6 +173,8 @@ const App = {
     if (e) e.stopPropagation();
     this.state.menuOpen = !this.state.menuOpen;
     this.renderMenu();
+    const btn = document.querySelector('.menu-btn');
+    if (btn) btn.setAttribute('aria-expanded', String(this.state.menuOpen));
     if (this.state.menuOpen) this.lockBody();
     else this.unlockBody();
   },
@@ -447,7 +449,7 @@ const App = {
   },
 
   imgTag(src, alt, minH = 60) {
-    return `<img src="${src}" alt="${alt}" loading="lazy" onerror="this.style.display='none'" class="img-tag" style="min-height:${minH}px">`;
+    return `<img src="${src}" alt="${alt}" loading="lazy" decoding="async" onerror="this.style.display='none'" class="img-tag" style="min-height:${minH}px">`;
   },
 
   starSVG(filled, size = 18) {
@@ -498,8 +500,8 @@ const App = {
   renderHome() {
     return `
     <div class="carousel">
-      <img src="images/add.png" alt="iBoardz" style="opacity:${this.state.ci === 0 ? 1 : 0}" loading="lazy">
-      <img src="images/add1.png" alt="iBoardz" style="opacity:${this.state.ci === 1 ? 1 : 0}" loading="lazy">
+      <img src="images/add.jpg" alt="iBoardz - متجر إلكترونيات وأردوينو" width="1100" height="620" fetchpriority="high" style="opacity:${this.state.ci === 0 ? 1 : 0}" decoding="async">
+      <img src="images/add1.jpg" alt="iBoardz - عروض المنتجات" width="1100" height="619" loading="lazy" style="opacity:${this.state.ci === 1 ? 1 : 0}" decoding="async">
       <button class="carousel-arrow prev" onclick="App.setCi(${(this.state.ci - 1 + 2) % 2})">${this.svgIcon('<polyline points="9 18 15 12 9 6"/>', 22)}</button>
       <button class="carousel-arrow next" onclick="App.setCi(${(this.state.ci + 1) % 2})">${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 22)}</button>
       <div class="carousel-dots">
@@ -567,7 +569,7 @@ const App = {
       <div class="filter-bar">${this.cats.map(c => `<button class="filter-btn${this.state.filter === c.key ? ' active' : ''}" onclick="App.setFilter('${c.key}')">${c.label}</button>`).join('')}</div>
       ${filtered.length === 0
         ? `<div class="products-empty">${this.svgIcon('<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>', 48)}<p style="margin-top:12px;font-size:16px">لا توجد منتجات مطابقة</p><p style="font-size:13px">حاول تغيير معايير البحث</p></div>`
-        : `<div class="products-grid-large">${filtered.map(p => this.productCard(p, true)).join('')}</div>`
+        : `<div class="products-count">${filtered.length} منتج</div><div class="products-grid-large">${filtered.map(p => this.productCard(p, true)).join('')}</div>`
       }
     </div>`;
   },
@@ -823,10 +825,35 @@ const App = {
     this.setupReducedMotion();
     this.render();
     this.renderCart();
+    this.injectStructuredData();
+    const yearEl = document.getElementById('footerYear');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
     setTimeout(() => this.setupScrollReveal(), 200);
     this._setupKeyboard();
     this._setupClickOutside();
     this._setupResize();
+  },
+
+  // ===== STRUCTURED DATA =====
+  injectStructuredData() {
+    try {
+      const items = this.products.map(p => ({
+        '@type': 'Product',
+        name: p.name,
+        description: p.desc,
+        image: 'images/' + p.img,
+        offers: {
+          '@type': 'Offer',
+          priceCurrency: 'SAR',
+          price: p.price,
+          availability: 'https://schema.org/InStock'
+        }
+      }));
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.textContent = JSON.stringify({ '@context': 'https://schema.org', '@type': 'ItemList', itemListElement: items.map((it, i) => ({ '@type': 'ListItem', position: i + 1, item: it })) });
+      document.head.appendChild(script);
+    } catch {}
   }
 };
 

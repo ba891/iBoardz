@@ -46,14 +46,11 @@ img {
   display: block;
 }
 
-/* ===== ARABIGRAM FONT FAMILY ===== */
+/* ===== ARABIC HEADINGS (Mada = proper Arabic shaping) ===== */
 h1, h2, h3, h4, h5, h6,
 .section-title,
 .section-badge,
 .modal-title,
-.logo-text,
-.footer-logo,
-.preloader-logo,
 .cart-header h2,
 .contact-form h2,
 .modal-specs h3,
@@ -61,8 +58,6 @@ h1, h2, h3, h4, h5, h6,
 .footer h4,
 .feature-card h3,
 .quick-feature h3,
-.product-name,
-.cart-item-name,
 .products-subtitle,
 .filter-btn.active,
 .show-all-btn,
@@ -78,7 +73,6 @@ h1, h2, h3, h4, h5, h6,
 .review-pro-name,
 .review-name,
 .review-name-home,
-.footer-subtitle,
 .spec-item strong,
 .cart-total-label,
 .savings-text,
@@ -86,8 +80,16 @@ h1, h2, h3, h4, h5, h6,
 .section-header h2,
 .form-group label,
 .modal-color-label {
+  font-family: 'Mada', sans-serif;
+  letter-spacing: 0;
+}
+
+/* ===== BRAND / LATIN DISPLAY FONT (Arabigram) ===== */
+.logo-text,
+.footer-logo,
+.preloader-logo,
+.footer-subtitle {
   font-family: 'Arabigram', 'Mada', sans-serif;
-  letter-spacing: 3px;
 }
 
 /* ===== CSS VARIABLES ===== */
@@ -1150,7 +1152,7 @@ h1, h2, h3, h4, h5, h6,
   color: rgba(255,255,255,0.6);
   font-size: 13px;
   font-weight: 500;
-  letter-spacing: 0.3px;
+  letter-spacing: 0;
 }
 
 .marquee-item + .marquee-item::before {
@@ -1400,7 +1402,7 @@ h1, h2, h3, h4, h5, h6,
   cursor: pointer;
   line-height: 1.5;
   transition: color 0.3s ease;
-  letter-spacing: 1px;
+  letter-spacing: 0;
   font-family: 'Mada', sans-serif;
 }
 
@@ -2292,6 +2294,62 @@ textarea.form-input {
 
 .back-to-top:active {
   transform: translateY(-2px) scale(0.98);
+}
+
+/* ===== FLOATING WHATSAPP ===== */
+.wa-float {
+  position: fixed;
+  bottom: 28px;
+  left: 28px;
+  z-index: 500;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--whatsapp);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(37,211,102,0.4);
+  transition: transform var(--transition-bounce), box-shadow 0.3s ease;
+}
+
+.wa-float::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--whatsapp);
+  animation: waPulse 2.2s ease-out infinite;
+  z-index: -1;
+}
+
+.wa-float:hover {
+  transform: scale(1.1) translateY(-3px);
+  box-shadow: 0 10px 28px rgba(37,211,102,0.5);
+}
+
+.wa-float:active {
+  transform: scale(0.95);
+}
+
+@keyframes waPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .wa-float {
+    bottom: 16px;
+    left: 16px;
+    width: 50px;
+    height: 50px;
+  }
 }
 
 /* ===== SEARCH BAR (Products page) ===== */
@@ -3264,7 +3322,20 @@ html[data-theme="dark"] .dropdown-menu button.active svg {
 
   .header-search.open {
     display: block;
-    width: 100%;
+    position: fixed;
+    top: 60px;
+    right: 0;
+    left: 0;
+    padding: 12px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-md);
+    z-index: 999;
+    max-width: none;
+  }
+
+  .header-search.open input {
+    background: var(--bg);
   }
 
   .search-toggle {
@@ -3514,7 +3585,7 @@ html[data-theme="dark"] .dropdown-menu button.active svg {
   margin-bottom: 8px;
   position: relative;
   z-index: 1;
-  letter-spacing: -1px;
+  letter-spacing: 0;
 }
 
 .terms-hero-sub {
@@ -4071,6 +4142,13 @@ html[data-theme="dark"] .dropdown-menu button.active svg {
 
 .products-subtitle {
   color: var(--text-light);
+}
+
+.products-count {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 14px;
 }
 
 .img-tag {
