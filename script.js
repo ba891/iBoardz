@@ -20,7 +20,7 @@ const App = {
     { id:19, name:'L298N MOTOR DRIVER', price:19, op:30, cat:'sensor', img:'l298n-motor-driver.png', specs:['يتحكم بمحركين DC','جهد 5-35V','تيار 2A لكل محرك','PWM Control','حماية من الحرارة'], desc:'متحكم محركات DC و Stepper' },
     { id:20, name:'MICRO SD CARD READER', price:16, op:25, cat:'sensor', img:'micro-sd-card-reader.png', specs:['SPI Interface','يدعم SD/SDHC','جهد 3.3-5V','سرعة عالية','حجم صغير'], desc:'قارئ بطاقات Micro SD للمشاريع' },
     { id:21, name:'DS18B20 SENSOR', price:18, op:28, cat:'sensor', img:'ds18b20-sensor.png', specs:['حرارة -55°C إلى 125°C','1-Wire Interface','دقة ±0.5°C','مقاوم للماء','جهد 3-5.5V'], desc:'مستشعر حرارة رقمي مقاوم للماء' },
-    { id:22, name:'JUMPER WIRE', price:11, op:18, cat:'sensor', img:'jumper-wire.png', specs:['40 سلك','Male to Male','Male to Female','Female to Female','طول 20cm'], desc:'أسلاك توصيل متنوعة للمشاريع' },
+    { id:22, name:'JUMPER WIRES', price:11, op:18, cat:'sensor', img:'jumperwires.jpg', specs:['3 أنواع توصيل متوفرة','40 سلك لكل مجموعة','طول 20cm','جودة عالية ومقاومة للالتواء','يعمل مع جميع اللوحات'], desc:'أسلاك توصيل متنوعة لمشاريعك - اختر نوع التوصيل المناسب', colorOptions:['Male to Male','Male to Female','Female to Female'], optionLabel:'اختر نوع التوصيل:' },
     { id:23, name:'ACS712 30A RANGE', price:30, op:45, cat:'sensor', img:'acs712-30a.png', specs:['قياس تيار ±30A','Analog Output','دقة 66mV/A','جهد 5V','عزل كهربائي'], desc:'مستشعر التيار الكهربائي حتى 30 أمبير' },
     { id:24, name:'JOYSTICK', price:10, op:16, cat:'sensor', img:'joystick.png', specs:['محورين X/Y','زر ضغط','Analog Output','جهد 3.3-5V','سهل الاستخدام'], desc:'يد تحكم تناظرية للمشاريع' },
     { id:25, name:'RELAY MODULE HIGH 5V', price:13, op:20, cat:'sensor', img:'relay-module-5v.png', specs:['4 قنوات','جهد 5V','حمولة 10A/250VAC','عزل ضوئي','LED مؤشر'], desc:'موديول ريليه 4 قنوات للتحكم بالأحمال', pop:true, badge:'الأكثر طلباً' },
@@ -103,6 +103,7 @@ const App = {
   _bodyLockCount: 0,
   _revealObserver: null,
   _headerSearchOpen: false,
+  _lastAdd: null,
 
   // ===== HELPERS =====
   disc(p) { return Math.round((1 - p.price / p.op) * 100); },
@@ -218,6 +219,10 @@ const App = {
 
   // ===== CART ACTIONS =====
   addCart(prod, color) {
+    const key = prod.id + (color ? '|' + color : '');
+    const now = Date.now();
+    if (this._lastAdd && this._lastAdd.key === key && now - this._lastAdd.t < 600) return;
+    this._lastAdd = { key, t: now };
     const ex = color
       ? this.state.cart.find(i => i.product.id === prod.id && i.color === color)
       : this.state.cart.find(i => i.product.id === prod.id);
@@ -237,7 +242,7 @@ const App = {
 
   addCartWithColor(id) {
     const prod = this.products.find(x => x.id === id);
-    const sel = document.querySelector('input[name="ledColor"]:checked');
+    const sel = document.querySelector('input[name="prodOption"]:checked');
     const color = sel ? sel.value : null;
     if (prod.colorOptions && !color) {
       this.showToast('الرجاء اختيار اللون أولاً', 'error');
@@ -286,7 +291,9 @@ const App = {
   // ===== TOAST =====
   showToast(msg, type = 'success', showCartBtn = false) {
     const container = document.getElementById('toastContainer');
+    [...container.querySelectorAll('.toast')].forEach(c => { if (c.dataset.msg === msg) c.remove(); });
     const el = document.createElement('div');
+    el.dataset.msg = msg;
     el.className = `toast ${type}`;
     const icons = {
       success: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>',
@@ -435,7 +442,7 @@ const App = {
           </div>
           <h2 class="modal-title">${p.name}</h2>
           <p class="modal-desc">${p.desc}</p>
-          ${p.colorOptions ? `<div class="modal-color-picker"><label class="modal-color-label">اختر اللون المناسب:</label><div class="modal-color-options">${p.colorOptions.map(c => `<label class="modal-color-option"><input type="radio" name="ledColor" value="${c}" class="modal-color-radio"><span class="modal-color-swatch" data-color="${c}">${c}</span></label>`).join('')}</div></div>` : ''}
+          ${p.colorOptions ? `<div class="modal-color-picker"><label class="modal-color-label">${p.optionLabel || 'اختر اللون المناسب:'}</label><div class="modal-color-options">${p.colorOptions.map(c => `<label class="modal-color-option"><input type="radio" name="prodOption" value="${c}" class="modal-color-radio"><span class="modal-color-swatch" data-color="${c}">${c}</span></label>`).join('')}</div></div>` : ''}
           <div class="modal-prices"><span class="modal-new-price">${p.price} ر.س</span><span class="modal-old-price">${p.op} ر.س</span></div>
           <div class="modal-specs"><h3>المواصفات التقنية:</h3>${p.specs.map(s => `<div class="spec-item"><div class="spec-dot"></div><span class="spec-text">${s}</span></div>`).join('')}</div>
           <button class="modal-add-btn" onclick="App.addCartWithColor(${p.id})">أضف إلى السلة <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
@@ -475,7 +482,7 @@ const App = {
             <span class="price">${p.price} ر.س</span>
             <span class="old-price">${p.op} ر.س</span>
           </div>
-          <button class="add-btn" onclick="event.stopPropagation();App.addCart(App.products.find(x=>x.id===${p.id}))" aria-label="أضف للسلة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+          <button class="add-btn" onclick="event.stopPropagation();${p.colorOptions ? `App.showProduct(${p.id})` : `App.addCart(App.products.find(x=>x.id===${p.id}))`}" aria-label="أضف للسلة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
         </div>
       </div>
     </div>`;
