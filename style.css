@@ -1465,7 +1465,7 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .filter-btn {
-  padding: 10px 24px;
+  padding: 10px 18px;
   border-radius: 24px;
   border: 1px solid transparent;
   font-size: 14px;
@@ -1473,6 +1473,43 @@ h1, h2, h3, h4, h5, h6,
   transition: all var(--transition-smooth);
   font-family: 'Mada', sans-serif;
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.filter-ico {
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.8;
+  transition: transform var(--transition-bounce);
+}
+
+.filter-btn:hover .filter-ico {
+  transform: scale(1.15);
+}
+
+.filter-count {
+  font-size: 11px;
+  font-weight: 800;
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--border);
+  color: var(--text-muted);
+  transition: all var(--transition-smooth);
+}
+
+.filter-btn.active .filter-ico {
+  opacity: 1;
+}
+
+.filter-btn.active .filter-count {
+  background: rgba(255,255,255,0.22);
+  color: #fff;
+}
+
+[data-theme="dark"] .filter-btn.active .filter-count {
+  background: rgba(255,255,255,0.18);
 }
 
 .filter-btn.active {
