@@ -152,6 +152,111 @@ h1, h2, h3, h4, h5, h6,
     --header-height: 60px;
     --header-blur: 8px;
   }
+
+  .header {
+    padding: 0 12px;
+    gap: 8px;
+  }
+
+  .logo-text {
+    font-size: 25px;
+  }
+
+  .header-search {
+    display: none;
+  }
+
+  .header-actions {
+    gap: 2px;
+  }
+
+  .menu-btn,
+  .cart-btn,
+  .theme-toggle,
+  .search-toggle {
+    padding: 10px;
+  }
+
+  .menu-btn {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    padding: 0 !important;
+    font-size: 14px !important;
+    letter-spacing: 0.5px;
+  }
+
+  .cart-badge {
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-text {
+    font-size: 22px;
+  }
+
+  .menu-btn,
+  .cart-btn,
+  .theme-toggle,
+  .search-toggle {
+    padding: 8px;
+  }
+}
+
+  .header {
+    padding: 0 12px;
+    gap: 8px;
+  }
+
+  .logo-text {
+    font-size: 25px;
+  }
+
+  .header-search {
+    display: none;
+  }
+
+  .header-actions {
+    gap: 2px;
+  }
+
+  .menu-btn,
+  .cart-btn,
+  .theme-toggle,
+  .search-toggle {
+    padding: 10px;
+  }
+
+  .menu-btn {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    padding: 0 !important;
+    font-size: 14px !important;
+    letter-spacing: 0.5px;
+  }
+
+  .cart-badge {
+    width: 18px;
+    height: 18px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-text {
+    font-size: 22px;
+  }
+
+  .menu-btn,
+  .cart-btn,
+  .theme-toggle,
+  .search-toggle {
+    padding: 8px;
+  }
 }
 
 /* ===== HEADER ===== */
@@ -323,37 +428,38 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .menu-btn {
-  background: #151515;
+  background: linear-gradient(135deg, #151515 0%, #2a2a2a 100%);
   color: #fff;
-  border: 1px solid #333;
-  border-radius: 8px;
+  border: 1.5px solid rgba(255,255,255,0.08);
+  border-radius: 10px;
   width: auto;
-  min-width: 110px;
-  height: 42px;
-  padding: 0 20px;
+  min-width: 115px;
+  height: 44px;
+  padding: 0 16px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 13px;
+  font-weight: 700;
   font-family: 'Mada', sans-serif;
-  letter-spacing: 0.5px;
-  transition: all 0.2s ease;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+  will-change: transform;
 }
 
 .menu-btn:hover {
-  background: #ff9500;
+  background: linear-gradient(135deg, #ff9500 0%, #ffb14d 100%);
   color: #151515;
   border-color: #ff9500;
-  box-shadow: 0 3px 10px rgba(255,149,0,0.3);
+  box-shadow: 0 4px 16px rgba(255,149,0,0.35);
+  transform: translateY(-1px);
 }
 
 .menu-btn:active {
-  opacity: 0.9;
-  transform: translateY(1px);
+  opacity: 0.85;
 }
 
 .menu-btn svg {
@@ -3467,8 +3573,10 @@ html[data-theme="dark"] .dropdown-menu button.active svg {
   }
 
   .add-btn {
-    width: 32px;
-    height: 32px;
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+    padding: 0 !important;
     border-radius: 8px;
   }
 
@@ -3594,35 +3702,12 @@ html[data-theme="dark"] .dropdown-menu button.active svg {
   }
 
   .menu-btn {
-    min-width: 80px;
-    height: 36px;
-    padding: 0 12px;
-    font-size: 12px;
-    border-radius: 6px;
-  }
-
-  .add-btn {
-    width: auto;
-    height: 36px;
-    padding: 0 12px;
-    font-size: 12px;
-    border-radius: 6px;
-  }
-
-  .show-all-btn,
-  .submit-btn,
-  .modal-add-btn,
-  .whatsapp-btn,
-  .terms-cta-btn,
-  .filter-btn {
-    padding: 10px 14px;
-    font-size: 11px;
-  }
-
-  .cart-qty-controls .qty-btn {
-    width: 30px;
-    height: 30px;
-    padding: 4px;
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    padding: 0 !important;
+    font-size: 14px !important;
+    letter-spacing: 0.5px;
   }
 
   .toast {
@@ -4246,101 +4331,370 @@ html[data-theme="dark"] .dropdown-menu button.active svg {
   background: radial-gradient(circle at center, rgba(255,255,255,0.08), rgba(255,255,255,0.02));
 }
 
-/* ===== DIGITAL BUTTON SYSTEM ===== */
+/* ==========================================================================
+   DIGITAL BUTTON SYSTEM - Professional Consistent Design
+   ========================================================================== */
 
-/* Main CTA Buttons - Digital Layered Shadow Style */
 .btn,
-.show-all-btn {
-  background: #fffcd5;
-  box-shadow: 4px 4px #ffe00b, 9px 9px #151515;
-  color: #151515;
-  border: solid 2px #151515;
-  text-decoration: none;
-  padding: 18px 32px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  font-size: 14px;
-  font-weight: 700;
-  position: relative;
-  z-index: 1;
-  transition: 0.5s cubic-bezier(0.785, 0.135, 0.15, 0.86);
-  cursor: pointer;
-  overflow: hidden;
+.show-all-btn,
+.add-btn,
+.add-btn,
+.modal-add-btn,
+.submit-btn,
+.whatsapp-btn,
+.terms-cta-btn,
+.terms-cta-btn.primary,
+.terms-cta-btn.secondary,
+.contact-card,
+.filter-btn,
+.filter-btn.active,
+.quick-tag-chip,
+.back-to-top,
+.dropdown-menu button,
+.menu-btn {
+  background: var(--surface) !important;
+  box-shadow: 5px 5px var(--primary), 10px 10px var(--text) !important;
+  color: var(--text) !important;
+  border: 2px solid var(--text) !important;
+  text-decoration: none !important;
+  padding: 14px 28px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 10px !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  position: relative !important;
+  z-index: 1 !important;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer !important;
+  overflow: hidden !important;
   text-transform: uppercase !important;
-  letter-spacing: 1.5px;
-  border-radius: 6px;
-  font-family: sans-serif;
+  letter-spacing: 1.2px !important;
+  border-radius: 8px !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important;
 }
 
 .btn::before,
-.show-all-btn::before {
+.show-all-btn::before,
+.add-btn::before,
+.modal-add-btn::before,
+.submit-btn::before,
+.whatsapp-btn::before,
+.terms-cta-btn::before,
+.contact-card::before,
+.filter-btn::before,
+.filter-btn.active::before,
+.quick-tag-chip::before,
+.back-to-top::before,
+.dropdown-menu button::before,
+.menu-btn::before {
   position: absolute;
-  content: "";
+  content: '';
   top: 0;
   right: 0;
   width: 0%;
   height: 100%;
-  background: #151515;
+  background: var(--primary) !important;
   z-index: -1;
-  transition: 0.5s cubic-bezier(0.785, 0.135, 0.15, 0.86);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn:hover::before,
-.show-all-btn:hover::before {
+.show-all-btn:hover::before,
+.add-btn:hover::before,
+.modal-add-btn:hover::before,
+.submit-btn:hover::before,
+.whatsapp-btn:hover::before,
+.terms-cta-btn:hover::before,
+.contact-card:hover::before,
+.filter-btn:hover::before,
+.filter-btn.active:hover::before,
+.quick-tag-chip:hover::before,
+.back-to-top:hover::before,
+.dropdown-menu button:hover::before,
+.menu-btn:hover::before {
   width: 100%;
   left: 0;
-  right: unset;
 }
 
 .btn:hover,
-.show-all-btn:hover {
-  box-shadow: 0 0 #ffe00b, 0 0 #151515;
-  color: white;
-  transform: translate(2px, 2px);
-}
-
-/* Normal Buttons - Simple Consistent Style */
-.menu-btn {
-  background: #151515;
-  color: #fff;
-  border: 1px solid #333;
-  border-radius: 6px;
-  height: 36px;
-  padding: 0 14px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  font-family: 'Mada', sans-serif;
-  transition: background 0.2s ease;
-}
-
+.show-all-btn:hover,
+.add-btn:hover,
+.modal-add-btn:hover,
+.submit-btn:hover,
+.whatsapp-btn:hover,
+.terms-cta-btn:hover,
+.contact-card:hover,
+.filter-btn:hover,
+.filter-btn.active:hover,
+.quick-tag-chip:hover,
+.back-to-top:hover,
+.dropdown-menu button:hover,
 .menu-btn:hover {
-  background: #ff9500;
-  color: #151515;
+  box-shadow: 0 0 var(--primary), 0 0 var(--text) !important;
+  color: var(--surface) !important;
+  transform: translate(3px, 3px);
 }
 
-.add-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
-  background: #151515;
+/* WhatsApp Button Specific */
+.whatsapp-btn {
+  background: #25D366 !important;
+  color: #fff !important;
+  border-color: #1da851 !important;
+  box-shadow: 5px 5px #1da851, 10px 10px #0d4a27 !important;
+}
+
+.whatsapp-btn::before {
+  background: #1fb855 !important;
+}
+
+.whatsapp-btn:hover {
+  box-shadow: 0 0 #25D366, 0 0 #0d4a27 !important;
+  color: #fff !important;
+}
+
+/* Filter Buttons Active State */
+.filter-btn.active {
+  background: var(--primary) !important;
+  color: #fff !important;
+  border-color: var(--primary-dark) !important;
+  box-shadow: 4px 4px var(--primary-dark), 8px 8px var(--text) !important;
+}
+
+.filter-btn.active::before {
+  background: var(--primary-dark) !important;
+  width: 100%;
+}
+
+.filter-btn.active:hover {
+  box-shadow: 0 0 var(--primary), 0 0 var(--text) !important;
+}
+
+/* Cart Quantity Buttons */
+.qty-btn,
+.cart-remove {
+  background: var(--surface) !important;
+  border: 2px solid var(--border-strong) !important;
+  color: var(--text) !important;
+  padding: 8px 12px !important;
+  border-radius: 6px !important;
+  transition: all 0.3s ease !important;
+}
+
+.qty-btn:hover,
+.cart-remove:hover {
+  background: var(--primary) !important;
+  color: #fff !important;
+  border-color: var(--primary) !important;
+  transform: scale(1.05);
+}
+
+/* Icon Buttons */
+.icon-btn {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 10px !important;
+}
+
+.icon-btn:hover {
+  background: var(--primary-light) !important;
+  color: var(--primary) !important;
+  box-shadow: none !important;
+  transform: scale(1.1);
+}
+
+/* Close Button */
+.modal-close,
+.cart-close {
+  background: var(--surface) !important;
+  border: 2px solid var(--border-strong) !important;
+  box-shadow: none !important;
+}
+
+.modal-close:hover,
+.cart-close:hover {
+  background: var(--danger) !important;
+  color: #fff !important;
+  border-color: var(--danger) !important;
+  transform: rotate(90deg);
+}
+
+/* Quick Tags */
+.quick-tag-chip {
+  padding: 8px 16px !important;
+  font-size: 12px !important;
+}
+
+/* Dark Mode Overrides */
+[data-theme="dark"] .btn,
+[data-theme="dark"] .show-all-btn,
+[data-theme="dark"] .add-btn,
+[data-theme="dark"] .modal-add-btn,
+[data-theme="dark"] .submit-btn,
+[data-theme="dark"] .filter-btn,
+[data-theme="dark"] .filter-btn.active,
+[data-theme="dark"] .quick-tag-chip {
+  background: var(--dark) !important;
+  box-shadow: 4px 4px var(--primary), 8px 8px #000 !important;
+  color: #fff !important;
+  border-color: var(--primary) !important;
+}
+
+[data-theme="dark"] .btn::before,
+[data-theme="dark"] .show-all-btn::before,
+[data-theme="dark"] .add-btn::before,
+[data-theme="dark"] .modal-add-btn::before,
+[data-theme="dark"] .submit-btn::before,
+[data-theme="dark"] .filter-btn::before,
+[data-theme="dark"] .filter-btn.active::before,
+[data-theme="dark"] .quick-tag-chip::before {
+  background: var(--primary) !important;
+}
+
+[data-theme="dark"] .btn:hover,
+[data-theme="dark"] .show-all-btn:hover,
+[data-theme="dark"] .add-btn:hover,
+[data-theme="dark"] .modal-add-btn:hover,
+[data-theme="dark"] .submit-btn:hover,
+[data-theme="dark"] .filter-btn:hover,
+[data-theme="dark"] .filter-btn.active:hover,
+[data-theme="dark"] .quick-tag-chip:hover {
+  box-shadow: 0 0 var(--primary), 0 0 #000 !important;
+  color: #000 !important;
+}
+
+/* Digital Background Pattern */
+body {
+  background-color: var(--bg);
+  background-image: 
+    radial-gradient(var(--primary-glow) 1px, transparent 1px),
+    radial-gradient(rgba(0,0,0,0.03) 1px, transparent 1px);
+  background-size: 20px 20px, 40px 40px;
+  background-position: 0 0, 10px 10px;
+}
+
+/* Floating WhatsApp */
+.wa-float {
+  box-shadow: 5px 5px #25D366, 10px 10px #0d4a27 !important;
+  animation: waPulse 2s infinite;
+}
+
+.wa-float:hover {
+  transform: scale(1.1);
+}
+
+@keyframes waPulse {
+  0%, 100% { box-shadow: 5px 5px #25D366, 10px 10px #0d4a27; }
+  50% { box-shadow: 5px 5px #25D366, 10px 10px #0d4a27, 0 0 20px rgba(37, 211, 102, 0.5); }
+}
+
+/* Product Card Hover */
+.product-card {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 2px solid transparent;
+}
+
+.product-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 8px 8px var(--primary), 16px 16px var(--text);
+  border-color: var(--primary);
+}
+
+/* Section Headers */
+.section-badge {
+  background: var(--primary);
   color: #fff;
-  border: 1px solid #333;
-  cursor: pointer;
-  display: inline-flex;
+  padding: 8px 20px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: inline-block;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.section-subtitle {
+  color: var(--text-muted);
+  font-size: 16px;
+}
+
+/* Quick Features Icons */
+.quick-feature-icon {
+  background: var(--primary-light);
+  border: 2px solid var(--primary);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease;
+  transition: all 0.3s ease;
 }
 
-.add-btn:hover {
-  background: #ff9500;
-  color: #151515;
-  border-color: #ff9500;
+.quick-feature:hover .quick-feature-icon {
+  background: var(--primary);
+  transform: scale(1.1) rotate(10deg);
+  box-shadow: 0 0 20px var(--primary-glow);
 }
 
-/* ===== END DIGITAL BUTTON SYSTEM =====
+/* Discount Badge */
+.discount-badge {
+  background: var(--danger);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: 2px 2px rgba(0,0,0,0.2);
+}
+
+/* Product Badge */
+.product-badge {
+  background: var(--primary);
+  color: #fff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+/* Back to Top */
+.back-to-top {
+  background: var(--primary) !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: 4px 4px var(--primary-dark), 8px 8px var(--text) !important;
+}
+
+.back-to-top:hover {
+  box-shadow: 0 0 var(--primary), 0 0 var(--text) !important;
+}
+
+/* Form Inputs */
+.form-input {
+  border: 2px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 14px 18px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+  background: var(--surface);
+}
+
+.form-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--primary-glow);
+  outline: none;
+}
+
+/* ===== END DIGITAL BUTTON SYSTEM ===== */
