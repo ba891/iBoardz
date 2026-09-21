@@ -408,9 +408,9 @@ const App = {
           <div class="cart-item-prices"><span class="price" style="font-size:15px">${item.product.price} ر.س</span><span class="old-price">${item.product.op} ر.س</span></div>
         </div>
         <div class="cart-qty-controls">
-          <button class="qty-btn" onclick="App.updQty(${item.product.id},-1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-          <span style="font-weight:800;min-width:20px;text-align:center;font-size:15px">${item.qty}</span>
-          <button class="qty-btn" onclick="App.updQty(${item.product.id},1)"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+          <button class="qty-btn" onclick="App.updQty(${item.product.id},-1)" aria-label="نقص" title="نقص الكمية">−</button>
+          <span style="font-weight:900;min-width:22px;text-align:center;font-size:16px;color:var(--primary)">${item.qty}</span>
+          <button class="qty-btn" onclick="App.updQty(${item.product.id},1)" aria-label="زيادة" title="زيادة الكمية">+</button>
           <button class="cart-remove" onclick="App.removeCart(${item.product.id})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
         </div>
       </div>`).join('');

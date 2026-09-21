@@ -206,59 +206,6 @@ h1, h2, h3, h4, h5, h6,
   }
 }
 
-  .header {
-    padding: 0 12px;
-    gap: 8px;
-  }
-
-  .logo-text {
-    font-size: 25px;
-  }
-
-  .header-search {
-    display: none;
-  }
-
-  .header-actions {
-    gap: 2px;
-  }
-
-  .menu-btn,
-  .cart-btn,
-  .theme-toggle,
-  .search-toggle {
-    padding: 10px;
-  }
-
-  .menu-btn {
-    width: 40px !important;
-    height: 40px !important;
-    min-width: 40px !important;
-    padding: 0 !important;
-    font-size: 14px !important;
-    letter-spacing: 0.5px;
-  }
-
-  .cart-badge {
-    width: 18px;
-    height: 18px;
-    font-size: 10px;
-  }
-}
-
-@media (max-width: 480px) {
-  .logo-text {
-    font-size: 22px;
-  }
-
-  .menu-btn,
-  .cart-btn,
-  .theme-toggle,
-  .search-toggle {
-    padding: 8px;
-  }
-}
-
 /* ===== HEADER ===== */
 .header {
   position: fixed;
@@ -352,7 +299,7 @@ h1, h2, h3, h4, h5, h6,
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   direction: rtl;
 }
 
@@ -703,10 +650,11 @@ h1, h2, h3, h4, h5, h6,
 .cart-item {
   display: flex;
   gap: 14px;
-  padding: 14px 0;
-  border-bottom: 1px solid var(--border);
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-strong);
   align-items: center;
   animation: fadeIn 0.3s ease;
+  min-height: 70px;
 }
 
 .cart-item-img {
@@ -754,17 +702,34 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .qty-btn {
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   border-radius: 8px;
-  border: 1px solid var(--border-strong);
+  border: 2px solid var(--border-strong);
   background: var(--surface);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text);
+  font-weight: 800;
+  font-size: 18px;
+  line-height: 1;
   transition: all var(--transition-smooth);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+}
+
+.qty-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+  box-shadow: 0 2px 8px rgba(255,149,0,0.2);
+}
+
+.qty-btn svg {
+  width: 14px;
+  height: 14px;
+  stroke-width: 3;
 }
 
 .qty-btn:hover {
