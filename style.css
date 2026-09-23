@@ -204,6 +204,15 @@ h1, h2, h3, h4, h5, h6,
   .search-toggle {
     padding: 8px;
   }
+
+  .menu-btn {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+    padding: 0 !important;
+    font-size: 14px !important;
+    letter-spacing: 0.5px;
+  }
 }
 
 /* ===== HEADER ===== */
@@ -1383,12 +1392,15 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .product-card {
-  background: var(--surface);
-  border-radius: 18px;
-  border: 1px solid var(--border);
-  overflow: hidden;
-  transition: all 0.4s var(--ease);
-  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+   background: var(--surface);
+   border-radius: 18px;
+   border: 1px solid var(--border);
+   overflow: hidden;
+   transition: all 0.4s var(--ease);
+   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+   display: flex;
+   flex-direction: column;
+   height: 100%;
 }
 
 .product-card:hover {
@@ -1496,6 +1508,26 @@ h1, h2, h3, h4, h5, h6,
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.product-prices {
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.product-prices .price,
+.product-prices .old-price {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+.product-card .add-btn {
+  flex-shrink: 0;
 }
 
 .product-prices {
@@ -3571,7 +3603,8 @@ html[data-theme="dark"] .dropdown-menu button.active svg {
   }
 
   .dropdown-menu {
-    right: 12px;
+    right: auto;
+    left: 8px;
     min-width: 180px;
     top: 62px;
   }
@@ -4664,77 +4697,125 @@ body {
 
 /* ===== END DIGITAL BUTTON SYSTEM ===== */
 
-/* ===== MOBILE FIXES: restore original button sizes / colors ===== */
+/* ===== MOBILE: ensure digital button system works consistently ===== */
 @media (max-width: 768px) {
-  /* Menu button — restore dark gradient + white lines, small size */
+  /* Keep menu button consistent with digital button system */
   .menu-btn {
-    background: linear-gradient(135deg, #151515 0%, #2a2a2a 100%) !important;
-    color: #fff !important;
-    border: 1.5px solid rgba(255,255,255,0.08) !important;
     width: 40px !important;
     height: 40px !important;
     min-width: 40px !important;
     padding: 0 !important;
     font-size: 14px !important;
-    letter-spacing: 0.5px !important;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.15) !important;
+    background: var(--surface) !important;
+    color: var(--text) !important;
+    border: 2px solid var(--text) !important;
+    border-radius: 8px !important;
+    box-shadow: 5px 5px var(--primary), 10px 10px var(--text) !important;
     text-transform: none !important;
-    overflow: hidden !important;
+    letter-spacing: 0 !important;
+    font-family: 'Mada', sans-serif !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
   .menu-btn:hover {
-    background: linear-gradient(135deg, #ff9500 0%, #ffb14d 100%) !important;
-    color: #151515 !important;
-    border-color: #ff9500 !important;
-    box-shadow: 0 4px 16px rgba(255,149,0,0.35) !important;
-    transform: translateY(-1px) !important;
+    box-shadow: 0 0 var(--primary), 0 0 var(--text) !important;
+    color: var(--surface) !important;
+    transform: translate(3px, 3px) !important;
+  }
+  .menu-btn::before {
+    position: absolute !important;
+    content: '' !important;
+    top: 0 !important;
+    right: 0 !important;
+    width: 0% !important;
+    height: 100% !important;
+    background: var(--primary) !important;
+    z-index: -1 !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+  .menu-btn:hover::before {
+    width: 100% !important;
+    left: 0 !important;
   }
 
-  /* Add button inside product cards — revert to original size so it doesn't cover price */
+  /* Add button inside product cards — use unified digital style, compact for mobile */
   .product-card .add-btn,
   .products-grid .add-btn,
   .products-grid-large .add-btn {
     width: auto !important;
-    height: 42px !important;
-    border-radius: 8px !important;
-    background: #151515 !important;
-    color: #fff !important;
-    border: 1px solid #333 !important;
-    cursor: pointer !important;
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 8px !important;
-    padding: 0 18px !important;
-    font-size: 14px !important;
-    font-weight: 600 !important;
-    font-family: 'Mada', sans-serif !important;
-    transition: all 0.2s ease !important;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.15) !important;
-    text-transform: none !important;
-    letter-spacing: 0 !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    padding: 0 12px !important;
+    font-size: 13px !important;
+    gap: 6px !important;
     position: static !important;
     z-index: auto !important;
+    background: var(--surface) !important;
+    color: var(--text) !important;
+    border: 2px solid var(--text) !important;
+    border-radius: 8px !important;
+    box-shadow: 5px 5px var(--primary), 10px 10px var(--text) !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    font-family: 'Mada', sans-serif !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
   .product-card .add-btn:hover,
   .products-grid .add-btn:hover,
   .products-grid-large .add-btn:hover {
-    background: #ff9500 !important;
-    color: #151515 !important;
-    border-color: #ff9500 !important;
-    box-shadow: 0 3px 10px rgba(255,149,0,0.3) !important;
-    transform: translateY(-1px) !important;
+    box-shadow: 0 0 var(--primary), 0 0 var(--text) !important;
+    color: var(--surface) !important;
+    transform: translate(3px, 3px) !important;
   }
-  .product-card .add-btn:active,
-  .products-grid .add-btn:active,
-  .products-grid-large .add-btn:active {
-    opacity: 0.9 !important;
-    transform: translateY(1px) !important;
+  .product-card .add-btn::before,
+  .products-grid .add-btn::before,
+  .products-grid-large .add-btn::before {
+    position: absolute !important;
+    content: '' !important;
+    top: 0 !important;
+    right: 0 !important;
+    width: 0% !important;
+    height: 100% !important;
+    background: var(--primary) !important;
+    z-index: -1 !important;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  }
+  .product-card .add-btn:hover::before,
+  .products-grid .add-btn:hover::before,
+  .products-grid-large .add-btn:hover::before {
+    width: 100% !important;
+    left: 0 !important;
   }
   .product-card .add-btn svg,
   .products-grid .add-btn svg,
   .products-grid-large .add-btn svg {
-    width: 20px !important;
-    height: 20px !important;
+    width: 18px !important;
+    height: 18px !important;
     stroke-width: 2.5 !important;
+  }
+
+  /* Ensure product bottom layout prevents overlap on small screens */
+  .product-bottom {
+    flex-wrap: nowrap;
+    gap: 8px;
+  }
+  .product-prices {
+    flex-shrink: 1;
+    min-width: 0;
+    overflow: hidden;
+  }
+  .product-prices .price,
+  .product-prices .old-price {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+  .product-card .add-btn {
+    flex-shrink: 0;
+  }
+
+  /* Shift product card slightly left on mobile so add button isn't cut off */
+  .product-card {
+    margin-right: -4px;
   }
 }
