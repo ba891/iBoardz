@@ -1,0 +1,14 @@
+{
+  "name": "iboardz-store-backend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dependency-free backend for the iBoardz storefront and dashboard",
+  "scripts": {
+    "start": "node ../store-dashboard/server.js",
+    "test": "node --test ../store-dashboard/server.test.js",
+    "check": "node -e \"const fs=require('fs'),path=require('path'),cp=require('child_process');const walk=d=>fs.readdirSync(d,{withFileTypes:true}).flatMap(e=>{const f=path.join(d,e.name);if(e.isDirectory())return e.name==='node_modules'||e.name==='.git'?[]:walk(f);return e.isFile()&&f.endsWith('.js')?[f]:[]});for(const root of ['.','../store-dashboard']){for(const f of walk(root)){const r=cp.spawnSync(process.execPath,['--check',f],{stdio:'inherit'});if(r.status)process.exit(r.status||1)}}\""
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,38 +1,6 @@
 const App = {
   // ===== DATA =====
-  products: [
-    { id:2, name:'ESP32 DEV MODEL', price:39.75, op:60, cat:'mcu', img:'esp32-dev-model.png', specs:['واي فاي + بلوتوث','USB Type-C','340KB SRAM','48MHz processor','18 GPIO pin'], desc:'نسخة مطورة من ESP32 مع منفذ USB-C', pop:true, badge:'مميز' },
-    { id:3, name:'ARDUINO UNO R3', price:32.75, op:50, cat:'mcu', img:'arduino-uno-r3.png', specs:['ATmega328P','16MHz clock','32KB Flash','14 Digital I/O','6 Analog Inputs'], desc:'المتحكم الأشهر في العالم، مثالي للمبتدئين', pop:true, badge:'الأكثر مبيعاً' },
-    { id:4, name:'ESP32 C3 MINI', price:29.75, op:45, cat:'mcu', img:'esp32-c3-mini.png', specs:['RISC-V 160MHz','400KB SRAM','WiFi 4 + BT5','22 GPIO pin','حجم صغير جداً'], desc:'متحكم صغير الحجم بكفاءة عالية' },
-    { id:5, name:'ESP8266 D1 BOARD', price:29.75, op:42, cat:'mcu', img:'esp8266-d1-board.png', specs:['ESP8266 WiFi','80MHz clock','11 GPIO pin','ADC مدمج','USB Micro'], desc:'لوحة تطوير اقتصادية مع واي فاي' },
-    { id:6, name:'ESP32 D1 BOARD', price:39.75, op:58, cat:'mcu', img:'esp32-d1-board.png', specs:['ESP32 Dual Core','WiFi + BLE','30 GPIO pin','520KB SRAM','USB Type-C'], desc:'لوحة D1 المطورة مع ESP32', pop:true, badge:'مميز' },
-    { id:7, name:'MAX 30102', price:25.75, op:40, cat:'sensor', img:'max-30102.png', specs:['مستشعر نبضات','IR + Red LED','I2C Interface','18-bit ADC','استهلاك منخفض'], desc:'مستشعر نبضات القلب والأكسجين في الدم' },
-    { id:8, name:'HC-SR04 ULTRASONIC', price:18.75, op:28, cat:'sensor', img:'hc-sr04-ultrasonic.png', specs:['قياس مسافة 2-400cm','دقة 3mm','Trigger + Echo','جهد عمل 5V','زاوية 15°'], desc:'مستشعر الموجات فوق الصوتية لقياس المسافة', pop:true, badge:'الأكثر طلباً' },
-    { id:9, name:'DHT11 SENSOR', price:16.75, op:25, cat:'sensor', img:'dht11-sensor.png', specs:['حرارة 0-50°C','رطوبة 20-90%','دقة ±2°C','Digital Output','جهد 3.3-5V'], desc:'مستشعر الحرارة والرطوبة', pop:true, badge:'الأكثر مبيعاً' },
-    { id:10, name:'Capacitive Moisture Sensor V2.0', price:20.75, op:32, cat:'sensor', img:'capacitive-moisture-sensor-v2.png', specs:['قياس رطوبة التربة','Analog Output','مقاوم للتآكل','جهد 3.3-5V','طراز V2.0'], desc:'مستشعر رطوبة التربة السعوي' },
-    { id:11, name:'MPU6050 SENSOR', price:23.75, op:36, cat:'sensor', img:'mpu6050-sensor.png', specs:['جيروسكوب 3 محاور','مقياس تسارع 3 محاور','I2C Interface','16-bit ADC','استهلاك منخفض'], desc:'مستشعر الحركة والتسارع' },
-    { id:12, name:'MATRIX KEYBOARD 3x4', price:14.75, op:22, cat:'input', img:'matrix-keypad-3x4.png', specs:['12 مفتاح','3 صفوف × 4 أعمدة','Flexible Film','سهل التوصيل','استهلاك منخفض'], desc:'لوحة مفاتيح مرنة 3×4' },
-    { id:14, name:'WATER PUMP', price:21.75, op:35, cat:'motor', img:'water-pump.png', specs:['جهد 3-6V','تدفق 80-120 L/H','مقاوم للتآكل','صغير الحجم','DC Motor'], desc:'مضخة مياه صغيرة للمشاريع' },
-    { id:15, name:'SERVO MOTOR', price:16.75, op:25, cat:'motor', img:'servo-motor.png', specs:['زاوية 0-180°','عزم 1.8kg/cm','جهد 4.8-6V','PWM Control','SG90 Micro'], desc:'محرك سيرفو صغير للتحكم بالزاوية', pop:true, badge:'الأكثر مبيعاً' },
-    { id:16, name:'MATRIX KEYBOARD 4x4', price:19.75, op:30, cat:'input', img:'matrix-keypad-4x4.png', specs:['16 مفتاح','4 صفوف × 4 أعمدة','Flexible Film','سهل التوصيل','استهلاك منخفض'], desc:'لوحة مفاتيح مرنة 4×4' },
-    { id:17, name:'TDS METER V1.0', price:39.75, op:55, cat:'sensor', img:'tds-meter-v1.png', specs:['قياس TDS','Analog Output','جهد 3.3-5V','دقة ±10%','مقاوم للماء'], desc:'مستشعر قياس جودة الماء' },
-    { id:18, name:'AHT20+BMP280', price:22.75, op:35, cat:'sensor', img:'aht20-bmp280.png', specs:['حرارة + رطوبة + ضغط','I2C Interface','دقة عالية','استهلاك منخفض','حجم صغير'], desc:'مستشعر حرارة ورطوبة وضغط جوي مدمج' },
-    { id:19, name:'L298N MOTOR DRIVER', price:19.75, op:30, cat:'motor', img:'l298n-motor-driver.png', specs:['يتحكم بمحركين DC','جهد 5-35V','تيار 2A لكل محرك','PWM Control','حماية من الحرارة'], desc:'متحكم محركات DC و Stepper' },
-    { id:20, name:'MICRO SD CARD READER', price:16.75, op:25, cat:'accessory', img:'micro-sd-card-reader.png', specs:['SPI Interface','يدعم SD/SDHC','جهد 3.3-5V','سرعة عالية','حجم صغير'], desc:'قارئ بطاقات Micro SD للمشاريع' },
-    { id:21, name:'DS18B20 SENSOR', price:18.75, op:28, cat:'sensor', img:'ds18b20-sensor.png', specs:['حرارة -55°C إلى 125°C','1-Wire Interface','دقة ±0.5°C','مقاوم للماء','جهد 3-5.5V'], desc:'مستشعر حرارة رقمي مقاوم للماء' },
-    { id:22, name:'JUMPER WIRES', price:11.75, op:18, cat:'accessory', img:'jumperwires.jpg', specs:['3 أنواع توصيل متوفرة','40 سلك لكل مجموعة','طول 20cm','جودة عالية ومقاومة للالتواء','يعمل مع جميع اللوحات'], desc:'أسلاك توصيل متنوعة لمشاريعك - اختر نوع التوصيل المناسب', colorOptions:['Male to Male','Male to Female','Female to Female'], optionLabel:'اختر نوع التوصيل:' },
-    { id:23, name:'ACS712 30A RANGE', price:30.75, op:45, cat:'sensor', img:'acs712-30a.png', specs:['قياس تيار ±30A','Analog Output','دقة 66mV/A','جهد 5V','عزل كهربائي'], desc:'مستشعر التيار الكهربائي حتى 30 أمبير' },
-    { id:24, name:'JOYSTICK', price:10.75, op:16, cat:'input', img:'joystick.png', specs:['محورين X/Y','زر ضغط','Analog Output','جهد 3.3-5V','سهل الاستخدام'], desc:'يد تحكم تناظرية للمشاريع' },
-    { id:25, name:'RELAY MODULE HIGH 5V', price:13.75, op:20, cat:'motor', img:'relay-module-5v.png', specs:['4 قنوات','جهد 5V','حمولة 10A/250VAC','عزل ضوئي','LED مؤشر'], desc:'موديول ريليه 4 قنوات للتحكم بالأحمال', pop:true, badge:'الأكثر طلباً' },
-    { id:26, name:'SH1107 OLED DISPLAY', price:109.75, op:160, cat:'display', img:'sh1107-oled-display.png', specs:['شاشة OLED 1.3"','دقة 128×64','I2C Interface','تباين عالي جداً','استهلاك منخفض'], desc:'شاشة OLED 1.3 بوصة عالية الجودة للمشاريع', pop:true, badge:'مميز' },
-    { id:27, name:'LCD 1602 WITH I2C', price:27.75, op:40, cat:'display', img:'lcd-1602-i2c.png', specs:['16 حرف × 2 سطر','I2C Interface','إضاءة خلفية زرقاء','جهد 5V','تباين قابل للتعديل'], desc:'شاشة LCD مع واجهة I2C سهلة التوصيل' },
-    { id:28, name:'SSD1306 OLED 0.96"', price:35.75, op:52, cat:'display', img:'ssd1306-oled-096.png', specs:['شاشة OLED 0.96"','دقة 128×64','I2C Interface','أبيض وأزرق','استهلاك منخفض جداً'], desc:'شاشة OLED صغيرة ومثالية للمشاريع' },
-    { id:29, name:'LED صغيرة (جميع الألوان)', price:1.25, op:2, cat:'accessory', img:'led.png', specs:['ألوان متوفرة: أحمر، أخضر، أزرق، أصفر، أبيض','جهد 2-3V','تيار 20mA','قطر 5mm','اختر اللون من القائمة أعلاه'], desc:'LED صغيرة 5mm بجميع الألوان - اختر اللون المناسب لمشروعك', colorOptions:['أحمر','أخضر','أزرق','أصفر','أبيض'] },
-    { id:30, name:'RAIN WATER LEVEL DETECTION SENSOR MODULE 3-5VDC', price:14.75, op:22, cat:'sensor', img:'rainsensor.jpg', specs:['جهد 3.3-5V','مخرج Analog + Digital','مقاوم للماء','لوحة حساسة للماء','مقارن LM393'], desc:'مستشعر كشف المطر ومستوى المياه' },
-    { id:31, name:'DS1302 RTC Real Time Clock Module', price:17.75, op:25, cat:'accessory', img:'ds1302.jpg', specs:['RTC DS1302','واجهة SPI','بطارية احتياطية','حفظ الوقت وال تاريخ','جهد 3.3-5V'], desc:'وحدة الوقت الحقيقي RTC مع بطارية احتياطية' },
-    { id:32, name:'Piezo Buzzer (جرس صوتي)', price:5.75, op:8, cat:'motor', img:'buzzer.jpg', specs:['جهد 3.5-5V','تردد 2300Hz','مستمر الصوت','حجم صغير','سهل التوصيل'], desc:'جرس بيزو كهربائي لإصدار صوت التنبيه في المشاريع' },
-    { id:33, name:'TTP223 TOUCH SENSOR', price:5.75, op:9, cat:'sensor', img:'ttp223.jpeg', specs:['حساس لمس سعوي','جهد 2-5.5V','مخرج رقمي (HIGH عند اللمس)','يعمل مع Arduino و ESP32','حجم صغير وسهل التوصيل'], desc:'حساس لمس سعوي يكشف لمسة الإصبع بدون أي ضغط', pop:true },
-  ],
+  products: window.IBOARDZ_CATALOG.products,
 
   cats: [
     { key:'all', label:'الكل', icon:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>' },
@@ -110,6 +78,12 @@ const App = {
   _lastAdd: null,
 
   // ===== HELPERS =====
+  getStock(product) {
+    if (!product || product.stock == null || product.stock === '') return null;
+    const stock = Number(product.stock);
+    return Number.isFinite(stock) ? Math.max(0, Math.floor(stock)) : null;
+  },
+
   disc(p) { return Math.round((1 - p.price / p.op) * 100); },
 
   totalItems() { return this.state.cart.reduce((s, i) => s + i.qty, 0); },
@@ -121,8 +95,75 @@ const App = {
   totalSaved() { return this.totalOriginal() - this.totalPrice(); },
 
   // ===== PERSISTENCE =====
+  async syncCatalog() {
+    try {
+      const response = await fetch('/api/catalog');
+      if (!response.ok) return false;
+      const payload = await response.json();
+      const serverProducts = Array.isArray(payload)
+        ? payload
+        : payload && Array.isArray(payload.products)
+          ? payload.products
+          : payload && payload.data && Array.isArray(payload.data.products)
+            ? payload.data.products
+            : Array.isArray(payload?.data)
+              ? payload.data
+              : [];
+      if (!serverProducts.length) return false;
+      const updates = new Map();
+      serverProducts.forEach(product => {
+        if (product && product.id != null) updates.set(String(product.id), product);
+      });
+      if (!updates.size) return false;
+      this.products = this.products.map(product => {
+        const update = updates.get(String(product.id));
+        if (!update) return product;
+        const merged = { ...product };
+        ['price', 'stock', 'lowStockThreshold'].forEach(field => {
+          if (update[field] != null) merged[field] = update[field];
+        });
+        return merged;
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  },
+
   loadCart() {
-    try { const s = localStorage.getItem('iboardz-cart'); if (s) this.state.cart = JSON.parse(s); } catch {}
+    let saved = [];
+    try { saved = JSON.parse(localStorage.getItem('iboardz-cart') || '[]'); } catch {}
+    if (!Array.isArray(saved)) {
+      this.state.cart = [];
+      return;
+    }
+    const cart = [];
+    saved.forEach(line => {
+      if (!line || typeof line !== 'object') return;
+      const productId = line.product?.id ?? line.id;
+      const product = this.products.find(p => String(p.id) === String(productId));
+      if (!product) return;
+      const qty = Number(line.qty);
+      if (!Number.isFinite(qty) || qty <= 0) return;
+      const color = line.color == null ? null : String(line.color);
+      if (color !== null && (!product.colorOptions || !product.colorOptions.includes(color))) return;
+      if (color === null && product.colorOptions?.length) return;
+      const stock = this.getStock(product);
+      if (stock === 0) return;
+      const normalizedQty = stock === null ? Math.floor(qty) : Math.min(Math.floor(qty), stock);
+      if (normalizedQty < 1) return;
+      const existing = cart.find(item => String(item.product.id) === String(product.id) && (item.color || null) === color);
+      if (existing) {
+        const combined = existing.qty + normalizedQty;
+        existing.qty = stock === null ? combined : Math.min(combined, stock);
+      } else {
+        const item = { product, qty: normalizedQty };
+        if (color !== null) item.color = color;
+        cart.push(item);
+      }
+    });
+    this.state.cart = cart;
+    this.saveCart();
   },
 
   saveCart() {
@@ -223,49 +264,88 @@ const App = {
 
   // ===== CART ACTIONS =====
   addCart(prod, color) {
-    const key = prod.id + (color ? '|' + color : '');
+    const product = this.products.find(item => String(item.id) === String(prod?.id));
+    if (!product) return false;
+    const selectedColor = color == null ? null : String(color);
+    if (selectedColor !== null && (!product.colorOptions || !product.colorOptions.includes(selectedColor))) {
+      this.showToast('الرجاء اختيار خيار متاح', 'error');
+      return false;
+    }
+    if (selectedColor === null && product.colorOptions?.length) {
+      this.showToast('الرجاء اختيار اللون أولاً', 'error');
+      return false;
+    }
+    const ex = this.state.cart.find(item =>
+      String(item.product.id) === String(product.id) && (item.color || null) === selectedColor
+    );
+    const stock = this.getStock(product);
+    const nextQty = (ex ? ex.qty : 0) + 1;
+    if (stock !== null && nextQty > stock) {
+      this.showToast('الكمية المتوفرة غير كافية', 'error');
+      return false;
+    }
+    const key = product.id + (selectedColor !== null ? '|' + selectedColor : '');
     const now = Date.now();
-    if (this._lastAdd && this._lastAdd.key === key && now - this._lastAdd.t < 600) return;
+    if (this._lastAdd && this._lastAdd.key === key && now - this._lastAdd.t < 600) return false;
     this._lastAdd = { key, t: now };
-    const ex = color
-      ? this.state.cart.find(i => i.product.id === prod.id && i.color === color)
-      : this.state.cart.find(i => i.product.id === prod.id);
     if (ex) {
-      ex.qty++;
-      this.showToast(`تم زيادة الكمية: ${prod.name} ×${ex.qty}`, 'success');
+      ex.qty = nextQty;
+      this.showToast(`تم زيادة الكمية: ${product.name} ×${ex.qty}`, 'success');
     } else {
-      const item = { product: prod, qty: 1 };
-      if (color) item.color = color;
+      const item = { product, qty: 1 };
+      if (selectedColor !== null) item.color = selectedColor;
       this.state.cart.push(item);
-      this.showToast(`تمت الإضافة: ${prod.name}${color ? ' - ' + color : ''}`, 'success', true);
+      this.showToast(`تمت الإضافة: ${product.name}${selectedColor !== null ? ' - ' + selectedColor : ''}`, 'success', true);
     }
     this.saveCart();
     this.updateBadge();
     this.renderCart();
+    return true;
   },
 
   addCartWithColor(id) {
     const prod = this.products.find(x => x.id === id);
+    if (!prod) return;
     const sel = document.querySelector('input[name="prodOption"]:checked');
     const color = sel ? sel.value : null;
     if (prod.colorOptions && !color) {
       this.showToast('الرجاء اختيار اللون أولاً', 'error');
       return;
     }
-    this.addCart(prod, color);
-    this.closeModal();
+    if (this.addCart(prod, color)) this.closeModal();
   },
 
-  removeCart(id) {
-    this.state.cart = this.state.cart.filter(i => i.product.id !== id);
+  removeCart(id, color) {
+    const hasColor = color !== undefined;
+    const selectedColor = color == null ? null : String(color);
+    this.state.cart = this.state.cart.filter(item =>
+      String(item.product.id) !== String(id) || (hasColor && (item.color || null) !== selectedColor)
+    );
     this.saveCart();
     this.updateBadge();
     this.renderCart();
   },
 
-  updQty(id, d) {
-    const item = this.state.cart.find(i => i.product.id === id);
-    if (item) item.qty = Math.max(1, item.qty + d);
+  updQty(id, d, color) {
+    const hasColor = color !== undefined;
+    const selectedColor = color == null ? null : String(color);
+    const item = this.state.cart.find(line =>
+      String(line.product.id) === String(id) && (!hasColor || (line.color || null) === selectedColor)
+    );
+    const delta = Number(d);
+    if (!item || !Number.isFinite(delta)) return;
+    const stock = this.getStock(item.product);
+    if (stock === 0) {
+      this.state.cart = this.state.cart.filter(line => line !== item);
+      this.saveCart();
+      this.updateBadge();
+      this.renderCart();
+      this.showToast('المنتج غير متوفر حالياً', 'error');
+      return;
+    }
+    const nextQty = Math.max(1, item.qty + delta);
+    item.qty = stock === null ? nextQty : Math.min(nextQty, stock);
+    if (stock !== null && nextQty > stock) this.showToast('الكمية المتوفرة غير كافية', 'error');
     this.saveCart();
     this.renderCart();
   },
@@ -405,24 +485,24 @@ const App = {
         <div class="cart-item-img">${this.imgTag(`images/${item.product.img}`, item.product.name, 40)}</div>
         <div class="cart-item-info">
           <div class="cart-item-name">${item.product.name}${item.color ? `<span class="cart-item-color"> - ${item.color}</span>` : ''}</div>
-          <div class="cart-item-prices"><span class="price" style="font-size:15px">${item.product.price} ر.س</span><span class="old-price">${item.product.op} ر.س</span></div>
+          <div class="cart-item-prices"><span class="price" style="font-size:15px">⃁ ${item.product.price}</span><span class="old-price">⃁ ${item.product.op}</span></div>
         </div>
         <div class="cart-qty-controls">
-          <button class="qty-btn" onclick="App.updQty(${item.product.id},-1)" aria-label="نقص" title="نقص الكمية">−</button>
+          <button class="qty-btn" onclick="App.updQty(${item.product.id},-1${item.color == null ? '' : ',' + JSON.stringify(item.color).replace(/"/g, '&quot;')})" aria-label="نقص" title="نقص الكمية">−</button>
           <span style="font-weight:900;min-width:22px;text-align:center;font-size:16px;color:var(--primary)">${item.qty}</span>
-          <button class="qty-btn" onclick="App.updQty(${item.product.id},1)" aria-label="زيادة" title="زيادة الكمية">+</button>
-          <button class="cart-remove" onclick="App.removeCart(${item.product.id})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
+          <button class="qty-btn" onclick="App.updQty(${item.product.id},1${item.color == null ? '' : ',' + JSON.stringify(item.color).replace(/"/g, '&quot;')})" aria-label="زيادة" title="زيادة الكمية">+</button>
+          <button class="cart-remove" onclick="App.removeCart(${item.product.id}${item.color == null ? '' : ',' + JSON.stringify(item.color).replace(/"/g, '&quot;')})"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
         </div>
       </div>`).join('');
 
       const tp = this.totalPrice(), top2 = this.totalOriginal(), ts = this.totalSaved();
-      const waText = encodeURIComponent('مرحباً، أريد طلب:\n' + this.state.cart.map(i => `${i.product.name}${i.color ? ' - ' + i.color : ''} × ${i.qty} = ${i.product.price * i.qty} ر.س`).join('\n') + '\nالمجموع: ' + tp + ' ر.س');
+      const waText = encodeURIComponent('مرحباً، أريد طلب:\n' + this.state.cart.map(i => `${i.product.name}${i.color ? ' - ' + i.color : ''} × ${i.qty} = ⃁ ${i.product.price * i.qty}`).join('\n') + '\nالمجموع: ⃁ ' + tp);
 
       footer.style.display = 'block';
       footer.innerHTML = `<div class="cart-totals">
-        <div class="cart-total-row original"><span class="cart-total-label">الإجمالي قبل الخصم:</span><span class="cart-total-old">${top2} ر.س</span></div>
-        <div class="cart-total-row discounted"><span class="cart-total-label">الإجمالي بعد الخصم:</span><span class="cart-total-new">${tp} ر.س</span></div>
-        ${ts > 0 ? `<div class="cart-savings-badge"><span class="savings-icon">🎉</span><span class="savings-text">وفّرت ${ts} ر.س</span></div>` : ''}
+        <div class="cart-total-row original"><span class="cart-total-label">الإجمالي قبل الخصم:</span><span class="cart-total-old">⃁ ${top2}</span></div>
+        <div class="cart-total-row discounted"><span class="cart-total-label">الإجمالي بعد الخصم:</span><span class="cart-total-new">⃁ ${tp}</span></div>
+        ${ts > 0 ? `<div class="cart-savings-badge"><span class="savings-icon">🎉</span><span class="savings-text">وفّرت ⃁ ${ts}</span></div>` : ''}
       </div>
       <a href="https://wa.me/966552645082?text=${waText}" target="_blank" rel="noopener noreferrer"><button class="whatsapp-btn">${this.svgIcon(this.icons.whatsapp, 20, '#25D366', '#25D366')} اطلب عبر واتساب</button></a>`;
     }
@@ -447,7 +527,7 @@ const App = {
           <h2 class="modal-title">${p.name}</h2>
           <p class="modal-desc">${p.desc}</p>
           ${p.colorOptions ? `<div class="modal-color-picker"><label class="modal-color-label">${p.optionLabel || 'اختر اللون المناسب:'}</label><div class="modal-color-options">${p.colorOptions.map(c => `<label class="modal-color-option"><input type="radio" name="prodOption" value="${c}" class="modal-color-radio"><span class="modal-color-swatch" data-color="${c}">${c}</span></label>`).join('')}</div></div>` : ''}
-          <div class="modal-prices"><span class="modal-new-price">${p.price} ر.س</span><span class="modal-old-price">${p.op} ر.س</span></div>
+          <div class="modal-prices"><span class="modal-new-price">⃁ ${p.price}</span><span class="modal-old-price">⃁ ${p.op}</span></div>
           <div class="modal-specs"><h3>المواصفات التقنية:</h3>${p.specs.map(s => `<div class="spec-item"><div class="spec-dot"></div><span class="spec-text">${s}</span></div>`).join('')}</div>
           <button class="modal-add-btn" onclick="App.addCartWithColor(${p.id})">أضف إلى السلة <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
         </div>
@@ -483,8 +563,8 @@ const App = {
         <h3 class="product-name" onclick="App.showProduct(${p.id})">${p.name}</h3>
         <div class="product-bottom">
           <div class="product-prices">
-            <span class="price">${p.price} ر.س</span>
-            <span class="old-price">${p.op} ر.س</span>
+            <span class="price">⃁ ${p.price}</span>
+            <span class="old-price">⃁ ${p.op}</span>
           </div>
           <button class="add-btn" onclick="event.stopPropagation();${p.colorOptions ? `App.showProduct(${p.id})` : `App.addCart(App.products.find(x=>x.id===${p.id}))`}" aria-label="أضف للسلة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
         </div>
@@ -834,7 +914,8 @@ const App = {
   },
 
   // ===== INIT =====
-  init() {
+  async init() {
+    await this.syncCatalog();
     this.loadCart();
     this.setTheme(this.getTheme());
     this.setupReducedMotion();
@@ -861,7 +942,7 @@ const App = {
           '@type': 'Offer',
           priceCurrency: 'SAR',
           price: p.price,
-          availability: 'https://schema.org/InStock'
+          availability: this.getStock(p) === 0 ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock'
         }
       }));
       const script = document.createElement('script');
