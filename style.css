@@ -2391,7 +2391,13 @@ textarea.form-input {
 }
 
 .toast.success {
-  background: linear-gradient(135deg, #065f46, #047857);
+  background: linear-gradient(135deg, #064e3b, #065f46);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+[data-theme="dark"] .toast.success {
+  background: linear-gradient(135deg, #0a2e1a, #065f46);
+  border-color: rgba(74, 222, 128, 0.25);
 }
 
 .toast.error {
@@ -2442,6 +2448,19 @@ textarea.form-input {
     opacity: 0;
     transform: translateY(-20px) scale(0.95);
   }
+}
+
+/* ===== FLY TO CART ===== */
+.fly-to-cart {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  background: var(--primary);
+  border-radius: 50%;
+  z-index: 99999;
+  pointer-events: none;
+  box-shadow: 0 0 12px rgba(255,149,0,0.6);
+  transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 /* ===== BACK TO TOP ===== */

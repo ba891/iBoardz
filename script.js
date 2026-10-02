@@ -9,6 +9,9 @@ const App = {
     { key:'display', label:'الشاشات', icon:'<rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>' },
     { key:'motor', label:'المحركات والمشغلات', icon:'<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>' },
     { key:'input', label:'أدوات الإدخال', icon:'<rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M6 14h.01M18 14h.01M9 14h6"/>' },
+    { key:'output', label:'أدوات الإخراج', icon:'<path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/>' },
+    { key:'power', label:'الطاقة والشحن', icon:'<rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="13" x2="23" y2="11"/><line x1="6" y1="10" x2="6" y2="14"/><line x1="10" y1="10" x2="10" y2="14"/>' },
+    { key:'module', label:'الموديولات الإلكترونية', icon:'<rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><line x1="9" y1="1" x2="9" y2="4"/><line x1="15" y1="1" x2="15" y2="4"/><line x1="9" y1="20" x2="9" y2="23"/><line x1="15" y1="20" x2="15" y2="23"/><line x1="20" y1="9" x2="23" y2="9"/><line x1="20" y1="14" x2="23" y2="14"/><line x1="1" y1="9" x2="4" y2="9"/><line x1="1" y1="14" x2="4" y2="14"/>' },
     { key:'accessory', label:'الإكسسوارات والتوصيل', icon:'<path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/>' },
   ],
 
@@ -263,7 +266,7 @@ const App = {
   },
 
   // ===== CART ACTIONS =====
-  addCart(prod, color) {
+  addCart(prod, color, event) {
     const product = this.products.find(item => String(item.id) === String(prod?.id));
     if (!product) return false;
     const selectedColor = color == null ? null : String(color);
@@ -300,7 +303,48 @@ const App = {
     this.saveCart();
     this.updateBadge();
     this.renderCart();
+    if (event) this.flyToCart(event);
     return true;
+  },
+
+  flyToCart(event) {
+    const cartBtn = document.querySelector('.cart-btn');
+    if (!cartBtn || !event) return;
+    const btnRect = event.currentTarget ? event.currentTarget.getBoundingClientRect() : event.target.getBoundingClientRect();
+    const cartRect = cartBtn.getBoundingClientRect();
+    const flyEl = document.createElement('div');
+    flyEl.className = 'fly-to-cart';
+    flyEl.style.cssText = `
+      position: fixed;
+      width: 20px;
+      height: 20px;
+      background: var(--primary);
+      border-radius: 50%;
+      z-index: 99999;
+      pointer-events: none;
+      box-shadow: 0 0 12px rgba(255,149,0,0.6);
+      transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    `;
+    const startX = btnRect.left + btnRect.width / 2 - 10;
+    const startY = btnRect.top + btnRect.height / 2 - 10;
+    const endX = cartRect.left + cartRect.width / 2 - 10;
+    const endY = cartRect.top + cartRect.height / 2 - 10;
+    flyEl.style.left = startX + 'px';
+    flyEl.style.top = startY + 'px';
+    document.body.appendChild(flyEl);
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        flyEl.style.left = endX + 'px';
+        flyEl.style.top = endY + 'px';
+        flyEl.style.transform = 'scale(0.3)';
+        flyEl.style.opacity = '0.6';
+      });
+    });
+    setTimeout(() => {
+      flyEl.remove();
+      cartBtn.style.transform = 'scale(1.2)';
+      setTimeout(() => { cartBtn.style.transform = ''; }, 200);
+    }, 700);
   },
 
   addCartWithColor(id) {
@@ -566,7 +610,7 @@ const App = {
             <span class="price">⃁ ${p.price}</span>
             <span class="old-price">⃁ ${p.op}</span>
           </div>
-          <button class="add-btn" onclick="event.stopPropagation();${p.colorOptions ? `App.showProduct(${p.id})` : `App.addCart(App.products.find(x=>x.id===${p.id}))`}" aria-label="أضف للسلة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+          <button class="add-btn" onclick="event.stopPropagation();${p.colorOptions ? `App.showProduct(${p.id})` : `App.addCart(App.products.find(x=>x.id===${p.id}), null, event)`}" aria-label="أضف للسلة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
         </div>
       </div>
     </div>`;
