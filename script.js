@@ -149,8 +149,10 @@ const App = {
       const qty = Number(line.qty);
       if (!Number.isFinite(qty) || qty <= 0) return;
       const color = line.color == null ? null : String(line.color);
-      if (color !== null && (!product.colorOptions || !product.colorOptions.includes(color))) return;
-      if (color === null && product.colorOptions?.length) return;
+      if (!product.customInput) {
+        if (color !== null && (!product.colorOptions || !product.colorOptions.includes(color))) return;
+        if (color === null && product.colorOptions?.length) return;
+      }
       const stock = this.getStock(product);
       if (stock === 0) return;
       const normalizedQty = stock === null ? Math.floor(qty) : Math.min(Math.floor(qty), stock);
@@ -270,13 +272,15 @@ const App = {
     const product = this.products.find(item => String(item.id) === String(prod?.id));
     if (!product) return false;
     const selectedColor = color == null ? null : String(color);
-    if (selectedColor !== null && (!product.colorOptions || !product.colorOptions.includes(selectedColor))) {
-      this.showToast('الرجاء اختيار خيار متاح', 'error');
-      return false;
-    }
-    if (selectedColor === null && product.colorOptions?.length) {
-      this.showToast('الرجاء اختيار اللون أولاً', 'error');
-      return false;
+    if (!product.customInput) {
+      if (selectedColor !== null && (!product.colorOptions || !product.colorOptions.includes(selectedColor))) {
+        this.showToast('الرجاء اختيار خيار متاح', 'error');
+        return false;
+      }
+      if (selectedColor === null && product.colorOptions?.length) {
+        this.showToast('الرجاء اختيار اللون أولاً', 'error');
+        return false;
+      }
     }
     const ex = this.state.cart.find(item =>
       String(item.product.id) === String(product.id) && (item.color || null) === selectedColor
@@ -298,7 +302,7 @@ const App = {
       const item = { product, qty: 1 };
       if (selectedColor !== null) item.color = selectedColor;
       this.state.cart.push(item);
-      this.showToast(`تمت الإضافة: ${product.name}${selectedColor !== null ? ' - ' + selectedColor : ''}`, 'success', true);
+      this.showToast(`تمت الإضافة: ${product.name}${selectedColor !== null ? (product.customInput ? ' - القيمة: ' + selectedColor : ' - ' + selectedColor) : ''}`, 'success', true);
     }
     this.saveCart();
     this.updateBadge();
@@ -350,11 +354,22 @@ const App = {
   addCartWithColor(id) {
     const prod = this.products.find(x => x.id === id);
     if (!prod) return;
-    const sel = document.querySelector('input[name="prodOption"]:checked');
-    const color = sel ? sel.value : null;
-    if (prod.colorOptions && !color) {
-      this.showToast('الرجاء اختيار اللون أولاً', 'error');
-      return;
+    let color = null;
+    if (prod.customInput) {
+      const inp = document.getElementById('prodCustomValue');
+      const val = inp ? inp.value.trim() : '';
+      if (!val) {
+        this.showToast('الرجاء كتابة القيمة المطلوبة أولاً', 'error');
+        return;
+      }
+      color = val;
+    } else {
+      const sel = document.querySelector('input[name="prodOption"]:checked');
+      color = sel ? sel.value : null;
+      if (prod.colorOptions && !color) {
+        this.showToast('الرجاء اختيار اللون أولاً', 'error');
+        return;
+      }
     }
     if (this.addCart(prod, color)) this.closeModal();
   },
@@ -528,7 +543,7 @@ const App = {
       body.innerHTML = this.state.cart.map(item => `<div class="cart-item">
         <div class="cart-item-img">${this.imgTag(`images/${item.product.img}`, item.product.name, 40)}</div>
         <div class="cart-item-info">
-          <div class="cart-item-name">${item.product.name}${item.color ? `<span class="cart-item-color"> - ${item.color}</span>` : ''}</div>
+          <div class="cart-item-name">${item.product.name}${item.color ? `<span class="cart-item-color">${item.product.customInput ? ' - القيمة: ' + item.color : ' - ' + item.color}</span>` : ''}</div>
           <div class="cart-item-prices"><span class="price" style="font-size:15px">⃁ ${item.product.price}</span><span class="old-price">⃁ ${item.product.op}</span></div>
         </div>
         <div class="cart-qty-controls">
@@ -540,7 +555,7 @@ const App = {
       </div>`).join('');
 
       const tp = this.totalPrice(), top2 = this.totalOriginal(), ts = this.totalSaved();
-      const waText = encodeURIComponent('مرحباً، أريد طلب:\n' + this.state.cart.map(i => `${i.product.name}${i.color ? ' - ' + i.color : ''} × ${i.qty} = ⃁ ${i.product.price * i.qty}`).join('\n') + '\nالمجموع: ⃁ ' + tp);
+      const waText = encodeURIComponent('مرحباً، أريد طلب:\n' + this.state.cart.map(i => `${i.product.name}${i.color ? (i.product.customInput ? ' (القيمة: ' + i.color + ')' : ' - ' + i.color) : ''} × ${i.qty} = ⃁ ${i.product.price * i.qty}`).join('\n') + '\nالمجموع: ⃁ ' + tp);
 
       footer.style.display = 'block';
       footer.innerHTML = `<div class="cart-totals">
@@ -570,7 +585,7 @@ const App = {
           </div>
           <h2 class="modal-title">${p.name}</h2>
           <p class="modal-desc">${p.desc}</p>
-          ${p.colorOptions ? `<div class="modal-color-picker"><label class="modal-color-label">${p.optionLabel || 'اختر اللون المناسب:'}</label><div class="modal-color-options">${p.colorOptions.map(c => `<label class="modal-color-option"><input type="radio" name="prodOption" value="${c}" class="modal-color-radio"><span class="modal-color-swatch" data-color="${c}">${c}</span></label>`).join('')}</div></div>` : ''}
+          ${p.customInput ? `<div class="modal-color-picker"><label class="modal-color-label">${p.customInput.label || 'القيمة:'}</label><input type="text" id="prodCustomValue" class="modal-custom-input" placeholder="${p.customInput.placeholder || ''}" autocomplete="off"></div>` : p.colorOptions ? `<div class="modal-color-picker"><label class="modal-color-label">${p.optionLabel || 'اختر اللون المناسب:'}</label><div class="modal-color-options">${p.colorOptions.map(c => `<label class="modal-color-option"><input type="radio" name="prodOption" value="${c}" class="modal-color-radio"><span class="modal-color-swatch" data-color="${c}">${c}</span></label>`).join('')}</div></div>` : ''}
           <div class="modal-prices"><span class="modal-new-price">⃁ ${p.price}</span><span class="modal-old-price">⃁ ${p.op}</span></div>
           <div class="modal-specs"><h3>المواصفات التقنية:</h3>${p.specs.map(s => `<div class="spec-item"><div class="spec-dot"></div><span class="spec-text">${s}</span></div>`).join('')}</div>
           <button class="modal-add-btn" onclick="App.addCartWithColor(${p.id})">أضف إلى السلة <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
@@ -610,7 +625,7 @@ const App = {
             <span class="price">⃁ ${p.price}</span>
             <span class="old-price">⃁ ${p.op}</span>
           </div>
-          <button class="add-btn" onclick="event.stopPropagation();${p.colorOptions ? `App.showProduct(${p.id})` : `App.addCart(App.products.find(x=>x.id===${p.id}), null, event)`}" aria-label="أضف للسلة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
+          <button class="add-btn" onclick="event.stopPropagation();${(p.colorOptions || p.customInput) ? `App.showProduct(${p.id})` : `App.addCart(App.products.find(x=>x.id===${p.id}), null, event)`}" aria-label="أضف للسلة"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
         </div>
       </div>
     </div>`;
