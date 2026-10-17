@@ -6,7 +6,7 @@
    Glyph from "Noto Naskh Arabic" (SIL Open Font License 1.1), subset to U+20C1. */
 @font-face {
   font-family: 'Riyal Sign';
-  src: url('fonts/riyal-sign.woff2') format('woff2');
+  src: url('../fonts/riyal-sign.woff2') format('woff2');
   font-weight: 100 900;
   font-style: normal;
   font-display: block;
@@ -52,6 +52,20 @@ img {
   display: block;
 }
 
+/* readable by screen readers, invisible on screen */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
 .price,
 .old-price,
 .cart-total-old,
@@ -60,6 +74,18 @@ img {
 .modal-old-price {
   direction: ltr;
   unicode-bidi: isolate;
+}
+
+/* Phone numbers: always one horizontal left-to-right run, never mirrored by
+   the surrounding RTL paragraph and never broken onto a second line.
+   Wrap the digits in <span class="phone"> (and add tel:/wa.me links as usual). */
+.phone,
+.phone a {
+  direction: ltr;
+  unicode-bidi: isolate;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
 }
 
 /* ===== ARABIC HEADINGS (Mada = proper Arabic shaping) ===== */
@@ -71,7 +97,7 @@ h1, h2, h3, h4, h5, h6,
 .contact-form h2,
 .modal-specs h3,
 .work-hours h3,
-.footer h4,
+.footer h3,
 .feature-card h3,
 .quick-feature h3,
 .products-subtitle,
@@ -585,21 +611,25 @@ h1, h2, h3, h4, h5, h6,
   font-weight: 500;
 }
 
+/* A full-screen backdrop-filter layer stays in the compositor even at
+   opacity:0, which washes the whole page out. Only create it while open. */
 #menuBackdrop {
   position: fixed;
   inset: 0;
   z-index: 9998;
   background: rgba(0,0,0,0.3);
   opacity: 0;
+  visibility: hidden;
   pointer-events: none;
-  transition: opacity 0.25s ease;
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
+  transition: opacity 0.25s ease, visibility 0.25s ease;
 }
 
 #menuBackdrop.open {
   opacity: 1;
+  visibility: visible;
   pointer-events: auto;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
 }
 
 /* ===== CART ===== */
@@ -843,7 +873,8 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .savings-icon {
-  font-size: 18px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .savings-text {
@@ -1270,32 +1301,77 @@ h1, h2, h3, h4, h5, h6,
 
 /* ===== MARQUEE ===== */
 .marquee {
+  position: relative;
   overflow: hidden;
   background: var(--dark);
+  --marquee-bg: var(--dark);
   padding: 10px 0;
   white-space: nowrap;
+  /* the track is wider than the strip; anchoring it to the left edge keeps
+     the items on screen while they travel (an RTL host would anchor right
+     and push them out of view) */
+  direction: ltr;
   border-bottom: 1px solid rgba(255,255,255,0.04);
 }
 
+/* Soft edges, painted in the bar's own colour. This used to be a mask-image,
+   but a mask fades the background along with the text, so the white page
+   behind the bar bled through as a dusty haze at both ends. Overlays in
+   --marquee-bg dissolve the items into the bar instead — same soft cut, no dust. */
+.marquee::before,
+.marquee::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 90px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.marquee::before {
+  left: 0;
+  background: linear-gradient(90deg, var(--marquee-bg) 0%, transparent 100%);
+}
+
+.marquee::after {
+  right: 0;
+  background: linear-gradient(270deg, var(--marquee-bg) 0%, transparent 100%);
+}
+
+/* Two identical sets of items are rendered, so travelling -50% lands exactly
+   on the start of the second set — a seamless loop with no empty pause.
+   The track is forced to LTR: an over-wide box inside the RTL page would
+   otherwise be anchored to the right edge and scroll out of view. Each item
+   keeps its own RTL direction so the icon stays on the right of the label. */
 .marquee-track {
-  display: inline-block;
-  animation: marqueeScroll 40s linear infinite;
-  padding-left: 100%;
+  display: flex;
+  direction: ltr;
+  width: max-content;
+  animation: marqueeScroll 42s linear infinite;
+  will-change: transform;
 }
 
 .marquee-item {
   display: inline-flex;
+  direction: rtl;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
   margin: 0 32px;
-  color: rgba(255,255,255,0.6);
+  color: rgba(255,255,255,0.72);
   font-size: 13px;
   font-weight: 500;
   letter-spacing: 0;
 }
 
+.marquee-item svg {
+  flex: none;
+  opacity: 0.9;
+}
+
 .marquee-item + .marquee-item::before {
   content: '';
+  flex: none;
   width: 4px;
   height: 4px;
   border-radius: 50%;
@@ -1309,7 +1385,7 @@ h1, h2, h3, h4, h5, h6,
     transform: translateX(0);
   }
   to {
-    transform: translateX(-100%);
+    transform: translateX(-50%);
   }
 }
 
@@ -1328,26 +1404,51 @@ h1, h2, h3, h4, h5, h6,
   gap: 20px;
 }
 
+/* One definition for the whole strip — the icon used to be described twice
+   further down the file, and the later copy filled the disc with orange while
+   the glyph was still painted orange, so hovering made the icon vanish. */
 .quick-feature {
   display: flex;
   align-items: center;
   gap: 14px;
+  padding: 12px 14px;
+  border: 2px solid transparent;
+  border-radius: 18px;
+  transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease),
+              border-color 0.35s var(--ease), background 0.35s var(--ease);
+}
+
+/* Same hover language as .product-card: lift + hard orange offset. */
+.quick-feature:hover {
+  transform: translateY(-5px);
+  background: var(--bg);
+  border-color: var(--primary);
+  box-shadow: 5px 5px 0 var(--primary);
 }
 
 .quick-feature-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: var(--radius-md);
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
   background: var(--primary-light);
+  border: 2px solid var(--primary);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: transform var(--transition-bounce), background 0.3s ease;
+  /* --primary-darker, not --primary: the raw brand orange on the peach disc is
+     only 1.99:1, this shade clears the 3:1 floor for meaningful graphics. */
+  color: var(--primary-darker);
+  transition: transform 0.35s var(--ease), background 0.35s var(--ease),
+              color 0.35s var(--ease);
 }
 
+/* Hover fills the disc with orange, so the glyph flips to the site's dark
+   ink (#151515 on #ff9500 clears WCAG AA) rather than blending into it. */
 .quick-feature:hover .quick-feature-icon {
-  transform: scale(1.1) rotate(-5deg);
+  background: var(--primary);
+  color: #151515;
+  transform: scale(1.06);
 }
 
 .quick-feature h3 {
@@ -1357,7 +1458,7 @@ h1, h2, h3, h4, h5, h6,
 }
 
 .quick-feature p {
-  color: var(--text-light);
+  color: var(--text-secondary);
   font-size: 13px;
   margin: 2px 0 0;
 }
@@ -1509,7 +1610,7 @@ h1, h2, h3, h4, h5, h6,
 
 .badge-primary {
   background: var(--primary);
-  color: #fff;
+  color: #151515;
 }
 
 .discount-badge {
@@ -2334,7 +2435,7 @@ textarea.form-input {
   margin-top: 8px;
 }
 
-.footer h4 {
+.footer h3 {
   font-weight: 800;
   margin-bottom: 16px;
   color: var(--primary);
@@ -3241,8 +3342,6 @@ html[data-theme="dark"] .dropdown-menu button.active svg {
 
 [data-theme="dark"] #menuBackdrop {
   background: rgba(0,0,0,0.7);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
 }
 
 [data-theme="dark"] #menuBackdrop.open {
@@ -3307,6 +3406,7 @@ html[data-theme="dark"] .dropdown-menu button.active svg {
 
 [data-theme="dark"] .marquee {
   background: var(--darker);
+  --marquee-bg: var(--darker);
 }
 
 [data-theme="dark"] .preloader {
@@ -3583,6 +3683,11 @@ html[data-theme="dark"] .dropdown-menu button.active svg {
 
   .marquee {
     padding: 8px 0;
+  }
+
+  .marquee::before,
+  .marquee::after {
+    width: 44px;
   }
 
   .marquee-item {
@@ -4025,8 +4130,17 @@ html[data-theme="dark"] .dropdown-menu button.active svg {
 }
 
 .terms-grid-icon {
-  font-size: 28px;
-  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  margin-bottom: 14px;
+}
+
+.terms-grid-icon.blue {
+  background: rgba(59, 130, 246, 0.12);
 }
 
 .terms-grid-card h4 {
@@ -4193,8 +4307,14 @@ html[data-theme="dark"] .dropdown-menu button.active svg {
 }
 
 .terms-warranty-icon {
-  font-size: 32px;
-  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: rgba(139, 92, 246, 0.12);
+  margin-bottom: 14px;
 }
 
 .terms-warranty-card h4 {
@@ -4414,7 +4534,6 @@ html[data-theme="dark"] .dropdown-menu button.active svg {
 .filter-btn,
 .filter-btn.active,
 .quick-tag-chip,
-.back-to-top,
 .dropdown-menu button,
 .menu-btn {
   background: var(--surface) !important;
@@ -4451,7 +4570,6 @@ html[data-theme="dark"] .dropdown-menu button.active svg {
 .filter-btn::before,
 .filter-btn.active::before,
 .quick-tag-chip::before,
-.back-to-top::before,
 .dropdown-menu button::before,
 .menu-btn::before {
   position: absolute;
@@ -4693,25 +4811,6 @@ body {
   font-size: 16px;
 }
 
-/* Quick Features Icons */
-.quick-feature-icon {
-  background: var(--primary-light);
-  border: 2px solid var(--primary);
-  border-radius: 50%;
-  width: 60px;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-}
-
-.quick-feature:hover .quick-feature-icon {
-  background: var(--primary);
-  transform: scale(1.1) rotate(10deg);
-  box-shadow: 0 0 20px var(--primary-glow);
-}
-
 /* Discount Badge */
 .discount-badge {
   background: var(--danger);
@@ -4723,10 +4822,11 @@ body {
   box-shadow: 2px 2px rgba(0,0,0,0.2);
 }
 
-/* Product Badge */
+/* Product Badge — dark ink on the orange fill: white on #ff9500 is only
+   2.19:1, this combination clears 4.5:1 and matches the rest of the site. */
 .product-badge {
   background: var(--primary);
-  color: #fff;
+  color: #151515;
   padding: 6px 14px;
   border-radius: 20px;
   font-size: 11px;
@@ -4739,6 +4839,9 @@ body {
   background: var(--primary) !important;
   color: #fff !important;
   border: none !important;
+  border-radius: 8px !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
   box-shadow: 4px 4px var(--primary-dark), 8px 8px var(--text) !important;
 }
 
@@ -4884,5 +4987,972 @@ body {
   /* Shift product card slightly left on mobile so add button isn't cut off */
   .product-card {
     margin-right: -4px;
+  }
+}
+
+/* ==========================================================================
+   SEARCH EXPERIENCE v2
+   --------------------------------------------------------------------------
+   Live suggestions dropdown, instant results, sort bar, match highlighting
+   and a helpful "no results" state. Layered on top of the original search bar.
+   ========================================================================== */
+
+/* ===== SEARCH FIELD (header) ===== */
+.header-search {
+  position: relative;
+}
+
+.search-field {
+  position: relative;
+  width: 100%;
+}
+
+.search-field input::-webkit-search-cancel-button,
+.productsSearchInput::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.search-field-icon {
+  position: absolute;
+  top: 50%;
+  right: 14px;
+  transform: translateY(-50%);
+  color: var(--text-light);
+  pointer-events: none;
+  display: flex;
+}
+
+.search-field input {
+  padding-right: 40px;
+  padding-left: 34px;
+}
+
+.search-field-clear,
+.search-clear {
+  position: absolute;
+  top: 50%;
+  left: 8px;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  border: 1.5px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 2;
+}
+
+.search-field-clear:hover,
+.search-clear:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+}
+
+.search-field-clear[hidden],
+.search-clear[hidden] {
+  display: none;
+}
+
+/* ===== SUGGESTIONS PANEL =====
+   Fixed to <body> and placed by JS from the input's rect, so it can never be
+   trapped inside the header's backdrop-filter layer. */
+.search-suggest {
+  position: fixed;
+  left: 12px;
+  top: 72px;
+  width: 320px;
+  min-width: 280px;
+  max-width: min(460px, 92vw);
+  max-height: 72vh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--surface);
+  border: 2px solid var(--text);
+  border-radius: 14px;
+  box-shadow: 6px 6px 0 var(--primary), 12px 12px 0 rgba(0, 0, 0, 0.06);
+  padding: 8px;
+  z-index: 1400;
+  animation: sgIn 0.18s ease;
+  scrollbar-width: thin;
+}
+
+@keyframes sgIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.search-suggest[hidden] {
+  display: none;
+}
+
+.sg-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  color: var(--text-muted);
+  padding: 10px 8px 6px;
+  text-transform: uppercase;
+}
+
+.sg-clear {
+  float: inline-end;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 6px;
+  text-decoration: underline;
+}
+
+.sg-clear:hover {
+  color: var(--primary);
+}
+
+.sg-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.sg-chip {
+  background: var(--surface);
+  border: 1.5px solid var(--border-strong);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.sg-chip:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+  transform: translateY(-1px);
+}
+
+.sg-chip.hot {
+  border-color: var(--primary);
+  color: var(--primary);
+  background: var(--primary-light);
+}
+
+.sg-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  text-align: start;
+  padding: 8px;
+  border: none;
+  background: none;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--text);
+  transition: background 0.15s ease, transform 0.15s ease;
+  font-family: inherit;
+}
+
+.sg-item:hover,
+.sg-item.is-active {
+  background: var(--primary-light);
+  transform: translateX(-2px);
+}
+
+.sg-item.is-active {
+  box-shadow: inset 3px 0 0 var(--primary);
+}
+
+.sg-thumb {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.sg-thumb img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.sg-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.sg-name {
+  font-size: 13.5px;
+  font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  /* Latin product names inside the RTL panel: let the first strong
+     character pick the direction so the ellipsis lands at the end. */
+  unicode-bidi: plaintext;
+}
+
+.sg-sub {
+  font-size: 11.5px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  unicode-bidi: plaintext;
+}
+
+.sg-price,
+.sg-cta {
+  font-size: 12.5px;
+  font-weight: 800;
+  color: var(--primary);
+  direction: ltr;
+  white-space: nowrap;
+}
+
+.sg-cta {
+  font-size: 10.5px;
+  background: var(--primary);
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 20px;
+  direction: rtl;
+}
+
+.sg-all {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 6px;
+  padding: 10px;
+  border: none;
+  border-top: 1px solid var(--border);
+  background: none;
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 13px;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.sg-all:hover,
+.sg-all.is-active {
+  background: var(--primary-light);
+}
+
+.sg-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 22px 12px;
+  color: var(--text-muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.sg-empty strong {
+  color: var(--text);
+  font-size: 14px;
+}
+
+/* ===== PRODUCTS PAGE: head, sort, results ===== */
+.products-head {
+  margin-bottom: 22px;
+}
+
+.products-head h1 {
+  font-size: 34px;
+  font-weight: 900;
+  margin: 0 0 6px;
+}
+
+.sort-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+  padding-bottom: 4px;
+}
+
+.sort-label {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-inline-end: 4px;
+}
+
+.sort-btn {
+  background: var(--surface);
+  border: 1.5px solid var(--border-strong);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.sort-btn:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.sort-btn.active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  box-shadow: 3px 3px 0 var(--text);
+}
+
+.sort-bar .products-count {
+  margin-inline-start: auto;
+  margin-bottom: 0;
+}
+
+#productsResults.enter {
+  animation: resultsIn 0.28s ease;
+}
+
+@keyframes resultsIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+mark {
+  background: var(--primary-light);
+  color: var(--primary);
+  border-radius: 4px;
+  padding: 0 2px;
+  font-weight: 800;
+}
+
+.product-name mark {
+  padding: 1px 3px;
+}
+
+.search-tip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--primary-light);
+  border: 2px solid var(--primary);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  margin-bottom: 18px;
+  color: var(--text);
+}
+
+.link {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-weight: 800;
+  text-decoration: underline;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: inherit;
+  padding: 0 2px;
+}
+
+.results-services {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.result-service {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  text-align: start;
+  background: var(--surface);
+  border: 2px solid var(--text);
+  border-radius: 16px;
+  box-shadow: 5px 5px 0 var(--primary);
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
+  color: var(--text);
+}
+
+.result-service:hover {
+  transform: translate(3px, 3px);
+  box-shadow: 2px 2px 0 var(--primary);
+}
+
+.result-service img {
+  width: 84px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.rs-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.rs-text strong {
+  font-size: 15px;
+}
+
+.rs-text span {
+  font-size: 12.5px;
+  color: var(--text-muted);
+}
+
+.rs-badge {
+  background: var(--primary);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+}
+
+.products-empty .empty-actions {
+  margin-top: 18px;
+}
+
+.empty-suggest {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px dashed var(--border-strong);
+  max-width: 620px;
+  margin-inline: auto;
+}
+
+.empty-suggest h4 {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+/* ==========================================================================
+   3D PRINTING SERVICE — announcement strip, ad card, service modal
+   ========================================================================== */
+
+/* ===== ANNOUNCEMENT STRIP ===== */
+.ad-strip {
+  /* .main already carries the header offset, so the announcement bar
+     starts flush underneath the fixed header. */
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  background: linear-gradient(90deg, #1a1a2e, #2b2b45);
+  color: #fff;
+  padding: 10px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  position: relative;
+}
+
+.ad-strip-tag {
+  background: var(--primary);
+  color: #151515;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 3px 10px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+}
+
+.ad-strip-text {
+  opacity: 0.92;
+}
+
+.ad-strip-cta {
+  background: transparent;
+  border: 1.5px solid var(--primary);
+  color: var(--primary);
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.ad-strip-cta:hover {
+  background: var(--primary);
+  color: #151515;
+}
+
+.ad-strip-close {
+  position: absolute;
+  inset-inline-end: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  display: flex;
+  padding: 6px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.ad-strip-close:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ===== AD SECTION ===== */
+.ad-section {
+  padding: 0 24px 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Same card language as .product-card: lift + growing offset shadow. */
+.ad-card {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr;
+  gap: 28px;
+  align-items: center;
+  background: var(--surface);
+  border: 2px solid var(--text);
+  border-radius: 22px;
+  box-shadow: 8px 8px 0 var(--primary), 16px 16px 0 rgba(0, 0, 0, 0.05);
+  padding: 22px;
+  overflow: hidden;
+  transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease);
+}
+
+.ad-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 12px 12px 0 var(--primary), 24px 24px 0 rgba(0, 0, 0, 0.06);
+}
+
+.ad-card:focus-within {
+  border-color: var(--primary);
+}
+
+/* The artwork is shown whole: `height: auto` keeps its 1184×880 ratio, so the
+   iBoardz logo in the top-left corner is never clipped by the frame. */
+.ad-media {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 2px solid var(--text);
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--bg);
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  font: inherit;
+}
+
+.ad-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  transition: transform 0.6s var(--ease);
+}
+
+.ad-card:hover .ad-media img,
+.ad-media:hover img {
+  transform: scale(1.06);
+}
+
+.ad-media:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 3px;
+}
+
+.ad-ribbon {
+  position: absolute;
+  top: 12px;
+  inset-inline-start: 12px;
+  background: var(--primary);
+  color: #151515;
+  font-size: 11px;
+  font-weight: 900;
+  padding: 5px 12px;
+  border-radius: 20px;
+  letter-spacing: 0.5px;
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.35);
+}
+
+.ad-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.ad-kicker {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 2px;
+  color: var(--primary);
+  text-transform: uppercase;
+}
+
+.ad-title {
+  font-size: 27px;
+  font-weight: 900;
+  line-height: 1.35;
+  margin: 0;
+}
+
+.ad-summary {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.ad-features {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 16px;
+  margin: 2px 0 0;
+  padding: 0;
+  width: 100%;
+}
+
+.ad-features li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.ad-features li svg {
+  flex: none;
+  color: var(--primary);
+}
+
+.ad-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.ad-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border-radius: 10px;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  border: 2px solid var(--text);
+  font-family: inherit;
+  transition: all 0.25s ease;
+}
+
+.ad-btn.primary {
+  background: var(--primary);
+  color: #151515;
+  border-color: var(--text);
+  box-shadow: 5px 5px 0 var(--text);
+}
+
+.ad-btn.primary:hover {
+  transform: translate(3px, 3px);
+  box-shadow: 2px 2px 0 var(--text);
+}
+
+.ad-btn.ghost {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.ad-btn.ghost:hover {
+  background: var(--primary-light);
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.ad-contact {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  margin: 0;
+  direction: rtl;
+}
+
+.ad-contact a {
+  color: var(--primary);
+  font-weight: 800;
+  direction: ltr;
+  display: inline-block;
+}
+
+/* ===== SERVICE MODAL ===== */
+.modal-content.service .modal-img {
+  background: var(--bg);
+  padding: 0;
+}
+
+.modal-content.service .modal-img img {
+  width: 100%;
+  height: auto;
+  max-height: 340px;
+  object-fit: contain;
+}
+
+.modal-name-ar {
+  font-size: 14px;
+  color: var(--text-muted);
+  font-weight: 600;
+  margin: -6px 0 8px;
+}
+
+.modal-add-btn.service {
+  text-decoration: none;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* ==========================================================================
+   DROPDOWN MENU CONTRAST FIX
+   The digital button system sets `color` with !important, which made the
+   inactive menu items unreadable. These rules come last on purpose.
+   ========================================================================== */
+.dropdown-menu button:not(.active) {
+  color: var(--text-secondary) !important;
+}
+
+.dropdown-menu button.active {
+  color: var(--primary) !important;
+  background: var(--primary-light) !important;
+}
+
+.dropdown-menu button:not(.active):hover {
+  color: var(--primary) !important;
+}
+
+.dropdown-menu button svg {
+  color: var(--text-muted);
+}
+
+.dropdown-menu button.active svg,
+.dropdown-menu button:hover svg {
+  color: var(--primary) !important;
+}
+
+/* ==========================================================================
+   RESPONSIVE — search & ad
+   ========================================================================== */
+@media (max-width: 900px) {
+  .ad-card {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .ad-title {
+    font-size: 23px;
+  }
+}
+
+@media (max-width: 768px) {
+  .search-suggest {
+    min-width: 0;
+    max-height: 60vh;
+  }
+
+  .header-search.open .search-field {
+    position: static;
+  }
+
+  .search-bar {
+    max-width: none;
+  }
+
+  .sort-bar {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    padding-bottom: 8px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .sort-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sort-bar .products-count {
+    display: none;
+  }
+
+  .products-head h1 {
+    font-size: 26px;
+  }
+
+  .ad-strip {
+    font-size: 12px;
+    gap: 8px;
+    padding: 8px 40px 8px 12px;
+    text-align: center;
+  }
+
+  .ad-section {
+    padding: 0 16px 32px;
+  }
+
+  .ad-card {
+    padding: 14px;
+    border-radius: 18px;
+    box-shadow: 5px 5px 0 var(--primary);
+  }
+
+  .ad-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 8px 8px 0 var(--primary), 12px 12px 0 rgba(0, 0, 0, 0.05);
+  }
+
+  .result-service {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .rs-text {
+    width: 100%;
+    order: 3;
+  }
+}
+
+@media (max-width: 480px) {
+  .ad-actions .ad-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .ad-features {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ==========================================================================
+   DARK MODE — search & ad
+   ========================================================================== */
+[data-theme="dark"] .search-suggest {
+  box-shadow: 6px 6px 0 var(--primary), 12px 12px 0 rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .sg-item:hover,
+[data-theme="dark"] .sg-item.is-active,
+[data-theme="dark"] .sg-all:hover,
+[data-theme="dark"] .sg-all.is-active {
+  background: rgba(255, 149, 0, 0.12);
+}
+
+[data-theme="dark"] .sg-thumb {
+  background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="dark"] .sg-chip {
+  background: var(--surface);
+}
+
+[data-theme="dark"] .sg-chip:hover,
+[data-theme="dark"] .sg-chip.hot {
+  background: rgba(255, 149, 0, 0.14);
+}
+
+[data-theme="dark"] mark {
+  background: rgba(255, 149, 0, 0.22);
+  color: #ffb84d;
+}
+
+[data-theme="dark"] .sort-btn.active {
+  color: #151515;
+}
+
+[data-theme="dark"] .search-tip {
+  background: rgba(255, 149, 0, 0.1);
+}
+
+[data-theme="dark"] .ad-card {
+  box-shadow: 8px 8px 0 var(--primary), 16px 16px 0 rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .ad-card:hover {
+  box-shadow: 12px 12px 0 var(--primary), 24px 24px 0 rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="dark"] .ad-media {
+  background: #0d1220;
+}
+
+[data-theme="dark"] .ad-summary {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .ad-btn.primary,
+[data-theme="dark"] .ad-strip-cta:hover {
+  color: #151515;
+}
+
+[data-theme="dark"] .result-service {
+  box-shadow: 5px 5px 0 var(--primary);
+}
+
+[data-theme="dark"] .sg-cta,
+[data-theme="dark"] .rs-badge {
+  color: #151515;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .search-suggest,
+  #productsResults.enter {
+    animation: none;
   }
 }
