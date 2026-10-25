@@ -4,9 +4,10 @@ Static, dependency-free storefront for **iBoardz (Arduino Future)** — an elect
 Arduino parts store for the Saudi market. Arabic-first (RTL), bilingual product data,
 and a search engine built to behave like the big international stores.
 
-The site is plain HTML + CSS + ES5-compatible JavaScript: no build step, no bundler,
-no framework. Drop the folder on any static host (or run it through the local
-server below) and it works.
+The site is plain HTML + CSS + ES5-compatible JavaScript: no bundler, no framework
+and no runtime build step. The product/category/content pages are generated once by
+a small Node script so every item has a real path. Drop the folder on any static host
+(or run it through the local server below) and it works.
 
 ---
 
@@ -14,7 +15,8 @@ server below) and it works.
 
 ```bash
 npm start            # node ../store-dashboard/server.js  →  http://127.0.0.1:3000
-npm test             # server API tests + search/catalog tests  (87 assertions)
+npm run pages:build  # regenerate product/category/shop pages + sitemap.xml
+npm test             # server API tests + search/catalog/page tests
 npm run check        # node --check over every .js in the repo
 npm run search:report   # human-readable search quality report
 ```
@@ -22,10 +24,34 @@ npm run search:report   # human-readable search quality report
 | URL | What it is |
 | --- | --- |
 | `http://127.0.0.1:3000/` | the storefront (this folder) |
+| `http://127.0.0.1:3000/shop/` | all products |
+| `http://127.0.0.1:3000/category/mcu/` | one category per path |
+| `http://127.0.0.1:3000/product/arduino-uno-r3/` | one full product page per product |
+| `http://127.0.0.1:3000/projects/` | ready-to-build projects (ابنِ مشروعك) |
 | `http://127.0.0.1:3000/store-dashboard/` | the admin dashboard (sibling folder) |
 
 A static host only needs the files in this folder — `catalog-data.js` is loaded as a
-plain `<script>`, so the page also works when opened without any server.
+plain `<script>`, so the pages also work without any server or build tool. Product,
+category and content pages are generated ahead of time by
+`scripts/build-pages.js`; regenerate them whenever the catalog changes.
+
+### Opening it from disk (no server)
+
+Double-click `index.html` — or any page inside its folder — rather than pasting the
+folder URL. Chrome/Edge/Firefox render a **folder listing** for
+`file:///…/projects/` and never serve the `index.html` inside it, so the trailing
+slash form cannot show the page.
+
+In that mode `assets/js/app.js` detects `location.protocol === 'file:'` and:
+
+* appends `index.html` to every internal link (the way back, shop, product, category,
+  menu and breadcrumb links all keep working);
+* skips the `/api/catalog` sync, because there is no server origin. The bundled
+  `catalog-data.js` stays the source of truth, so offline pages show catalog prices
+  and stock only.
+
+Over HTTP nothing changes: links stay clean (`/shop/`, `/product/<slug>/`) and the
+live API keeps prices/stock in sync.
 
 ---
 
@@ -33,29 +59,43 @@ plain `<script>`, so the page also works when opened without any server.
 
 ```
 iBoardz/
-├── index.html                  the whole page shell (header, cart, footer, modals)
+├── index.html                  homepage shell (header, cart, footer, modals)
 ├── catalog-data.js             ⭐ single source of truth: meta, categories,
 │                                  services, popular searches and all 41 products
+├── shop/index.html             /shop/ — all products
+├── category/<key>/index.html   /category/<key>/ — one landing page per category
+├── product/<slug>/index.html   /product/<slug>/ — one full page per product
+├── projects/index.html         /projects/ — project kits and board picker
+├── features/index.html         /features/ — meta-refresh redirect to /projects/
+├── contact/index.html          /contact/
+├── terms/index.html            /terms/
+├── site.webmanifest            PWA metadata + install icon
+├── robots.txt                  crawler rules
+├── sitemap.xml                 generated from the catalog (all paths)
+├── _headers                    Netlify security + cache headers
+├── _redirects                  Netlify 301: /features/ → /projects/
 ├── logo111.jpeg                logo used by the dashboard / preview placeholders
 ├── logo123.jpeg                storefront logo (kept at the root on purpose)
 │
 ├── assets/
-│   ├── css/style.css           one stylesheet: base, dark mode, search UI, ad, responsive
+│   ├── css/style.css           one stylesheet: base, dark mode, search UI, product page
 │   ├── js/
 │   │   ├── search-engine.js    window.IBSearch — normalization, synonyms, fuzzy, ranking
-│   │   └── app.js              window.App     — routing, rendering, search UI, cart
+│   │   ├── menu.js             mega-menu markup
+│   │   └── app.js              window.App — page rendering, filters, search UI, cart
 │   └── fonts/                  riyal-sign.woff2 + OFL licence
 │
 ├── images/
 │   ├── logo.png
-│   ├── banners/                add.jpg, add1.jpg — homepage carousel
+│   ├── banners/                add.jpg, add1.jpg — social / OG artwork
 │   ├── services/               3d-printing-service.jpg — the 3D printing ad artwork
 │   └── products/<slug>/<file>  one folder per product (41 folders)
 │
 ├── scripts/
+│   ├── build-pages.js          generates every product/category/content page + sitemap
 │   └── migrate-store-images.js rewrites the dashboard DB image paths (re-runnable)
 ├── tests/
-│   ├── search.test.js          node --test assertions: ranking, cut-off, catalog integrity
+│   ├── search.test.js          ranking, catalog integrity and generated-page assertions
 │   └── search-check.js         prints the ranking table for every sample query
 └── docs/archive/               leftovers kept out of the way (old screenshot, unused assets)
 ```
@@ -84,6 +124,7 @@ module.exports = {
   meta:      { brand, tagline, whatsapp, email, site, currency, logo, ... },
   categories: [ { key, label, icon, aliases: [...] } ],   // 9 real + the "all" pseudo-key
   services:   [ { id, slug, name, nameAr, summary, longDesc, features, img, badge } ],
+  projects:   [ { key, icon, title, summary, level, time, tags, parts: [ { id, qty, option?, value? } ], steps, tip } ],
   popularSearches: [ 'اردوينو', 'ESP32', ... ],
   products:   [ {
     id, sku, slug, name, nameAr,
@@ -100,9 +141,11 @@ module.exports = {
 1. Create `images/products/<slug>/` and drop the photo in.
 2. Add the product to `products[]` in `catalog-data.js` with
    `img: 'products/<slug>/<file>'`.
-3. Run `npm test` — it fails if the image is missing, if the file is not inside
+3. Run `npm run pages:build` to create `/product/<slug>/`, rebuild the category
+   pages, and refresh `sitemap.xml`.
+4. Run `npm test` — it fails if the image/page is missing, if the image is not inside
    `images/<slug>/`, or if `id` / `slug` / `sku` collide.
-4. Run `node scripts/migrate-store-images.js` so the dashboard DB picks up the new path.
+5. Run `node scripts/migrate-store-images.js` so the dashboard DB picks up the new path.
 
 ### Adding the 3D printing ad
 
@@ -120,6 +163,30 @@ clickable and reachable by keyboard, and the card reuses the product-card hover 
 (8px lift, offset shadow that grows, 1.06 image zoom).
 
 It is also injected as `schema.org/Service` JSON-LD for SEO.
+
+### Project kits (`/projects/`)
+
+The old "المميزات" page was replaced by **ابنِ مشروعك**, a working page rather than
+a list of marketing claims. Everything is driven by `catalog.projects`:
+
+* each project is a bill of materials (`parts: [{ id, qty }]`) pointing at real
+  catalogue products; `option` picks a product colour and `value` fills a custom
+  value such as `220Ω`,
+* the UI computes the live total and saving from the catalogue, shows every part
+  with its product link, and adds the whole kit with one button,
+* `steps` and `tip` are real wiring/safety notes, shown in a `<details>` panel,
+* `/projects/` also carries a board picker (UNO R3 / ESP32 / ESP32-C3), an LED
+  resistor calculator that adds the computed resistor to the cart, and a battery
+  life calculator,
+* the generated page includes `HowTo` JSON-LD and a no-JS fallback listing every
+  kit, its parts, total and steps,
+* the homepage carries a three-project teaser and the header search indexes the
+  kits, so “مشروع” and project names return real results.
+
+Add or edit a project in `catalog-data.js`, then run `npm run pages:build`.
+`/features/` stays as a 301 (`_redirects`) plus a meta-refresh fallback for other
+static hosts. The old `/?view=features` link redirects to `/projects/` in
+`legacyRedirect()`.
 
 ---
 
@@ -169,10 +236,19 @@ Pipeline:
 * Keyboard: `↑` `↓` move, `Enter` opens the highlighted row, `Esc` closes, `/` focuses
   the header search.
 * Recent searches (`localStorage`) and popular searches when the box is empty.
-* URL stays in sync: `?q=…&cat=…&sort=…`, so results are shareable and survive reload.
-* Products page: category chips, 6 sort modes (relevance, popularity, price ↑↓,
-  name, biggest discount) and a live result count.
-* Entering a query from any page navigates to the products page automatically.
+* URL stays in sync: `/shop/?q=…&sort=…&price=…&page=…` or
+  `/category/mcu/?q=…`, so results are shareable and survive reload. Old
+  `/?product=…`, `/?cat=…`, `/?shop=1` and `/?view=…` links redirect to the
+  matching directory path.
+* Products page: sticky category sidebar, price buckets, deals / popular flags,
+  active-filter chips, 6 sort modes and a live result count. Results are paged at
+  12 per page with numbered pagination and "showing x–y of z" feedback.
+* Entering a query from the homepage or a product page takes the shopper to
+  `/shop/?q=…`; inside a category it filters that category in place.
+* Product pages are full pages, not modals: large image, price, options,
+  specs, shipping panel, related products and breadcrumbs.
+* Home page: category hub, featured-product tabs (popular / new / deals) and a
+  responsive CSS hero built from real catalog products instead of raster banners.
 
 ---
 
@@ -217,7 +293,7 @@ marketing filler. The rules that keep it there:
 
 ## 7. Quality gates
 
-`npm test` (87 assertions) covers:
+`npm test` covers:
 
 * the top hit for 30 queries, Arabic and English, including typos (`dth11`, `oeld`,
   `hlc-sr04`, `sirvo`),
@@ -227,8 +303,16 @@ marketing filler. The rules that keep it there:
 * Arabic normalization, highlighting and HTML escaping,
 * catalog integrity: unique `id`/`slug`/`sku`, known category, **image exists on disk
   inside `images/<slug>/`**,
+* every product and category has a generated page at its own path, and every
+  product is listed in `sitemap.xml`,
+* every project kit references real products, has steps/tips, and `/projects/`
+  carries its `HowTo` structured data,
 * every asset referenced by `index.html` exists,
 * the 3D printing ad: the artwork exists, the service `img` points at it, and `index.html`
   references the same path (JSON-LD).
 
-Lighthouse on the homepage: **Accessibility 100 · Best Practices 100 · SEO 100**.
+Lighthouse on the homepage, shop, category and product pages:
+**Accessibility 100 · Best Practices 100 · SEO 100**.
+
+Deployment is static: upload this folder to Netlify (or any static host). The
+`_headers` file is Netlify-specific; other hosts simply ignore it.

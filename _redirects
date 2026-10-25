@@ -1,0 +1,5 @@
+# The old "المميزات" page became the project kits page.
+# `!` forces the 301 even though features/index.html exists as a fallback
+# for static hosts that ignore _redirects.
+/features/  /projects/  301!
+/features   /projects/  301!

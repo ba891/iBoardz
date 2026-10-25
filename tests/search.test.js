@@ -186,6 +186,62 @@ test('assets referenced by index.html exist', () => {
   assert.ok(checked.length >= 4);
 });
 
+test('every product and category has a generated path page', () => {
+  catalog.products.forEach((p) => {
+    const file = path.join(ROOT, 'product', p.slug, 'index.html');
+    assert.ok(fs.existsSync(file), `missing product page for ${p.slug}`);
+    const html = fs.readFileSync(file, 'utf8');
+    assert.ok(html.includes('data-page="product"'), `${p.slug} page has no product page marker`);
+    assert.ok(html.includes(`data-product="${p.slug}"`), `${p.slug} page has no product slug`);
+    assert.ok(html.includes(`/product/${p.slug}/`), `${p.slug} page has no canonical product URL`);
+  });
+
+  catalog.categories.filter((c) => c.key !== 'all').forEach((c) => {
+    const file = path.join(ROOT, 'category', c.key, 'index.html');
+    assert.ok(fs.existsSync(file), `missing category page for ${c.key}`);
+    const html = fs.readFileSync(file, 'utf8');
+    assert.ok(html.includes('data-page="category"'), `${c.key} page has no category page marker`);
+    assert.ok(html.includes(`data-category="${c.key}"`), `${c.key} page has no category key`);
+    assert.ok(html.includes(`/category/${c.key}/`), `${c.key} page has no canonical category URL`);
+  });
+
+  ['shop', 'projects', 'contact', 'terms'].forEach((name) => {
+    assert.ok(fs.existsSync(path.join(ROOT, name, 'index.html')), `missing /${name}/ page`);
+  });
+  assert.ok(fs.existsSync(path.join(ROOT, 'features', 'index.html')), 'missing /features/ redirect page');
+
+  const sitemap = fs.readFileSync(path.join(ROOT, 'sitemap.xml'), 'utf8');
+  catalog.products.forEach((p) => {
+    assert.ok(sitemap.includes(`https://iboardz.netlify.app/product/${p.slug}/`), `sitemap missing ${p.slug}`);
+  });
+  assert.ok(sitemap.includes('https://iboardz.netlify.app/projects/'), 'sitemap missing /projects/');
+  assert.ok(!sitemap.includes('https://iboardz.netlify.app/features/'), 'sitemap should not list the old /features/ redirect');
+});
+
+test('project kits reference real products and have usable steps', () => {
+  assert.ok(Array.isArray(catalog.projects) && catalog.projects.length >= 4, 'no projects in the catalog');
+  const ids = new Set(catalog.products.map((p) => String(p.id)));
+  const keys = new Set();
+  catalog.projects.forEach((project) => {
+    assert.ok(project.key && !keys.has(project.key), `project key missing or duplicated: ${project.key}`);
+    keys.add(project.key);
+    assert.ok(project.title && project.summary, `project ${project.key} missing title/summary`);
+    assert.ok(['beginner', 'intermediate', 'advanced'].includes(project.level), `project ${project.key} has bad level`);
+    assert.ok(Array.isArray(project.parts) && project.parts.length >= 3, `project ${project.key} has too few parts`);
+    project.parts.forEach((part) => {
+      assert.ok(ids.has(String(part.id)), `project ${project.key} references missing product ${part.id}`);
+      assert.ok(Number(part.qty) >= 1, `project ${project.key} has invalid qty for product ${part.id}`);
+    });
+    assert.ok(Array.isArray(project.steps) && project.steps.length >= 3, `project ${project.key} has too few steps`);
+    assert.ok(project.tip, `project ${project.key} has no practical tip`);
+  });
+
+  const html = fs.readFileSync(path.join(ROOT, 'projects', 'index.html'), 'utf8');
+  assert.ok(html.includes('data-page="projects"'), '/projects/ page has no projects marker');
+  assert.ok(html.includes('/projects/'), '/projects/ page has no canonical URL');
+  assert.ok(html.includes('HowTo'), '/projects/ page is missing the HowTo structured data');
+});
+
 test('the 3D printing service ad is present', () => {
   assert.ok(fs.existsSync(path.join(ROOT, 'images', 'services', '3d-printing-service.jpg')));
   assert.ok(Array.isArray(catalog.services) && catalog.services.length >= 1);

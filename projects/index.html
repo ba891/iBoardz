@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<script>
+(function() {
+  var t = localStorage.getItem('iboardz-theme') || 'light';
+  document.documentElement.setAttribute('data-theme', t);
+})();
+</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مشاريع جاهزة — ابنِ مشروعك خطوة بخطوة | iBoardz</title>
+<meta name="description" content="مشاريع أردوينو وESP32 جاهزة مع قائمة القطع المطلوبة والسعر الإجمالي. اختر مشروعك وأضف كل القطع إلى السلة بضغطة واحدة من iBoardz.">
+<meta name="keywords" content="مشاريع اردوينو, مشاريع ESP32, مشاريع جاهزة, ابنِ مشروعك, iBoardz">
+<meta name="author" content="iBoardz">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<link rel="canonical" href="https://iboardz.netlify.app/projects/">
+<meta name="theme-color" content="#ff9500">
+<meta name="geo.region" content="SA">
+<meta name="geo.placename" content="Saudi Arabia">
+<meta name="rating" content="general">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="iBoardz">
+<meta property="og:locale" content="ar_SA">
+<meta property="og:title" content="مشاريع جاهزة — ابنِ مشروعك خطوة بخطوة | iBoardz">
+<meta property="og:description" content="مشاريع أردوينو وESP32 جاهزة مع قائمة القطع المطلوبة والسعر الإجمالي. اختر مشروعك وأضف كل القطع إلى السلة بضغطة واحدة من iBoardz.">
+<meta property="og:url" content="https://iboardz.netlify.app/projects/">
+<meta property="og:image" content="https://iboardz.netlify.app/images/banners/add.jpg">
+<meta property="og:image:alt" content="ابنِ مشروعك — iBoardz">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="مشاريع جاهزة — ابنِ مشروعك خطوة بخطوة | iBoardz">
+<meta name="twitter:description" content="مشاريع أردوينو وESP32 جاهزة مع قائمة القطع المطلوبة والسعر الإجمالي. اختر مشروعك وأضف كل القطع إلى السلة بضغطة واحدة من iBoardz.">
+<meta name="twitter:image" content="https://iboardz.netlify.app/images/banners/add.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Noto+Sans+Symbols+2&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="../images/logo.png">
+<link rel="apple-touch-icon" href="../images/logo.png">
+<link rel="manifest" href="../site.webmanifest">
+<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/mega-menu.css">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "ابنِ مشروعك",
+  "description": "مشاريع أردوينو وESP32 جاهزة مع قائمة القطع المطلوبة والسعر الإجمالي. اختر مشروعك وأضف كل القطع إلى السلة بضغطة واحدة من iBoardz.",
+  "url": "https://iboardz.netlify.app/projects/",
+  "isPartOf": {
+    "@type": "WebSite",
+    "name": "iBoardz",
+    "url": "https://iboardz.netlify.app/"
+  },
+  "mainEntity": {
+    "@type": "ItemList",
+    "numberOfItems": 6,
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "محطة طقس منزلية",
+        "item": {
+          "@type": "HowTo",
+          "name": "محطة طقس منزلية",
+          "description": "حساس حرارة ورطوبة وضغط مع شاشة OLED تعرض القراءات لحظياً، وقاعدة جاهزة للربط بالواي فاي.",
+          "estimatedCost": {
+            "@type": "MonetaryAmount",
+            "currency": "SAR",
+            "value": 124.75
+          },
+          "supply": [
+            {
+              "@type": "HowToSupply",
+              "name": "ESP32 DEV MODEL ×1",
+              "url": "https://iboardz.netlify.app/product/esp32-dev-model/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "AHT20+BMP280 ×1",
+              "url": "https://iboardz.netlify.app/product/aht20-bmp280/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "SSD1306 OLED 0.96\" ×1",
+              "url": "https://iboardz.netlify.app/product/ssd1306-oled-display/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "JUMPER WIRES ×1",
+              "url": "https://iboardz.netlify.app/product/jumper-wires/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "BREADBOARD لوحة تجارب ×1",
+              "url": "https://iboardz.netlify.app/product/breadboard/"
+            }
+          ],
+          "step": [
+            {
+              "@type": "HowToStep",
+              "position": 1,
+              "text": "وصّل الحساس والشاشة على ناقل I2C نفسه: SDA وSCL مشتركة، والتغذية 3.3V."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 2,
+              "text": "ثبّت مكتبات AHT20 وBMP280 وAdafruit SSD1306 من Library Manager داخل Arduino IDE."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 3,
+              "text": "ارفع الكود واعرض الحرارة والرطوبة والضغط على الشاشة كل ثانيتين."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 4,
+              "text": "اختبر القراءات بجانب النافذة وقارنها بتطبيق الطقس قبل تركيب المشروع."
+            }
+          ]
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "ريّ نباتات تلقائي",
+        "item": {
+          "@type": "HowTo",
+          "name": "ريّ نباتات تلقائي",
+          "description": "حساس رطوبة تربة يقرأ احتياج النبتة، وريلاي يشغّل المضخة فقط وقت الجفاف.",
+          "estimatedCost": {
+            "@type": "MonetaryAmount",
+            "currency": "SAR",
+            "value": 115.5
+          },
+          "supply": [
+            {
+              "@type": "HowToSupply",
+              "name": "ARDUINO UNO R3 ×1",
+              "url": "https://iboardz.netlify.app/product/arduino-uno-r3/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "Capacitive Moisture Sensor V2.0 ×1",
+              "url": "https://iboardz.netlify.app/product/capacitive-moisture-sensor-v2/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "RELAY MODULE HIGH 5V ×1",
+              "url": "https://iboardz.netlify.app/product/relay-module-5v/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "WATER PUMP ×1",
+              "url": "https://iboardz.netlify.app/product/water-pump/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "JUMPER WIRES ×1",
+              "url": "https://iboardz.netlify.app/product/jumper-wires/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "BREADBOARD لوحة تجارب ×1",
+              "url": "https://iboardz.netlify.app/product/breadboard/"
+            }
+          ],
+          "step": [
+            {
+              "@type": "HowToStep",
+              "position": 1,
+              "text": "اقرأ حساس رطوبة التربة في الهواء وداخل الماء وسجّل أقل وأعلى قيمة عندك."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 2,
+              "text": "وصّل خرج حساس التربة على A0، وإشارة الريلاي على D7، وشغّل المضخة من مصدر 5V خارجي عبر طرفي COM وNO."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 3,
+              "text": "اضبط حد الرطوبة في الكود، واجعل المضخة تعمل 5 ثوانٍ فقط ثم تتوقف وتنتظر."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 4,
+              "text": "اختبر النظام على كوب ماء قبل وضعه في أصيص النبتة."
+            }
+          ]
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "كاشف غاز ودخان",
+        "item": {
+          "@type": "HowTo",
+          "name": "كاشف غاز ودخان",
+          "description": "حساس MQ-2 مع جرس وإنذار ضوئي ينبهك عند ارتفاع نسبة الغاز أو الدخان.",
+          "estimatedCost": {
+            "@type": "MonetaryAmount",
+            "currency": "SAR",
+            "value": 91.5
+          },
+          "supply": [
+            {
+              "@type": "HowToSupply",
+              "name": "ARDUINO UNO R3 ×1",
+              "url": "https://iboardz.netlify.app/product/arduino-uno-r3/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "MQ-2 GAS SENSOR ×1",
+              "url": "https://iboardz.netlify.app/product/mq-2-gas-sensor/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "Piezo Buzzer (جرس صوتي) ×1",
+              "url": "https://iboardz.netlify.app/product/piezo-buzzer/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "LED صغيرة (جميع الألوان) ×1",
+              "url": "https://iboardz.netlify.app/product/led/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "مقاومات ×1",
+              "url": "https://iboardz.netlify.app/product/resistors/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "JUMPER WIRES ×1",
+              "url": "https://iboardz.netlify.app/product/jumper-wires/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "BREADBOARD لوحة تجارب ×1",
+              "url": "https://iboardz.netlify.app/product/breadboard/"
+            }
+          ],
+          "step": [
+            {
+              "@type": "HowToStep",
+              "position": 1,
+              "text": "شغّل حساس MQ-2 لمدة 24 ساعة قبل الاعتماد على قراءاته (تسخين أولي)."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 2,
+              "text": "وصّل VCC على 5V، وGND، وخرج A0 على منفذ تناظري، والليد مع مقاومة 220Ω على منفذ رقمي مثل D8."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 3,
+              "text": "اضبط حد التنبيه في الكود بعد قراءة القيمة الطبيعية في مكانك."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 4,
+              "text": "اختبر الجرس والليد يدوياً، ثم جرّب مصدر غاز خفيف على مسافة آمنة."
+            }
+          ]
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "name": "رادار مسافة بالسونار",
+        "item": {
+          "@type": "HowTo",
+          "name": "رادار مسافة بالسونار",
+          "description": "محرك سيرفو يحرّك حساس المسافة يميناً ويساراً، والجرس يصدر تنبيهاً عند الاقتراب.",
+          "estimatedCost": {
+            "@type": "MonetaryAmount",
+            "currency": "SAR",
+            "value": 100.5
+          },
+          "supply": [
+            {
+              "@type": "HowToSupply",
+              "name": "ARDUINO UNO R3 ×1",
+              "url": "https://iboardz.netlify.app/product/arduino-uno-r3/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "HC-SR04 ULTRASONIC ×1",
+              "url": "https://iboardz.netlify.app/product/hc-sr04-ultrasonic/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "SERVO MOTOR ×1",
+              "url": "https://iboardz.netlify.app/product/servo-motor/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "Piezo Buzzer (جرس صوتي) ×1",
+              "url": "https://iboardz.netlify.app/product/piezo-buzzer/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "JUMPER WIRES ×1",
+              "url": "https://iboardz.netlify.app/product/jumper-wires/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "BREADBOARD لوحة تجارب ×1",
+              "url": "https://iboardz.netlify.app/product/breadboard/"
+            }
+          ],
+          "step": [
+            {
+              "@type": "HowToStep",
+              "position": 1,
+              "text": "ثبّت HC-SR04 على ذراع السيرفو ووصّل Trig بـ D10 وEcho بـ D11."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 2,
+              "text": "وصّل إشارة السيرفو بـ D9، وغذّه من 5V مع GND مشترك."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 3,
+              "text": "برمج مسحاً من 15° إلى 165° ثم اعكس الاتجاه، واحسب المسافة من زمن Echo."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 4,
+              "text": "شغّل الجرس عندما تقل المسافة عن 20 سم، وجرّب الأداة على حائط متحرك."
+            }
+          ]
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 5,
+        "name": "مقياس نبضات القلب",
+        "item": {
+          "@type": "HowTo",
+          "name": "مقياس نبضات القلب",
+          "description": "حساس MAX30102 يقرأ النبض، وشاشة OLED تعرض القراءة أثناء وضع الإصبع.",
+          "estimatedCost": {
+            "@type": "MonetaryAmount",
+            "currency": "SAR",
+            "value": 127.75
+          },
+          "supply": [
+            {
+              "@type": "HowToSupply",
+              "name": "ESP32 DEV MODEL ×1",
+              "url": "https://iboardz.netlify.app/product/esp32-dev-model/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "MAX 30102 ×1",
+              "url": "https://iboardz.netlify.app/product/max-30102/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "SSD1306 OLED 0.96\" ×1",
+              "url": "https://iboardz.netlify.app/product/ssd1306-oled-display/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "JUMPER WIRES ×1",
+              "url": "https://iboardz.netlify.app/product/jumper-wires/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "BREADBOARD لوحة تجارب ×1",
+              "url": "https://iboardz.netlify.app/product/breadboard/"
+            }
+          ],
+          "step": [
+            {
+              "@type": "HowToStep",
+              "position": 1,
+              "text": "وصّل MAX30102 والشاشة على I2C مع تغذية 3.3V فقط."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 2,
+              "text": "ثبّت SparkFun MAX3010x وAdafruit SSD1306 من Library Manager."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 3,
+              "text": "ضع الإصبع بهدوء على الحساس دون ضغط زائد وانتظر عدة ثوانٍ لاستقرار القراءة."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 4,
+              "text": "اعرض النبض على الشاشة وأضف متوسطاً لآخر 10 قراءات لتقليل التذبذب."
+            }
+          ]
+        }
+      },
+      {
+        "@type": "ListItem",
+        "position": 6,
+        "name": "إنذار باب مغناطيسي",
+        "item": {
+          "@type": "HowTo",
+          "name": "إنذار باب مغناطيسي",
+          "description": "حساس مغناطيسي يكتشف فتح الباب ويشغّل جرساً وليداً، مع إمكانية إشعار واي فاي لاحقاً.",
+          "estimatedCost": {
+            "@type": "MonetaryAmount",
+            "currency": "SAR",
+            "value": 83.5
+          },
+          "supply": [
+            {
+              "@type": "HowToSupply",
+              "name": "ESP32 DEV MODEL ×1",
+              "url": "https://iboardz.netlify.app/product/esp32-dev-model/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "حساس التبديل المغناطيسي Dry Reed Pipe Module ×1",
+              "url": "https://iboardz.netlify.app/product/dry-reed-pipe-module/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "Piezo Buzzer (جرس صوتي) ×1",
+              "url": "https://iboardz.netlify.app/product/piezo-buzzer/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "LED صغيرة (جميع الألوان) ×1",
+              "url": "https://iboardz.netlify.app/product/led/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "مقاومات ×1",
+              "url": "https://iboardz.netlify.app/product/resistors/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "JUMPER WIRES ×1",
+              "url": "https://iboardz.netlify.app/product/jumper-wires/"
+            },
+            {
+              "@type": "HowToSupply",
+              "name": "BREADBOARD لوحة تجارب ×1",
+              "url": "https://iboardz.netlify.app/product/breadboard/"
+            }
+          ],
+          "step": [
+            {
+              "@type": "HowToStep",
+              "position": 1,
+              "text": "وصّل أحد طرفي حساس الريد إلى GPIO 4 والطرف الآخر إلى GND، وفعّل INPUT_PULLUP في الكود."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 2,
+              "text": "وصّل الليد مع مقاومة 220Ω على D5، والجرس على D6."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 3,
+              "text": "اقرأ حالة الحساس: الباب مغلق = LOW، والباب مفتوح = HIGH (أو العكس حسب توصيلك)."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 4,
+              "text": "شغّل الجرس والليد عند فتح الباب، وأضف تأخيراً ثانياً لمنع التنبيه المتكرر."
+            },
+            {
+              "@type": "HowToStep",
+              "position": 5,
+              "text": "لاحقاً أضف إشعار واي فاي أو رسالة تيليجرام باستخدام ESP32."
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
+</script>
+</head>
+<body data-page="projects" data-root="../">
+
+<a class="skip-link" href="#mainContent">تجاوز إلى المحتوى الرئيسي</a>
+
+<header class="header" id="header">
+  <a class="logo" href="../" title="iBoardz — الصفحة الرئيسية" aria-label="iBoardz — الصفحة الرئيسية">
+    <span class="logo-text"><span class="i">i</span><span class="boardz">Boardz</span></span>
+  </a>
+
+  <div class="header-search" id="headerSearch" role="search">
+    <div class="search-field">
+      <input type="search" id="headerSearchInput" placeholder="ابحث عن قطعة… مثال: حساس حرارة"
+        oninput="App.searchDebounced(this.value,'header')" onfocus="App.focusSearch('header')" onkeydown="App.searchKeydown(event)"
+        autocomplete="off" autocapitalize="off" spellcheck="false"
+        role="combobox" aria-expanded="false" aria-controls="searchSuggest" aria-autocomplete="list" aria-label="ابحث عن منتج">
+      <span class="search-field-icon" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </span>
+      <button class="search-field-clear" data-search-clear onclick="App.clearSearch('header')" aria-label="مسح البحث" hidden>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div id="searchSuggest" class="search-suggest" role="listbox" aria-label="نتائج البحث الفورية" hidden></div>
+  </div>
+
+  <div class="header-actions">
+    <button class="menu-btn" onclick="App.toggleMenu(event)" aria-label="القائمة" aria-expanded="false" aria-controls="dropdown" aria-haspopup="true" title="القائمة">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <button class="cart-btn icon-btn" onclick="App.openCart()">
+      <span class="sr-only">سلة التسوق</span>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+      <span class="cart-badge" id="cartBadge" style="display:none">0</span>
+    </button>
+    <button class="theme-toggle icon-btn" id="themeToggle" onclick="App.toggleTheme()" aria-label="الوضع الداكن">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>
+      </svg>
+    </button>
+    <button class="search-toggle icon-btn" id="searchToggle" onclick="App.toggleHeaderSearch()" aria-label="بحث">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
+  </div>
+</header>
+
+<div id="dropdown" class="dropdown-menu"></div>
+<div id="menuBackdrop" onclick="App.closeMenu()"></div>
+
+<div id="cartOverlay" class="cart-overlay">
+  <div class="cart-backdrop" onclick="App.closeCart()"></div>
+  <div class="cart-panel">
+    <div class="cart-header">
+      <h2>سلة التسوق (<span id="cartCount">0</span>)</h2>
+      <button class="cart-close icon-btn" onclick="App.closeCart()" aria-label="إغلاق السلة">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="cart-body" id="cartBody"></div>
+    <div class="cart-footer" id="cartFooter" style="display:none"></div>
+  </div>
+</div>
+
+<div id="modalOverlay" class="modal-overlay" style="display:none"></div>
+<div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="false"></div>
+<button id="backToTop" class="back-to-top" onclick="App.scrollToTop()" aria-label="العودة للأعلى">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+<a class="wa-float" href="https://wa.me/966552645082" target="_blank" rel="noopener noreferrer" aria-label="تواصل عبر واتساب">
+  <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<main class="main" id="mainContent" tabindex="-1">
+<noscript>
+  <div class="noscript-notice">
+    <nav class="breadcrumbs" aria-label="مسار التصفح">
+      <a href="../">الرئيسية</a>
+      <span class="crumb-sep">/</span>
+      <span class="crumb-current">ابنِ مشروعك</span>
+    </nav>
+    <h1>ابنِ مشروعك</h1>
+    <p>مشاريع جاهزة بالقطع المطلوبة وأسعارها، مع خطوات التركيب ونصائح عملية.</p>
+    <section>
+      <h2>محطة طقس منزلية</h2>
+      <p>حساس حرارة ورطوبة وضغط مع شاشة OLED تعرض القراءات لحظياً، وقاعدة جاهزة للربط بالواي فاي.</p>
+      <p><strong>المستوى:</strong> متوسط — <strong>الوقت المتوقع:</strong> 60–90 دقيقة</p>
+      <h3>القطع المطلوبة</h3>
+      <ul><li><a href="../product/esp32-dev-model/">ESP32 DEV MODEL</a> ×1 — 39.75 ر.س</li><li><a href="../product/aht20-bmp280/">AHT20+BMP280</a> ×1 — 22.75 ر.س</li><li><a href="../product/ssd1306-oled-display/">SSD1306 OLED 0.96&quot;</a> ×1 — 35.75 ر.س</li><li><a href="../product/jumper-wires/">JUMPER WIRES</a> ×1 — 11.75 ر.س</li><li><a href="../product/breadboard/">BREADBOARD لوحة تجارب</a> ×1 — 14.75 ر.س</li></ul>
+      <p><strong>إجمالي القطع: 124.75 ر.س</strong></p>
+      <h3>خطوات التركيب</h3>
+      <ol><li>وصّل الحساس والشاشة على ناقل I2C نفسه: SDA وSCL مشتركة، والتغذية 3.3V.</li><li>ثبّت مكتبات AHT20 وBMP280 وAdafruit SSD1306 من Library Manager داخل Arduino IDE.</li><li>ارفع الكود واعرض الحرارة والرطوبة والضغط على الشاشة كل ثانيتين.</li><li>اختبر القراءات بجانب النافذة وقارنها بتطبيق الطقس قبل تركيب المشروع.</li></ol>
+      <p>الحساس والشاشة يتشاركان نفس خطي I2C — أربعة أسلاك فقط تكفي لتشغيل الاثنين.</p>
+    </section>
+    <section>
+      <h2>ريّ نباتات تلقائي</h2>
+      <p>حساس رطوبة تربة يقرأ احتياج النبتة، وريلاي يشغّل المضخة فقط وقت الجفاف.</p>
+      <p><strong>المستوى:</strong> متوسط — <strong>الوقت المتوقع:</strong> 60–90 دقيقة</p>
+      <h3>القطع المطلوبة</h3>
+      <ul><li><a href="../product/arduino-uno-r3/">ARDUINO UNO R3</a> ×1 — 32.75 ر.س</li><li><a href="../product/capacitive-moisture-sensor-v2/">Capacitive Moisture Sensor V2.0</a> ×1 — 20.75 ر.س</li><li><a href="../product/relay-module-5v/">RELAY MODULE HIGH 5V</a> ×1 — 13.75 ر.س</li><li><a href="../product/water-pump/">WATER PUMP</a> ×1 — 21.75 ر.س</li><li><a href="../product/jumper-wires/">JUMPER WIRES</a> ×1 — 11.75 ر.س</li><li><a href="../product/breadboard/">BREADBOARD لوحة تجارب</a> ×1 — 14.75 ر.س</li></ul>
+      <p><strong>إجمالي القطع: 115.5 ر.س</strong></p>
+      <h3>خطوات التركيب</h3>
+      <ol><li>اقرأ حساس رطوبة التربة في الهواء وداخل الماء وسجّل أقل وأعلى قيمة عندك.</li><li>وصّل خرج حساس التربة على A0، وإشارة الريلاي على D7، وشغّل المضخة من مصدر 5V خارجي عبر طرفي COM وNO.</li><li>اضبط حد الرطوبة في الكود، واجعل المضخة تعمل 5 ثوانٍ فقط ثم تتوقف وتنتظر.</li><li>اختبر النظام على كوب ماء قبل وضعه في أصيص النبتة.</li></ol>
+      <p>لا تغذِّ المضخة من لوح الأردوينو مباشرة؛ استخدم مصدر 5V خارجياً (غير مشمول بالقائمة) والريلاي يفصل بينهما.</p>
+    </section>
+    <section>
+      <h2>كاشف غاز ودخان</h2>
+      <p>حساس MQ-2 مع جرس وإنذار ضوئي ينبهك عند ارتفاع نسبة الغاز أو الدخان.</p>
+      <p><strong>المستوى:</strong> مبتدئ — <strong>الوقت المتوقع:</strong> 30–45 دقيقة</p>
+      <h3>القطع المطلوبة</h3>
+      <ul><li><a href="../product/arduino-uno-r3/">ARDUINO UNO R3</a> ×1 — 32.75 ر.س</li><li><a href="../product/mq-2-gas-sensor/">MQ-2 GAS SENSOR</a> ×1 — 24.75 ر.س</li><li><a href="../product/piezo-buzzer/">Piezo Buzzer (جرس صوتي)</a> ×1 — 5.75 ر.س</li><li><a href="../product/led/">LED صغيرة (جميع الألوان)</a> ×1 — 1.25 ر.س</li><li><a href="../product/resistors/">مقاومات</a> ×1 — 0.5 ر.س</li><li><a href="../product/jumper-wires/">JUMPER WIRES</a> ×1 — 11.75 ر.س</li><li><a href="../product/breadboard/">BREADBOARD لوحة تجارب</a> ×1 — 14.75 ر.س</li></ul>
+      <p><strong>إجمالي القطع: 91.5 ر.س</strong></p>
+      <h3>خطوات التركيب</h3>
+      <ol><li>شغّل حساس MQ-2 لمدة 24 ساعة قبل الاعتماد على قراءاته (تسخين أولي).</li><li>وصّل VCC على 5V، وGND، وخرج A0 على منفذ تناظري، والليد مع مقاومة 220Ω على منفذ رقمي مثل D8.</li><li>اضبط حد التنبيه في الكود بعد قراءة القيمة الطبيعية في مكانك.</li><li>اختبر الجرس والليد يدوياً، ثم جرّب مصدر غاز خفيف على مسافة آمنة.</li></ol>
+      <p>هذا مشروع تعليمي للتنبيه المبكر، ولا يُغني عن كاشف الدخان المعتمد في المنزل.</p>
+    </section>
+    <section>
+      <h2>رادار مسافة بالسونار</h2>
+      <p>محرك سيرفو يحرّك حساس المسافة يميناً ويساراً، والجرس يصدر تنبيهاً عند الاقتراب.</p>
+      <p><strong>المستوى:</strong> متوسط — <strong>الوقت المتوقع:</strong> 60–90 دقيقة</p>
+      <h3>القطع المطلوبة</h3>
+      <ul><li><a href="../product/arduino-uno-r3/">ARDUINO UNO R3</a> ×1 — 32.75 ر.س</li><li><a href="../product/hc-sr04-ultrasonic/">HC-SR04 ULTRASONIC</a> ×1 — 18.75 ر.س</li><li><a href="../product/servo-motor/">SERVO MOTOR</a> ×1 — 16.75 ر.س</li><li><a href="../product/piezo-buzzer/">Piezo Buzzer (جرس صوتي)</a> ×1 — 5.75 ر.س</li><li><a href="../product/jumper-wires/">JUMPER WIRES</a> ×1 — 11.75 ر.س</li><li><a href="../product/breadboard/">BREADBOARD لوحة تجارب</a> ×1 — 14.75 ر.س</li></ul>
+      <p><strong>إجمالي القطع: 100.5 ر.س</strong></p>
+      <h3>خطوات التركيب</h3>
+      <ol><li>ثبّت HC-SR04 على ذراع السيرفو ووصّل Trig بـ D10 وEcho بـ D11.</li><li>وصّل إشارة السيرفو بـ D9، وغذّه من 5V مع GND مشترك.</li><li>برمج مسحاً من 15° إلى 165° ثم اعكس الاتجاه، واحسب المسافة من زمن Echo.</li><li>شغّل الجرس عندما تقل المسافة عن 20 سم، وجرّب الأداة على حائط متحرك.</li></ol>
+      <p>HC-SR04 يعمل على 5V — لا توصله مباشرة على 3.3V.</p>
+    </section>
+    <section>
+      <h2>مقياس نبضات القلب</h2>
+      <p>حساس MAX30102 يقرأ النبض، وشاشة OLED تعرض القراءة أثناء وضع الإصبع.</p>
+      <p><strong>المستوى:</strong> متقدم — <strong>الوقت المتوقع:</strong> 90–120 دقيقة</p>
+      <h3>القطع المطلوبة</h3>
+      <ul><li><a href="../product/esp32-dev-model/">ESP32 DEV MODEL</a> ×1 — 39.75 ر.س</li><li><a href="../product/max-30102/">MAX 30102</a> ×1 — 25.75 ر.س</li><li><a href="../product/ssd1306-oled-display/">SSD1306 OLED 0.96&quot;</a> ×1 — 35.75 ر.س</li><li><a href="../product/jumper-wires/">JUMPER WIRES</a> ×1 — 11.75 ر.س</li><li><a href="../product/breadboard/">BREADBOARD لوحة تجارب</a> ×1 — 14.75 ر.س</li></ul>
+      <p><strong>إجمالي القطع: 127.75 ر.س</strong></p>
+      <h3>خطوات التركيب</h3>
+      <ol><li>وصّل MAX30102 والشاشة على I2C مع تغذية 3.3V فقط.</li><li>ثبّت SparkFun MAX3010x وAdafruit SSD1306 من Library Manager.</li><li>ضع الإصبع بهدوء على الحساس دون ضغط زائد وانتظر عدة ثوانٍ لاستقرار القراءة.</li><li>اعرض النبض على الشاشة وأضف متوسطاً لآخر 10 قراءات لتقليل التذبذب.</li></ol>
+      <p>MAX30102 حساس 3.3V — توصيله على 5V قد يتلفه. النتائج تعليمية وليست طبية.</p>
+    </section>
+    <section>
+      <h2>إنذار باب مغناطيسي</h2>
+      <p>حساس مغناطيسي يكتشف فتح الباب ويشغّل جرساً وليداً، مع إمكانية إشعار واي فاي لاحقاً.</p>
+      <p><strong>المستوى:</strong> مبتدئ — <strong>الوقت المتوقع:</strong> 30–45 دقيقة</p>
+      <h3>القطع المطلوبة</h3>
+      <ul><li><a href="../product/esp32-dev-model/">ESP32 DEV MODEL</a> ×1 — 39.75 ر.س</li><li><a href="../product/dry-reed-pipe-module/">حساس التبديل المغناطيسي Dry Reed Pipe Module</a> ×1 — 9.75 ر.س</li><li><a href="../product/piezo-buzzer/">Piezo Buzzer (جرس صوتي)</a> ×1 — 5.75 ر.س</li><li><a href="../product/led/">LED صغيرة (جميع الألوان)</a> ×1 — 1.25 ر.س</li><li><a href="../product/resistors/">مقاومات</a> ×1 — 0.5 ر.س</li><li><a href="../product/jumper-wires/">JUMPER WIRES</a> ×1 — 11.75 ر.س</li><li><a href="../product/breadboard/">BREADBOARD لوحة تجارب</a> ×1 — 14.75 ر.س</li></ul>
+      <p><strong>إجمالي القطع: 83.5 ر.س</strong></p>
+      <h3>خطوات التركيب</h3>
+      <ol><li>وصّل أحد طرفي حساس الريد إلى GPIO 4 والطرف الآخر إلى GND، وفعّل INPUT_PULLUP في الكود.</li><li>وصّل الليد مع مقاومة 220Ω على D5، والجرس على D6.</li><li>اقرأ حالة الحساس: الباب مغلق = LOW، والباب مفتوح = HIGH (أو العكس حسب توصيلك).</li><li>شغّل الجرس والليد عند فتح الباب، وأضف تأخيراً ثانياً لمنع التنبيه المتكرر.</li><li>لاحقاً أضف إشعار واي فاي أو رسالة تيليجرام باستخدام ESP32.</li></ol>
+      <p>اختبر الحالة قبل تركيب الحساس على الباب، وتأكد من ثبات الأسلاك عند الحركة.</p>
+    </section>
+    <p><a href="../shop/">تصفح كل القطع في المتجر</a></p>
+    <p>لتجربة الموقع الكاملة يرجى تفعيل JavaScript، أو تواصل معنا عبر واتساب: <a href="https://wa.me/966552645082" target="_blank" rel="noopener noreferrer">+966 552 645 082</a></p>
+  </div>
+</noscript>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-top">
+      <div class="footer-col footer-brand">
+        <div class="footer-logo"><span class="i">i</span><span class="boardz">Boardz</span></div>
+        <div class="footer-subtitle">ARDUINO <span class="future">FUTURE</span></div>
+        <p class="footer-desc">منصتك الأولى لمكونات الإلكترونيات والبرمجة في المملكة العربية السعودية</p>
+        <div class="footer-trust">
+          <span>أصلي ومضمون</span>
+          <span>شحن لكل المملكة</span>
+          <span>دعم فني مباشر</span>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h3>روابط سريعة</h3>
+        <div class="footer-links" id="footerLinks">
+          <a href="../">الرئيسية</a>
+          <a href="../shop/">المنتجات</a>
+          <a href="../projects/">ابنِ مشروعك</a>
+          <a href="../contact/">تواصل معنا</a>
+          <a href="../terms/">الشروط والأحكام</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h3>أقسام المتجر</h3>
+        <div class="footer-links footer-cat-links" id="footerCategories">
+          <a href="../category/mcu/">المتحكمات الدقيقة<span>5</span></a>
+          <a href="../category/sensor/">الحساسات<span>14</span></a>
+          <a href="../category/display/">الشاشات<span>3</span></a>
+          <a href="../category/motor/">المحركات والمشغلات<span>4</span></a>
+          <a href="../category/input/">أدوات الإدخال<span>4</span></a>
+          <a href="../category/output/">أدوات الإخراج<span>2</span></a>
+          <a href="../category/power/">الطاقة والشحن<span>4</span></a>
+          <a href="../category/module/">الموديولات الإلكترونية<span>2</span></a>
+          <a href="../category/accessory/">الإكسسوارات والتوصيل<span>3</span></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h3>تواصل معنا</h3>
+        <div class="footer-contact">
+          <p>واتساب: <a class="phone" href="https://wa.me/966552645082" target="_blank" rel="noopener noreferrer">+966 552 645 082</a></p>
+          <p>البريد: <a href="mailto:iBoardz@outlook.com">iBoardz@outlook.com</a></p>
+          <p class="footer-address">الرياض، المملكة العربية السعودية</p>
+        </div>
+        <div class="footer-payments" aria-label="طرق الدفع المتاحة">
+          <span>مدى</span><span>Apple Pay</span><span>STC Pay</span><span>تحويل بنكي</span>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="footerYear">2026</span> iBoardz</span>
+      <span class="footer-bottom-sep">—</span>
+      <span>جميع الحقوق محفوظة</span>
+      <a class="footer-policy" href="../terms/">الشروط والأحكام</a>
+      <a class="footer-policy" href="../contact/">الدعم والمساعدة</a>
+    </div>
+  </div>
+</footer>
+
+<script src="../catalog-data.js"></script>
+<script src="../assets/js/search-engine.js"></script>
+<script src="../assets/js/menu.js"></script>
+<script src="../assets/js/app.js"></script>
+</body>
+</html>

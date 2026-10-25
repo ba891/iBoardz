@@ -14,8 +14,19 @@ const App = {
   catalog: window.IBOARDZ_CATALOG || { products: [], categories: [], services: [] },
   products: window.IBOARDZ_CATALOG ? window.IBOARDZ_CATALOG.products : [],
   services: window.IBOARDZ_CATALOG && window.IBOARDZ_CATALOG.services ? window.IBOARDZ_CATALOG.services : [],
+  projects: window.IBOARDZ_CATALOG && window.IBOARDZ_CATALOG.projects ? window.IBOARDZ_CATALOG.projects : [],
   popularSearches: window.IBOARDZ_CATALOG && window.IBOARDZ_CATALOG.popularSearches ? window.IBOARDZ_CATALOG.popularSearches : [],
   meta: (window.IBOARDZ_CATALOG && window.IBOARDZ_CATALOG.meta) || { whatsapp: '966552645082', whatsappDisplay: '+966 552 645 082', email: 'iBoardz@outlook.com' },
+
+  // Which static shell we are on (home / shop / category / product / projects / contact / terms)
+  // and the relative prefix that points at the site root from this page.
+  pageType: (document.body && document.body.dataset.page) || 'home',
+  root: (document.body && document.body.dataset.root) || './',
+  // True when the page was opened straight from disk. Browsers show a folder
+  // listing for `file://…/shop/` instead of serving its index.html, and there
+  // is no API origin, so links and the catalog sync adapt (see localHref).
+  localFileMode: window.location.protocol === 'file:',
+  siteOrigin: (window.IBOARDZ_CATALOG && window.IBOARDZ_CATALOG.meta && window.IBOARDZ_CATALOG.meta.site) || 'https://iboardz.netlify.app',
 
   // category icons (presentation only — labels/aliases live in catalog-data.js)
   catIcons: {
@@ -44,19 +55,29 @@ const App = {
     { text: 'احترام يجيب بسرعه', stars: 5 },
   ],
 
-  features: [
-    { title: 'جودة عالية', desc: 'جميع منتجاتنا أصلية ومضمونة' },
-    { title: 'أسعار تنافسية', desc: 'أفضل الأسعار في السوق السعودي' },
-    { title: 'شحن سريع', desc: 'توصيل سريع لجميع مناطق المملكة' },
-    { title: 'دعم فني 24/7', desc: 'فريق دعم متخصص على مدار الساعة' },
-    { title: 'ضمان كامل', desc: 'ضمان على جميع المنتجات' },
-    { title: 'موارد تعليمية', desc: 'شروحات وأكواد جاهزة لكل منتج' },
+  // Project-page helpers (board picker). Product data still comes from the catalog.
+  boards: [
+    {
+      id: 3, badge: 'الأنسب للبداية',
+      bullets: ['5V ومنافذ متوافقة مع أغلب الشيلدات', 'شروحات ومكتبات جاهزة بلا نهاية', 'الأفضل لمشاريع الدروس والتجارب'],
+      best: 'اخترها إذا كانت هذه أول مرة تمسك فيها لوح أردوينو أو تتبع شرحاً دراسياً.',
+    },
+    {
+      id: 2, badge: 'الأكثر مرونة',
+      bullets: ['واي فاي + بلوتوث مدمجان', 'معالج أسرع وذاكرة أكبر', 'مناسب لمشاريع IoT والتحكم عن بعد'],
+      best: 'اخترها إذا كان مشروعك يحتاج اتصالاً بالإنترنت أو تطبيق جوال أو حساسات متعددة.',
+    },
+    {
+      id: 4, badge: 'الأصغر حجماً',
+      bullets: ['حجم صغير جداً للتركيب داخل العلبة', 'واي فاي + بلوتوث', 'منافذ أقل — يكفي للمشاريع المدمجة'],
+      best: 'اخترها إذا كان الحجم مهمًا (ساعة، حساس متنقل، علبة صغيرة) ولا تحتاج منافذ كثيرة.',
+    },
   ],
 
   navItems: [
     { key: 'home', label: 'الرئيسية' },
     { key: 'products', label: 'المنتجات' },
-    { key: 'features', label: 'المميزات' },
+    { key: 'projects', label: 'ابنِ مشروعك' },
     { key: 'contact', label: 'تواصل معنا' },
     { key: 'terms', label: 'الشروط والأحكام' },
   ],
@@ -77,17 +98,34 @@ const App = {
     fire: '<path d="M12 2s4 4 4 8a4 4 0 01-8 0c0-1 .5-2 1-3 0 2 1 3 1 3s0-4 2-8z"/><path d="M6 14a6 6 0 0012 0"/>',
     printer: '<polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/>',
     check: '<polyline points="20 6 9 17 4 12"/>',
+    cloud: '<path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z"/>',
+    droplet: '<path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/>',
+    radar: '<circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/><line x1="12" y1="12" x2="19" y2="5"/>',
+    heart: '<path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/>',
+    door: '<path d="M4 21V3h12v18"/><path d="M16 21h4"/><circle cx="12" cy="12" r="1"/>',
+    wifi: '<path d="M5 12.55a11 11 0 0114 0"/><path d="M8.5 16.1a6 6 0 017 0"/><path d="M12 20h.01"/>',
+    battery: '<rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="13" x2="23" y2="11"/>',
+    calculator: '<rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="8" y1="11" x2="8.01" y2="11"/><line x1="12" y1="11" x2="12.01" y2="11"/><line x1="16" y1="11" x2="16.01" y2="11"/><line x1="8" y1="15" x2="8.01" y2="15"/><line x1="12" y1="15" x2="12.01" y2="15"/><line x1="8" y1="19" x2="8.01" y2="19"/><line x1="12" y1="19" x2="12.01" y2="19"/><line x1="16" y1="15" x2="16" y2="19"/>',
+    bulb: '<path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 00-4 12.7V18h8v-3.3A7 7 0 0012 2z"/>',
+    book: '<path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/>',
     tag: '<path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/>',
     award: '<circle cx="12" cy="8" r="6"/><polyline points="8.21 13.89 7 22 12 19 17 22 15.79 13.88"/>',
     mapPin: '<path d="M21 10c0 6.5-9 12-9 12s-9-5.5-9-12a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>',
     clipboard: '<path d="M16 4h2a2 2 0 012 2v14a2 2 0 01-2 2H6a2 2 0 01-2-2V6a2 2 0 012-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/>',
     wrench: '<path d="M20.5 6.5a5 5 0 01-7.6 4.3l-8.8 8.8a2 2 0 11-2.8-2.8l8.8-8.8A5 5 0 0117 6.5l-2.9 2.9 2.5 2.5 2.9-2.9a5 5 0 01-1.5 1.5z"/>',
+    card: '<rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/><line x1="5" y1="15" x2="9" y2="15"/>',
+    grid: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+    filter: '<polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>',
+    chevronDown: '<polyline points="6 9 12 15 18 9"/>',
   },
 
   // ===== 2. STATE =====
   state: {
     page: 'home', menuOpen: false, cartOpen: false, cart: [],
     filter: 'all', search: '', sort: 'relevance', ci: 0, selProd: null,
+    currentProduct: null, notFound: false,
+    pageNum: 1, perPage: 12, price: 'all', onlySale: false, onlyPop: false,
+    homeTab: 'popular', projectLevel: 'all', filtersOpen: false,
   },
 
   // sort options (label + comparator)
@@ -98,6 +136,15 @@ const App = {
     { key: 'price-desc', label: 'الأعلى سعراً' },
     { key: 'name', label: 'الاسم (أ-ي)' },
     { key: 'discount', label: 'أكبر خصم' },
+  ],
+
+  // price buckets used by the shop sidebar
+  priceRanges: [
+    { key: 'all', label: 'كل الأسعار' },
+    { key: 'under-10', label: 'أقل من 10 ر.س' },
+    { key: '10-25', label: '10 - 25 ر.س' },
+    { key: '25-50', label: '25 - 50 ر.س' },
+    { key: '50-plus', label: '50 ر.س وأكثر' },
   ],
 
   carouselTimer: null,
@@ -121,11 +168,113 @@ const App = {
     return cat ? cat.label : key;
   },
 
-  cats() {
-    return this.catalog.categories.map(c => ({ key: c.key, label: c.label, icon: this.catIcons[c.key] || this.catIcons.all }));
+  catDesc(key) {
+    const cat = this.catalog.categories.find(c => c.key === key);
+    return cat && cat.desc ? cat.desc : '';
   },
 
-  imgPath(rel) { return 'images/' + String(rel).replace(/^images\//, ''); },
+  catCount(key) {
+    return key === 'all' ? this.products.length : this.products.filter(p => p.cat === key).length;
+  },
+
+  productCount(n) {
+    const count = Number(n) || 0;
+    if (count === 1) return 'منتج واحد';
+    if (count === 2) return 'منتجان';
+    if (count >= 3 && count <= 10) return count + ' منتجات';
+    return count + ' منتج';
+  },
+
+  resultCount(n) {
+    const count = Number(n) || 0;
+    if (count === 0) return 'لا توجد نتائج';
+    if (count === 1) return 'نتيجة واحدة';
+    if (count === 2) return 'نتيجتان';
+    if (count >= 3 && count <= 10) return count + ' نتائج';
+    return count + ' نتيجة';
+  },
+
+  cats() {
+    return this.catalog.categories.map(c => ({ key: c.key, label: c.label, desc: c.desc || '', icon: this.catIcons[c.key] || this.catIcons.all }));
+  },
+
+  // ---- path helpers -------------------------------------------------
+  // The site is served from real directories, so every page builds links
+  // relative to the site root (`data-root`) instead of relying on query strings.
+  url(path) {
+    const clean = String(path == null ? '' : path).replace(/^\.\//, '').replace(/^\//, '');
+    return this.localHref(this.root + clean);
+  },
+
+  /**
+   * Directory URLs work on the server (`/shop/`), but a browser opening the
+   * files directly (`file://`) renders a folder listing instead of the
+   * index.html inside it. In that mode every directory link gets the file
+   * name spelled out; over HTTP the clean URLs are left untouched.
+   */
+  localHref(href) {
+    const value = String(href == null ? '' : href);
+    if (!this.localFileMode || !value) return value;
+    if (/^(?:[a-z][a-z0-9+.-]*:|\/\/|#)/i.test(value)) return value; // external, anchor
+    const cut = value.search(/[?#]/);
+    const path = cut === -1 ? value : value.slice(0, cut);
+    const rest = cut === -1 ? '' : value.slice(cut);
+    if (!path || /\.[a-z0-9]{1,8}$/i.test(path)) return value; // already a file
+    return (path.charAt(path.length - 1) === '/' ? path : path + '/') + 'index.html' + rest;
+  },
+
+  /** Rewrite the links that are hard-coded in the static HTML shell. */
+  localizeLinks() {
+    if (!this.localFileMode) return;
+    document.querySelectorAll('a[href]').forEach(link => {
+      const href = link.getAttribute('href');
+      const next = this.localHref(href);
+      if (next !== href) link.setAttribute('href', next);
+    });
+  },
+
+  pagePath(page) {
+    if (page === 'home') return this.url('');
+    if (page === 'products' || page === 'shop') return this.url('shop/');
+    return this.url(page + '/');
+  },
+
+  productUrl(product) {
+    const slug = product && typeof product === 'object' ? product.slug : product;
+    return slug ? this.url('product/' + encodeURIComponent(String(slug)) + '/') : this.url('shop/');
+  },
+
+  categoryUrl(key) {
+    return !key || key === 'all' ? this.url('shop/') : this.url('category/' + encodeURIComponent(String(key)) + '/');
+  },
+
+  shopUrl(query) {
+    const base = this.url('shop/');
+    if (!query) return base;
+    const qs = typeof query === 'string' ? query.replace(/^\?/, '') : query.toString();
+    return qs ? base + '?' + qs : base;
+  },
+
+  go(target) {
+    if (!target) return;
+    window.location.href = this.localHref(target);
+  },
+
+  priceInRange(price, key) {
+    const n = Number(price) || 0;
+    if (key === 'under-10') return n < 10;
+    if (key === '10-25') return n >= 10 && n < 25;
+    if (key === '25-50') return n >= 25 && n < 50;
+    if (key === '50-plus') return n >= 50;
+    return true;
+  },
+
+  imgPath(rel) {
+    // Encode spaces and non-ASCII characters so image URLs work the same
+    // on every browser/CDN, not only when the server tolerates raw filenames.
+    // `root` keeps the same catalog data working from nested product/category pages.
+    return encodeURI(this.root + 'images/' + String(rel).replace(/^images\//, ''));
+  },
 
   getStock(product) {
     if (!product || product.stock == null || product.stock === '') return null;
@@ -153,8 +302,11 @@ const App = {
 
   // ===== 4. PERSISTENCE =====
   async syncCatalog() {
+    // Straight from disk there is no server origin to call; catalog-data.js
+    // already holds every product, so the static catalog is the whole store.
+    if (this.localFileMode) return false;
     try {
-      const response = await fetch('/api/catalog');
+      const response = await fetch(this.root + 'api/catalog');
       if (!response.ok) return false;
       const payload = await response.json();
       const serverProducts = Array.isArray(payload)
@@ -232,6 +384,8 @@ const App = {
     document.documentElement.setAttribute('data-theme', t);
     const btn = document.getElementById('themeToggle');
     if (btn) {
+      btn.setAttribute('aria-label', t === 'dark' ? 'الوضع الفاتح' : 'الوضع الداكن');
+      btn.title = t === 'dark' ? 'الوضع الفاتح' : 'الوضع الداكن';
       btn.innerHTML = t === 'dark'
         ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
         : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>';
@@ -249,33 +403,34 @@ const App = {
   },
 
   // ===== 6. NAVIGATION =====
-  _navigateTo(page, opts = {}) {
-    this.state.page = page;
-    this.state.menuOpen = false;
-    this.state.filter = 'all';
-    this.closeSearch();
-    if (!opts.preserveSearch) {
-      this.state.search = '';
-      this.state.sort = 'relevance';
-      this.syncSearchInputs();
-    }
+  // Every destination is a real directory on the server, so navigation is a
+  // normal page load. That keeps product/category URLs shareable and indexable.
+  nav(page) {
+    if (this.state.filtersOpen) this.toggleFilters(false);
     this.closeMenu();
-    const main = document.getElementById('mainContent');
-    main.style.opacity = '0';
-    main.style.transform = 'translateY(12px)';
-    setTimeout(() => {
-      this.render();
-      requestAnimationFrame(() => {
-        main.style.transition = 'opacity 0.35s ease, transform 0.35s ease';
-        main.style.opacity = '1';
-        main.style.transform = 'translateY(0)';
-        setTimeout(() => { main.style.transition = ''; }, 400);
-      });
+    this.closeSearch();
+    const target = this.pagePath(page);
+    let targetPath = target;
+    try { targetPath = new URL(target, window.location.href).pathname; } catch {}
+    if (targetPath === window.location.pathname) {
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, 180);
+      return;
+    }
+    this.go(target);
   },
 
-  nav(page) { this._navigateTo(page); },
+  navCategory(cat) {
+    this.closeMenu();
+    this.closeSearch();
+    const target = this.categoryUrl(cat);
+    let targetPath = target;
+    try { targetPath = new URL(target, window.location.href).pathname; } catch {}
+    if (targetPath === window.location.pathname) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    this.go(target);
+  },
 
   toggleMenu(e) {
     if (e) e.stopPropagation();
@@ -287,21 +442,29 @@ const App = {
   },
 
   closeMenu() {
+    const wasOpen = this.state.menuOpen;
+    const dd = document.getElementById('dropdown');
+    const active = document.activeElement;
     this.state.menuOpen = false;
     this.renderMenu();
-    this.unlockBody();
+    const btn = document.querySelector('.menu-btn');
+    if (btn) btn.setAttribute('aria-expanded', 'false');
+    if (active && dd && dd.contains(active) && btn) btn.focus({ preventScroll: true });
+    if (wasOpen) this.unlockBody();
   },
 
   openCart() {
+    if (this.state.cartOpen) { this.renderCart(); return; }
     this.state.cartOpen = true;
     this.renderCart();
     this.lockBody();
   },
 
   closeCart() {
+    const wasOpen = this.state.cartOpen;
     this.state.cartOpen = false;
     this.renderCart();
-    this.unlockBody();
+    if (wasOpen) this.unlockBody();
   },
 
   scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); },
@@ -494,16 +657,31 @@ const App = {
   },
 
   // ===== 9. MODAL =====
+  // Products now have a dedicated page; the modal remains only for the
+  // 3D-printing service, which is not an orderable catalog product.
   showProduct(id) {
-    this.state.selProd = this.products.find(p => String(p.id) === String(id));
-    this.renderModal();
-    if (this.state.selProd) this.lockBody();
+    const product = this.products.find(p => String(p.id) === String(id));
+    if (!product) return;
+    this.closeSearch();
+    this.closeMenu();
+    const target = this.productUrl(product);
+    let targetPath = target;
+    try { targetPath = new URL(target, window.location.href).pathname; } catch {}
+    if (targetPath === window.location.pathname) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return;
+    }
+    this.go(target);
   },
 
   closeModal() {
+    const wasOpen = !!this.state.selProd || !!this.state.selService;
     this.state.selProd = null;
+    this.state.selService = null;
     this.renderModal();
-    this.unlockBody();
+    if (wasOpen) this.unlockBody();
+    this.updateUrl();
+    this.syncSeo();
   },
 
   // ============================================================
@@ -520,6 +698,40 @@ const App = {
       })),
       []
     );
+    this.projectIndex = IBSearch.build(
+      this.projects.map(project => {
+        const totals = this.projectTotals(project);
+        const partWords = totals.parts.reduce((words, part) => words.concat([
+          part.product.name,
+          part.product.nameAr,
+          part.product.sku,
+        ]), []);
+        return {
+          id: 'project:' + project.key,
+          name: project.title,
+          nameAr: project.title,
+          keywords: ['مشروع', 'مشاريع', 'ابن مشروع', 'بناء مشروع', 'مشروع جاهز']
+            .concat(project.tags || [])
+            .concat(partWords)
+            .filter(Boolean),
+          sku: '',
+          cat: 'project',
+          desc: project.summary,
+          specs: [],
+          price: totals.price,
+          op: totals.original,
+          badge: this.projectLevelLabel(project.level),
+          isProject: true,
+          project,
+        };
+      }),
+      []
+    );
+  },
+
+  /** True on the two listing pages where filtering happens without a reload. */
+  isListingPage() {
+    return this.pageType === 'shop' || this.pageType === 'category';
   },
 
   /** Main entry point used by both the header and the page search box. */
@@ -527,16 +739,15 @@ const App = {
     const value = typeof rawValue === 'string' ? rawValue : '';
     const trimmed = value.trim();
     this.state.search = trimmed;
+    this.state.pageNum = 1;
     if (origin) this._searchOrigin = origin;
     if (!this.searchIndex) this.buildSearchIndex();
 
-    if (this.state.page !== 'products') {
-      // _navigateTo closes the panel, so the suggestions are rendered after it —
-      // otherwise the very first keystroke from another page shows nothing.
-      this._navigateTo('products', { preserveSearch: true });
-      this.syncSearchInputs();
-      this.updateUrl();
+    // On a product/content page the search box only suggests; submitting it
+    // takes the shopper to the shop page. Listing pages filter in place.
+    if (!this.isListingPage()) {
       this.renderSuggestions(trimmed);
+      if (origin === 'header') this.syncSearchInputs();
       return;
     }
 
@@ -544,6 +755,21 @@ const App = {
     if (origin === 'header') this.syncSearchInputs();
     this.updateProductsView();
     this.updateUrl();
+  },
+
+  /** Enter in a search box or a click on "view all results". */
+  submitSearch() {
+    const q = String(this.state.search || '').trim();
+    this.closeSearch();
+    if (this.isListingPage()) {
+      if (q) this.pushRecent(q);
+      this.updateProductsView();
+      this.updateUrl();
+      return;
+    }
+    if (!q) { this.go(this.shopUrl()); return; }
+    this.pushRecent(q);
+    this.go(this.shopUrl('q=' + encodeURIComponent(q)));
   },
 
   /** Debounced variant for typing in the page search box. */
@@ -571,8 +797,16 @@ const App = {
   },
 
   applySuggestion(query) {
-    this.pushRecent(query);
-    this.search(query, this._searchOrigin);
+    const q = String(query || '').trim();
+    if (!q) return;
+    this.pushRecent(q);
+    if (this.isListingPage()) {
+      this.search(q, this._searchOrigin);
+      this.closeSearch();
+      return;
+    }
+    this.closeSearch();
+    this.go(this.shopUrl('q=' + encodeURIComponent(q)));
   },
 
   pushRecent(query) {
@@ -630,6 +864,7 @@ const App = {
     } else {
       const productHits = IBSearch.query(this.searchIndex, q, { limit: 6 });
       const serviceHits = this.serviceIndex ? IBSearch.query(this.serviceIndex, q, { limit: 1 }) : { results: [] };
+      const projectHits = this.projectIndex ? IBSearch.query(this.projectIndex, q, { limit: 3 }) : { results: [], total: 0 };
       this._suggestItems = [];
 
       if (serviceHits.results && serviceHits.results.length) {
@@ -654,28 +889,56 @@ const App = {
           const idx = this._suggestItems.length;
           this._suggestItems.push({ type: 'product', id: p.id });
           const sub = (p.nameAr && p.nameAr !== p.name) ? p.nameAr : (this.catLabel(p.cat) + ' · ' + (hit.matchedIn === 'name' ? 'مطابق في الاسم' : 'مطابق في التفاصيل'));
-          html += `<button class="sg-item" onclick="App.showProduct(${p.id})" data-idx="${idx}">
+          html += `<a class="sg-item" href="${this.esc(this.productUrl(p))}" onclick="App.closeSearch()" data-idx="${idx}">
               <span class="sg-thumb">${this.imgTag(this.imgPath(p.img), p.name, 34)}</span>
               <span class="sg-meta">
                 <span class="sg-name">${IBSearch.highlight(p.name, hit.matchedTokens)}</span>
                 <span class="sg-sub">${this.esc(sub)}</span>
               </span>
               <span class="sg-price">⃁ ${p.price}</span>
-            </button>`;
+            </a>`;
         });
         const total = productHits.total;
-        html += `<button class="sg-all" onclick="App.applySuggestion(this.dataset.q)" data-q="${this.esc(q)}">
+        const allHref = this.isListingPage() ? '#' : this.shopUrl('q=' + encodeURIComponent(q));
+        html += `<a class="sg-all" href="${this.esc(allHref)}" onclick="event.preventDefault();App.applySuggestion(this.dataset.q)" data-q="${this.esc(q)}">
             عرض كل النتائج (${total}) ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 16)}
-          </button>`;
-      } else if (productHits.corrected) {
-        html += `<button class="sg-item empty" onclick="App.applySuggestion(this.dataset.q)" data-q="${this.esc(productHits.suggestion)}">
-            <span class="sg-meta"><span class="sg-name">هل تقصد: <strong>${this.esc(productHits.suggestion)}</strong></span></span>
-          </button>`;
-      } else {
-        html += `<div class="sg-empty">
-            <strong>لا توجد نتائج لـ "${this.esc(q)}"</strong>
-            <span>جرّب كلمة أخرى أو تصفح الأقسام</span>
-          </div>`;
+          </a>`;
+      }
+
+      if (projectHits.results.length) {
+        html += `<div class="sg-head">${this.svgIcon(this.icons.grid, 14)} مشاريع جاهزة</div>`;
+        projectHits.results.forEach(hit => {
+          const project = hit.product.project;
+          const totals = this.projectTotals(project);
+          const firstPart = totals.parts[0];
+          const href = this.pagePath('projects') + '#' + this.projectAnchor(project);
+          html += `<a class="sg-item" href="${this.esc(href)}" onclick="App.closeSearch()">
+              <span class="sg-thumb">${firstPart ? this.imgTag(this.imgPath(firstPart.product.img), project.title, 34) : this.svgIcon(this.icons.grid, 20)}</span>
+              <span class="sg-meta">
+                <span class="sg-name">${IBSearch.highlight(project.title, hit.matchedTokens)}</span>
+                <span class="sg-sub">${totals.parts.length} قطع · ${this.projectLevelLabel(project.level)} · ⃁ ${this.money(totals.price)}</span>
+              </span>
+              <span class="sg-cta">مشروع</span>
+            </a>`;
+        });
+        if (!productHits.results.length) {
+          html += `<a class="sg-all" href="${this.esc(this.pagePath('projects'))}" onclick="App.closeSearch()">
+              عرض كل المشاريع (${this.projects.length}) ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 16)}
+            </a>`;
+        }
+      }
+
+      if (!productHits.results.length && !projectHits.results.length) {
+        if (productHits.corrected) {
+          html += `<button class="sg-item empty" onclick="App.applySuggestion(this.dataset.q)" data-q="${this.esc(productHits.suggestion)}">
+              <span class="sg-meta"><span class="sg-name">هل تقصد: <strong>${this.esc(productHits.suggestion)}</strong></span></span>
+            </button>`;
+        } else {
+          html += `<div class="sg-empty">
+              <strong>لا توجد نتائج لـ "${this.esc(q)}"</strong>
+              <span>جرّب كلمة أخرى أو تصفح الأقسام</span>
+            </div>`;
+        }
       }
     }
 
@@ -684,6 +947,7 @@ const App = {
     panel.classList.toggle('empty', !q);
     this._suggestActive = -1;
     this._suggestOpen = true;
+    document.querySelectorAll('#headerSearchInput, #productsSearchInput').forEach(el => el.setAttribute('aria-expanded', 'false'));
     const input = this._currentSearchInput();
     if (input) input.setAttribute('aria-expanded', 'true');
   },
@@ -747,8 +1011,7 @@ const App = {
     if (panel) { panel.hidden = true; panel.innerHTML = ''; }
     this._suggestOpen = false;
     this._suggestActive = -1;
-    const input = this._currentSearchInput();
-    if (input) input.setAttribute('aria-expanded', 'false');
+    document.querySelectorAll('#headerSearchInput, #productsSearchInput').forEach(el => el.setAttribute('aria-expanded', 'false'));
   },
 
   /** Called from the search inputs' onkeydown handler. */
@@ -766,23 +1029,28 @@ const App = {
       }
       if (this.state.search) {
         e.preventDefault();
-        this.closeSearch();
-        this.pushRecent(this.state.search);
+        this.submitSearch();
       }
     }
   },
 
-  focusSearch() {
+  focusSearch(origin) {
+    if (origin) this._searchOrigin = origin;
     const input = this._currentSearchInput();
     if (input) this.renderSuggestions(this.state.search);
   },
 
   // ---- products page ----------------------------------------
-  updateProductsView() {
-    if (this.state.page !== 'products') return;
-    const pool = this.state.filter === 'all'
+  shopFiltered() {
+    let pool = this.state.filter === 'all'
       ? this.products.slice()
       : this.products.filter(p => p.cat === this.state.filter);
+
+    if (this.state.price !== 'all') {
+      pool = pool.filter(p => this.priceInRange(p.price, this.state.price));
+    }
+    if (this.state.onlySale) pool = pool.filter(p => this.disc(p) >= 50);
+    if (this.state.onlyPop) pool = pool.filter(p => p.pop);
 
     let list = pool;
     let hit = { total: pool.length, tokens: [], suggestion: '', corrected: false };
@@ -791,27 +1059,187 @@ const App = {
       list = res.results.map(r => r.product);
       hit = res;
     }
-    this._lastResult = hit;
+    const sorterKey = this.state.search
+      ? this.state.sort
+      : (this.state.sort === 'relevance' ? 'popular' : this.state.sort);
+    if (!(this.state.search && sorterKey === 'relevance')) list.sort(this._sorter(sorterKey));
+    return { list, hit };
+  },
 
-    const sorter = this._sorter(this.state.search ? this.state.sort : (this.state.sort === 'relevance' ? 'popular' : this.state.sort));
-    list.sort(sorter);
+  shopPages(total) {
+    return Math.max(1, Math.ceil(total / this.state.perPage));
+  },
+
+  updateProductsView() {
+    if (this.state.page !== 'products') return;
+    const result = this.shopFiltered();
+    const list = result.list;
+    const pageCount = this.shopPages(list.length);
+    this.state.pageNum = Math.min(Math.max(1, this.state.pageNum), pageCount);
+    const start = (this.state.pageNum - 1) * this.state.perPage;
+    const pageItems = list.slice(start, start + this.state.perPage);
+    this._lastResult = result.hit;
 
     const grid = document.getElementById('productsResults');
     if (grid) {
-      grid.innerHTML = this.renderResults(list, hit);
+      grid.innerHTML = this.renderResults(pageItems, result.hit);
       grid.classList.remove('enter');
       void grid.offsetWidth;
       grid.classList.add('enter');
     }
+
     const count = document.getElementById('productsCount');
-    if (count) count.textContent = this.state.search ? `${list.length} نتيجة` : `${list.length} منتج`;
-    document.querySelectorAll('#filterBar .filter-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.cat === this.state.filter);
+    if (count) count.textContent = this.state.search ? this.resultCount(list.length) : this.productCount(list.length);
+
+    const range = document.getElementById('productsRange');
+    if (range) {
+      range.textContent = list.length
+        ? `عرض ${start + 1}–${Math.min(start + pageItems.length, list.length)} من ${list.length}`
+        : '';
+    }
+
+    const pagination = document.getElementById('shopPagination');
+    if (pagination) pagination.innerHTML = this.renderPagination(list.length);
+
+    const active = document.getElementById('shopActiveFilters');
+    if (active) active.innerHTML = this.renderActiveFilters();
+
+    const crumbs = document.getElementById('shopBreadcrumb');
+    if (crumbs) crumbs.innerHTML = this.renderBreadcrumbs();
+
+    const title = document.getElementById('shopTitle');
+    if (title) title.textContent = this.state.filter === 'all' ? 'كل المنتجات' : this.catLabel(this.state.filter);
+
+    const subt = document.getElementById('shopSubtitle');
+    if (subt) subt.textContent = this.state.filter === 'all'
+      ? 'تصفح جميع القطع، أو اختر قسماً من القائمة لتصفية النتائج.'
+      : this.catDesc(this.state.filter);
+
+    const displaySort = this.displaySort();
+    const sel = document.getElementById('shopSort');
+    if (sel && sel.value !== displaySort) sel.value = displaySort;
+
+    document.querySelectorAll('#shopSidebar [data-cat]').forEach(link => {
+      const active = link.dataset.cat === this.state.filter;
+      link.classList.toggle('active', active);
+      if (active) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
     });
-    document.querySelectorAll('#sortBar .sort-btn').forEach(btn => {
-      btn.classList.toggle('active', btn.dataset.sort === this.state.sort);
+    document.querySelectorAll('#shopSidebar [data-price]').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.price === this.state.price);
+      btn.setAttribute('aria-pressed', String(btn.dataset.price === this.state.price));
     });
+    const sale = document.getElementById('filterOnlySale');
+    if (sale) sale.checked = this.state.onlySale;
+    const pop = document.getElementById('filterOnlyPop');
+    if (pop) pop.checked = this.state.onlyPop;
+
+    const badge = document.getElementById('filterCountBadge');
+    if (badge) {
+      const n = this.activeFilterCount();
+      badge.textContent = n ? String(n) : '';
+      badge.style.display = n ? 'inline-flex' : 'none';
+    }
+    document.title = this.pageTitle();
+    this.syncSeo();
     this.syncSearchInputs();
+  },
+
+  displaySort() {
+    return (!this.state.search && this.state.sort === 'relevance') ? 'popular' : this.state.sort;
+  },
+
+  activeFilterCount() {
+    let n = 0;
+    // The category itself is part of the path on /category/<key>/.
+    if (this.state.filter !== 'all' && this.pageType !== 'category') n++;
+    if (this.state.price !== 'all') n++;
+    if (this.state.onlySale) n++;
+    if (this.state.onlyPop) n++;
+    if (this.state.search) n++;
+    return n;
+  },
+
+  renderActiveFilters() {
+    const chips = [];
+    if (this.state.search) {
+      chips.push(`<button class="active-chip" onclick="App.clearSearch('page')">بحث: ${this.esc(this.state.search)} ${this.svgIcon(this.icons.close, 13)}</button>`);
+    }
+    if (this.state.filter !== 'all' && this.pageType !== 'category') {
+      chips.push(`<button class="active-chip" onclick="App.setFilter('all')">${this.esc(this.catLabel(this.state.filter))} ${this.svgIcon(this.icons.close, 13)}</button>`);
+    }
+    if (this.state.price !== 'all') {
+      const range = this.priceRanges.find(r => r.key === this.state.price);
+      chips.push(`<button class="active-chip" onclick="App.setPrice('all')">${range ? range.label : 'السعر'} ${this.svgIcon(this.icons.close, 13)}</button>`);
+    }
+    if (this.state.onlySale) chips.push(`<button class="active-chip" onclick="App.setFlag('onlySale', false)">خصم 50%+ ${this.svgIcon(this.icons.close, 13)}</button>`);
+    if (this.state.onlyPop) chips.push(`<button class="active-chip" onclick="App.setFlag('onlyPop', false)">الأكثر رواجاً ${this.svgIcon(this.icons.close, 13)}</button>`);
+    if (!chips.length) return '';
+    return `<span class="active-chip-label">الفلاتر النشطة:</span>${chips.join('')}<button class="active-chip-clear" onclick="App.clearFilters()">مسح الكل</button>`;
+  },
+
+  renderPagination(total) {
+    const pages = this.shopPages(total);
+    if (pages <= 1) return '';
+    const current = this.state.pageNum;
+    const nums = [];
+    const push = n => { if (!nums.includes(n)) nums.push(n); };
+    if (pages <= 7) {
+      for (let i = 1; i <= pages; i++) push(i);
+    } else {
+      push(1);
+      if (current <= 3) { push(2); push(3); push(4); }
+      else if (current >= pages - 2) { push(pages - 3); push(pages - 2); push(pages - 1); }
+      else { push(current - 1); push(current); push(current + 1); }
+      push(pages);
+    }
+    nums.sort((a, b) => a - b);
+
+    let items = '';
+    let prev = 0;
+    nums.forEach(n => {
+      if (prev && n - prev > 1) items += `<span class="page-ellipsis" aria-hidden="true">…</span>`;
+      items += `<button class="page-btn${n === current ? ' active' : ''}" onclick="App.goToPage(${n})" ${n === current ? 'aria-current="page"' : ''} aria-label="صفحة ${n}">${n}</button>`;
+      prev = n;
+    });
+
+    return `<nav class="shop-pagination" aria-label="التنقل بين صفحات المنتجات">
+      <button class="page-nav" onclick="App.goToPage(${current - 1})" ${current === 1 ? 'disabled' : ''} aria-label="الصفحة السابقة">
+        ${this.svgIcon('<polyline points="9 18 15 12 9 6"/>', 16)}<span>السابق</span>
+      </button>
+      <div class="page-numbers">${items}</div>
+      <span class="page-status">صفحة ${current} من ${pages}</span>
+      <button class="page-nav" onclick="App.goToPage(${current + 1})" ${current === pages ? 'disabled' : ''} aria-label="الصفحة التالية">
+        <span>التالي</span>${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 16)}
+      </button>
+    </nav>`;
+  },
+
+  goToPage(n) {
+    const pages = this.shopPages(this.shopFiltered().list.length);
+    const target = Math.min(Math.max(1, Number(n) || 1), pages);
+    this.state.pageNum = target;
+    this.updateProductsView();
+    this.updateUrl();
+    const el = document.getElementById('shopResults');
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.scrollY - 92;
+      window.scrollTo({ top: Math.max(0, top), behavior: 'smooth' });
+    }
+  },
+
+  toggleFilters(force) {
+    const wasOpen = this.state.filtersOpen;
+    const open = force === undefined ? !wasOpen : !!force;
+    this.state.filtersOpen = open;
+    const sidebar = document.getElementById('shopSidebar');
+    const backdrop = document.getElementById('shopFilterBackdrop');
+    if (sidebar) sidebar.classList.toggle('open', open);
+    if (backdrop) backdrop.classList.toggle('open', open);
+    const trigger = document.querySelector('.shop-filter-toggle');
+    if (trigger) trigger.setAttribute('aria-expanded', String(open));
+    if (open && !wasOpen) this.lockBody();
+    if (!open && wasOpen) this.unlockBody();
   },
 
   _sorter(key) {
@@ -828,50 +1256,197 @@ const App = {
 
   setSort(key) {
     this.state.sort = key;
+    this.state.pageNum = 1;
     this.updateProductsView();
     this.updateUrl();
   },
 
   setFilter(cat) {
-    this.state.filter = cat;
+    if (this.state.filtersOpen) this.toggleFilters(false);
+    if (this.pageType === 'shop') {
+      if (cat === 'all') {
+        this.state.filter = 'all';
+        this.state.pageNum = 1;
+        this.updateProductsView();
+        this.updateUrl();
+      } else {
+        this.go(this.categoryUrl(cat));
+      }
+      return;
+    }
+    if (this.pageType === 'category') {
+      if (cat === this.state.filter) return;
+      this.go(cat === 'all' ? this.shopUrl() : this.categoryUrl(cat));
+      return;
+    }
+    this.go(cat === 'all' ? this.shopUrl() : this.categoryUrl(cat));
+  },
+
+  setPrice(key) {
+    this.state.price = key;
+    this.state.pageNum = 1;
     this.updateProductsView();
+    this.updateUrl();
+  },
+
+  setFlag(flag, value) {
+    if (flag !== 'onlySale' && flag !== 'onlyPop') return;
+    this.state[flag] = !!value;
+    this.state.pageNum = 1;
+    this.updateProductsView();
+    this.updateUrl();
+  },
+
+  clearFilters() {
+    this.state.filter = this.pageType === 'category'
+      ? (document.body.dataset.category || 'all')
+      : 'all';
+    this.state.price = 'all';
+    this.state.onlySale = false;
+    this.state.onlyPop = false;
+    this.state.search = '';
+    this.state.pageNum = 1;
+    this.syncSearchInputs();
+    this.updateProductsView();
+    this.updateUrl();
+    this.closeSearch();
+    if (this.state.filtersOpen) this.toggleFilters(false);
   },
 
   showService(id) {
     const service = this.services.find(s => String(s.id) === String(id));
     if (!service) return;
+    const alreadyOpen = !!this.state.selProd || !!this.state.selService;
     this.closeSearch();
+    this.state.selProd = null;
     this.state.selService = service;
     this.renderServiceModal();
-    this.lockBody();
+    if (!alreadyOpen) this.lockBody();
   },
 
-  // ---- URL (?q=&cat=&sort=) --------------------------------
+  // ---- URL (filters stay as query params on the current path) -------
   updateUrl() {
     if (!window.history || !window.history.replaceState) return;
-    const url = new URL(window.location.href);
-    const q = this.state.search;
-    const cat = this.state.filter;
-    const sort = this.state.sort;
-    if (q) url.searchParams.set('q', q); else url.searchParams.delete('q');
-    if (cat && cat !== 'all') url.searchParams.set('cat', cat); else url.searchParams.delete('cat');
-    if (sort && sort !== 'relevance') url.searchParams.set('sort', sort); else url.searchParams.delete('sort');
-    window.history.replaceState({}, '', url.toString());
+    try {
+      const url = new URL(window.location.href);
+      ['q', 'cat', 'sort', 'price', 'sale', 'pop', 'page', 'shop', 'view', 'product'].forEach(key => url.searchParams.delete(key));
+      if (this.isListingPage()) {
+        if (this.state.search) url.searchParams.set('q', this.state.search);
+        if (this.state.sort && this.state.sort !== 'relevance') url.searchParams.set('sort', this.state.sort);
+        if (this.state.price !== 'all') url.searchParams.set('price', this.state.price);
+        if (this.state.onlySale) url.searchParams.set('sale', '1');
+        if (this.state.onlyPop) url.searchParams.set('pop', '1');
+        if (this.state.pageNum > 1) url.searchParams.set('page', String(this.state.pageNum));
+      }
+      window.history.replaceState({}, '', url.toString());
+    } catch {}
   },
 
-  readUrl() {
-    if (!window.URLSearchParams) return false;
+  /** Read the static shell (body data attributes) for this page. */
+  readPageContext() {
+    const body = document.body;
+    this.state.pageNum = 1;
+    this.state.filter = 'all';
+    this.state.currentProduct = null;
+    this.state.notFound = false;
+
+    if (this.pageType === 'product') {
+      const slug = body.dataset.product || '';
+      const product = this.products.find(p => String(p.slug) === String(slug));
+      this.state.page = 'products';
+      this.state.currentProduct = product || null;
+      this.state.notFound = !product;
+      if (product) this.state.filter = product.cat;
+      return;
+    }
+
+    if (this.pageType === 'category') {
+      const key = body.dataset.category || 'all';
+      this.state.page = 'products';
+      this.state.filter = this.catalog.categories.some(c => c.key === key) ? key : 'all';
+      return;
+    }
+
+    if (this.pageType === 'shop') {
+      this.state.page = 'products';
+      this.state.filter = 'all';
+      return;
+    }
+
+    this.state.page = ['projects', 'contact', 'terms'].indexOf(this.pageType) > -1 ? this.pageType : 'home';
+  },
+
+  /** Filters / sort / page number live in the query string of the current path. */
+  readQueryState() {
+    if (!window.URLSearchParams || !this.isListingPage()) return;
     const params = new URLSearchParams(window.location.search);
     const q = (params.get('q') || '').trim();
-    const cat = params.get('cat') || 'all';
     const sort = params.get('sort') || 'relevance';
+    const price = params.get('price') || 'all';
+    const page = Math.max(1, parseInt(params.get('page') || '1', 10) || 1);
     const validSort = this.sorts.some(s => s.key === sort);
     this.state.sort = validSort ? sort : 'relevance';
-    if (this.catalog.categories.some(c => c.key === cat)) this.state.filter = cat;
-    if (q) {
-      this.state.search = q;
-      return true;
+    if (this.priceRanges.some(r => r.key === price)) this.state.price = price;
+    this.state.onlySale = params.get('sale') === '1';
+    this.state.onlyPop = params.get('pop') === '1';
+    this.state.pageNum = page;
+    if (q) this.state.search = q;
+  },
+
+  /** Convert the old query-string URLs into the new directory paths. */
+  legacyRedirect() {
+    if (!window.URLSearchParams) return false;
+    const params = new URLSearchParams(window.location.search);
+    const filterKeys = ['q', 'sort', 'price', 'sale', 'pop', 'page'];
+    const filterQuery = () => {
+      const next = new URLSearchParams();
+      filterKeys.forEach(key => {
+        const value = params.get(key);
+        if (value) next.set(key, value);
+      });
+      const qs = next.toString();
+      return qs ? '?' + qs : '';
+    };
+    const withQuery = (base) => base + filterQuery();
+
+    const productParam = params.get('product');
+    if (productParam) {
+      const product = this.products.find(p => String(p.id) === String(productParam) || String(p.slug) === String(productParam));
+      if (product) {
+        window.location.replace(this.productUrl(product));
+        return true;
+      }
     }
+
+    if (this.pageType === 'home') {
+      const cat = params.get('cat');
+      if (cat && cat !== 'all' && this.catalog.categories.some(c => c.key === cat)) {
+        window.location.replace(withQuery(this.categoryUrl(cat)));
+        return true;
+      }
+      if (params.get('q') || params.get('shop') === '1') {
+        window.location.replace(withQuery(this.shopUrl()));
+        return true;
+      }
+      const view = params.get('view');
+      if (view === 'features') {
+        window.location.replace(this.pagePath('projects'));
+        return true;
+      }
+      if (['projects', 'contact', 'terms'].indexOf(view) > -1) {
+        window.location.replace(this.pagePath(view));
+        return true;
+      }
+    }
+
+    if (this.pageType === 'shop') {
+      const cat = params.get('cat');
+      if (cat && cat !== 'all' && this.catalog.categories.some(c => c.key === cat)) {
+        window.location.replace(withQuery(this.categoryUrl(cat)));
+        return true;
+      }
+    }
+
     return false;
   },
 
@@ -890,11 +1465,10 @@ const App = {
   renderMenu() {
     const dd = document.getElementById('dropdown');
     const bd = document.getElementById('menuBackdrop');
-    const m = { home: 'home', products: 'box', features: 'star', contact: 'envelope', terms: 'shield' };
-    if (this.state.menuOpen) {
-      dd.innerHTML = this.navItems.map(n =>
-        `<button class="${this.state.page === n.key ? 'active' : ''}" onclick="App.nav('${n.key}')">${this.svgIcon(this.icons[m[n.key] || 'envelope'])} ${n.label}</button>`
-      ).join('');
+    if (this.state.menuOpen && window.IBOARDZ_MENU) {
+      dd.innerHTML = window.IBOARDZ_MENU.html(this);
+      dd.setAttribute('aria-label', 'قائمة التنقل والمتجر');
+      dd.setAttribute('aria-hidden', 'false');
       requestAnimationFrame(() => {
         if (!this.state.menuOpen) return;
         dd.classList.add('open');
@@ -902,6 +1476,7 @@ const App = {
       });
     } else {
       dd.classList.remove('open');
+      dd.setAttribute('aria-hidden', 'true');
       bd.classList.remove('open');
     }
   },
@@ -932,7 +1507,7 @@ const App = {
         <button class="qty-btn" onclick="App.updQty(${item.product.id},-1${item.color == null ? '' : ',' + JSON.stringify(item.color).replace(/"/g, '&quot;')})" aria-label="نقص" title="نقص الكمية">−</button>
         <span style="font-weight:900;min-width:22px;text-align:center;font-size:16px;color:var(--primary)">${item.qty}</span>
         <button class="qty-btn" onclick="App.updQty(${item.product.id},1${item.color == null ? '' : ',' + JSON.stringify(item.color).replace(/"/g, '&quot;')})" aria-label="زيادة" title="زيادة الكمية">+</button>
-        <button class="cart-remove" onclick="App.removeCart(${item.product.id}${item.color == null ? '' : ',' + JSON.stringify(item.color).replace(/"/g, '&quot;')})">${this.svgIcon('<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>', 16)}</button>
+        <button class="cart-remove" onclick="App.removeCart(${item.product.id}${item.color == null ? '' : ',' + JSON.stringify(item.color).replace(/"/g, '&quot;')})" aria-label="إزالة ${this.esc(item.product.name)} من السلة" title="إزالة من السلة">${this.svgIcon('<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>', 16)}</button>
       </div>
     </div>`).join('');
 
@@ -947,7 +1522,7 @@ const App = {
       <div class="cart-total-row discounted"><span class="cart-total-label">الإجمالي بعد الخصم:</span><span class="cart-total-new">⃁ ${tp}</span></div>
       ${ts > 0 ? `<div class="cart-savings-badge"><span class="savings-icon">${this.svgIcon(this.icons.tag, 18, 'var(--success)')}</span><span class="savings-text">وفّرت ⃁ ${ts}</span></div>` : ''}
     </div>
-    <a href="${this.wa(waText)}" target="_blank" rel="noopener noreferrer"><button class="whatsapp-btn">${this.svgIcon(this.icons.whatsapp, 20, '#25D366', '#25D366')} اطلب عبر واتساب</button></a>`;
+    <a class="whatsapp-btn" href="${this.wa(waText)}" target="_blank" rel="noopener noreferrer">${this.svgIcon(this.icons.whatsapp, 20, 'currentColor', 'currentColor')} اطلب عبر واتساب</a>`;
   },
 
   renderModal() {
@@ -959,10 +1534,12 @@ const App = {
       m.style.display = 'none';
       return;
     }
+    const stock = this.getStock(p);
+    const related = this.products.filter(x => x.cat === p.cat && x.id !== p.id).slice(0, 3);
     m.style.display = 'flex';
     m.innerHTML = `<div class="modal-backdrop" onclick="App.closeModal()"></div>
       <div class="modal-content">
-        <button class="modal-close" onclick="App.closeModal()">${this.svgIcon('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>', 20)}</button>
+        <button class="modal-close" onclick="App.closeModal()" aria-label="إغلاق">${this.svgIcon('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>', 20)}</button>
         <div class="modal-img">${this.imgTag(this.imgPath(p.img), p.name, 160)}</div>
         <div class="modal-body">
           <div class="modal-badges">
@@ -972,15 +1549,33 @@ const App = {
           </div>
           <h2 class="modal-title">${this.esc(p.name)}</h2>
           ${p.nameAr ? `<p class="modal-name-ar">${this.esc(p.nameAr)}</p>` : ''}
+          <div class="modal-meta">
+            ${p.sku ? `<span>رمز القطعة: <strong dir="ltr">${this.esc(p.sku)}</strong></span>` : ''}
+            <span class="modal-stock${stock === 0 ? ' out' : ''}">${stock === 0 ? 'غير متوفر حالياً' : 'متوفر للطلب'}</span>
+          </div>
           <p class="modal-desc">${this.esc(p.desc)}</p>
           ${p.customInput
-            ? `<div class="modal-color-picker"><label class="modal-color-label">${this.esc(p.customInput.label || 'القيمة:')}</label><input type="text" id="prodCustomValue" class="modal-custom-input" placeholder="${this.esc(p.customInput.placeholder || '')}" autocomplete="off"></div>`
+            ? `<div class="modal-color-picker"><label class="modal-color-label" for="prodCustomValue">${this.esc(p.customInput.label || 'القيمة:')}</label><input type="text" id="prodCustomValue" class="modal-custom-input" placeholder="${this.esc(p.customInput.placeholder || '')}" autocomplete="off"></div>`
             : p.colorOptions
               ? `<div class="modal-color-picker"><label class="modal-color-label">${this.esc(p.optionLabel || 'اختر اللون المناسب:')}</label><div class="modal-color-options">${p.colorOptions.map(c => `<label class="modal-color-option"><input type="radio" name="prodOption" value="${this.esc(c)}" class="modal-color-radio"><span class="modal-color-swatch" data-color="${this.esc(c)}">${this.esc(c)}</span></label>`).join('')}</div></div>`
             : ''}
-          <div class="modal-prices"><span class="modal-new-price">⃁ ${p.price}</span><span class="modal-old-price">⃁ ${p.op}</span></div>
+          <div class="modal-prices"><span class="modal-new-price">⃁ ${p.price}</span><span class="modal-old-price">⃁ ${p.op}</span><span class="modal-save">توفير ${this.disc(p)}%</span></div>
           <div class="modal-specs"><h3>المواصفات التقنية:</h3>${p.specs.map(s => `<div class="spec-item"><div class="spec-dot"></div><span class="spec-text">${this.esc(s)}</span></div>`).join('')}</div>
+          <div class="modal-trust">
+            <span>${this.svgIcon(this.icons.truck, 14)} شحن لكل المملكة</span>
+            <span>${this.svgIcon(this.icons.shield, 14)} ضمان على المنتجات</span>
+            <span>${this.svgIcon(this.icons.headset, 14)} دعم فني</span>
+          </div>
           <button class="modal-add-btn" onclick="App.addCartWithColor(${p.id})">أضف إلى السلة ${this.svgIcon('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>', 16)}</button>
+          <a class="modal-wa-link" href="${this.wa('مرحباً، أريد طلب: ' + p.name + ' (الرمز: ' + (p.sku || p.id) + ')')}" target="_blank" rel="noopener noreferrer">${this.svgIcon(this.icons.whatsapp, 16)} أو اطلب مباشرة عبر واتساب</a>
+          ${related.length ? `<div class="modal-related">
+            <h3>منتجات مشابهة</h3>
+            <div class="modal-related-grid">${related.map(r => `<button class="modal-related-item" onclick="App.showProduct(${r.id})">
+              <span class="modal-related-img">${this.imgTag(this.imgPath(r.img), r.name, 54)}</span>
+              <span class="modal-related-name">${this.esc(r.name)}</span>
+              <span class="modal-related-price">⃁ ${r.price}</span>
+            </button>`).join('')}</div>
+          </div>` : ''}
         </div>
       </div>`;
   },
@@ -1011,7 +1606,29 @@ const App = {
   },
 
   imgTag(src, alt, minH = 60) {
-    return `<img src="${this.esc(src)}" alt="${this.esc(alt)}" loading="lazy" decoding="async" onerror="this.style.display='none'" class="img-tag" style="min-height:${minH}px">`;
+    return `<img src="${this.esc(src)}" alt="${this.esc(alt)}" loading="lazy" decoding="async" onerror="App.imgFallback(this)" class="img-tag" style="min-height:${minH}px">`;
+  },
+
+  // Retry once (covers a transient network/CDN hiccup), then show a branded
+  // placeholder instead of leaving an unexplained blank image area.
+  imgFallback(img) {
+    if (!img) return;
+    if (!img.dataset.retried) {
+      img.dataset.retried = '1';
+      const src = img.getAttribute('src') || '';
+      img.src = src + (src.indexOf('?') > -1 ? '&' : '?') + 'retry=1';
+      return;
+    }
+    img.onerror = null;
+    img.classList.add('img-fallback');
+    img.alt = 'صورة المنتج غير متوفرة';
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="160" height="120">' +
+      '<rect width="160" height="120" rx="12" fill="#f1f3f8"/>' +
+      '<path d="M46 78l20-24 14 16 10-12 24 30H46z" fill="#c7cedb"/>' +
+      '<circle cx="62" cy="44" r="9" fill="#c7cedb"/>' +
+      '<text x="80" y="104" text-anchor="middle" font-family="Arial" font-size="11" fill="#8b93a7">iBoardz</text>' +
+      '</svg>';
+    img.src = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
   },
 
   starSVG(filled, size = 18) {
@@ -1030,38 +1647,141 @@ const App = {
     const needsOptions = !!(p.colorOptions || p.customInput);
     const addAction = needsOptions
       ? `App.showProduct(${p.id})`
-      : `App.addCart(App.products.find(x=>x.id===${p.id}), null, event)`;
-    return `<div class="product-card">
-      <div class="product-img${large ? ' product-img-large' : ''}" onclick="App.showProduct(${p.id})">
+      : `App.addCart(App.products.find(x=>String(x.id)===String(${p.id})), null, event)`;
+    const stock = this.getStock(p);
+    const discount = this.disc(p);
+    const desc = p.desc ? this.esc(p.desc) : (p.nameAr ? this.esc(p.nameAr) : this.esc(this.catDesc(p.cat)));
+    const href = this.productUrl(p);
+    const imageLabel = `عرض صفحة ${p.name}${p.badge ? ' — ' + p.badge : ''} -${discount}%`;
+    return `<article class="product-card${large ? ' product-card-large' : ''}">
+      <a class="product-img${large ? ' product-img-large' : ''}" href="${this.esc(href)}" aria-label="${this.esc(imageLabel)}">
         ${this.imgTag(this.imgPath(p.img), p.name, 100)}
         ${p.badge ? `<span class="product-badge badge-primary">${this.esc(p.badge)}</span>` : ''}
-        <span class="discount-badge">-${this.disc(p)}%</span>
-      </div>
+        <span class="discount-badge">-${discount}%</span>
+      </a>
       <div class="product-info">
-        <h3 class="product-name" onclick="App.showProduct(${p.id})">${name}</h3>
+        <div class="product-cat-row">
+          <a class="product-cat" href="${this.esc(this.categoryUrl(p.cat))}">${this.esc(this.catLabel(p.cat))}</a>
+          ${stock !== null ? `<span class="stock-pill${stock === 0 ? ' out' : ''}">${stock === 0 ? 'غير متوفر' : 'متوفر'}</span>` : ''}
+        </div>
+        <h3 class="product-name" title="${this.esc(p.name)}"><a href="${this.esc(href)}">${name}</a></h3>
+        <p class="product-desc">${desc}</p>
         <div class="product-bottom">
           <div class="product-prices">
             <span class="price">⃁ ${p.price}</span>
             <span class="old-price">⃁ ${p.op}</span>
           </div>
-          <button class="add-btn" onclick="event.stopPropagation();${addAction}" aria-label="أضف للسلة">${this.svgIcon('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>', 16)}</button>
+          <button class="add-btn" onclick="event.stopPropagation();${addAction}" aria-label="أضف ${this.esc(p.name)} إلى السلة">
+            ${this.svgIcon('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>', 16)}
+            <span class="add-btn-label">أضف</span>
+          </button>
         </div>
       </div>
-    </div>`;
+    </article>`;
   },
 
   renderMain() {
     const main = document.getElementById('mainContent');
     const fl = document.getElementById('footerLinks');
-    if (fl) fl.innerHTML = this.navItems.map(n => `<button onclick="App.nav('${n.key}')">${n.label}</button>`).join('');
+    if (fl) fl.innerHTML = this.navItems.map(n => `<a href="${this.esc(this.pagePath(n.key))}">${n.label}</a>`).join('');
+    const fc = document.getElementById('footerCategories');
+    if (fc) fc.innerHTML = this.cats().filter(c => c.key !== 'all').map(c =>
+      `<a href="${this.esc(this.categoryUrl(c.key))}">${c.label}<span>${this.catCount(c.key)}</span></a>`
+    ).join('');
 
-    if (this.state.page === 'home') main.innerHTML = this.renderHome();
-    else if (this.state.page === 'products') main.innerHTML = this.renderProducts();
-    else if (this.state.page === 'features') main.innerHTML = this.renderFeatures();
-    else if (this.state.page === 'terms') main.innerHTML = this.renderTerms();
-    else if (this.state.page === 'contact') main.innerHTML = this.renderContact();
+    if (this.pageType === 'product') main.innerHTML = this.renderProductPage();
+    else if (this.pageType === 'category' || this.pageType === 'shop') main.innerHTML = this.renderProducts();
+    else if (this.pageType === 'projects') main.innerHTML = this.renderProjects();
+    else if (this.pageType === 'terms') main.innerHTML = this.renderTerms();
+    else if (this.pageType === 'contact') main.innerHTML = this.renderContact();
+    else main.innerHTML = this.renderHome();
 
+    document.title = this.pageTitle();
+    this.syncSeo();
     setTimeout(() => this.setupScrollReveal(), 100);
+  },
+
+  syncSeo() {
+    try {
+      document.title = this.pageTitle();
+      const origin = this.siteOrigin;
+      let path = '/';
+      let desc = 'متجر iBoardz - وجهتك الرقمية الأولى لمكونات الإلكترونيات والبرمجة في السعودية. متحكمات Arduino وESP32 وحساسات وشاشات ووحدات طاقة وشحن سريع لجميع المدن.';
+      let image = origin + '/images/banners/add.jpg';
+      let imageAlt = 'iBoardz — متجر الإلكترونيات والاردوينو';
+      let ogType = 'website';
+
+      if (this.pageType === 'product') {
+        const p = this.state.currentProduct;
+        if (p) {
+          path = `/product/${encodeURIComponent(p.slug)}/`;
+          desc = `${p.name}${p.nameAr ? ' — ' + p.nameAr : ''}: ${p.desc || ''} — السعر ${p.price} ر.س من متجر iBoardz مع شحن سريع.`;
+          image = origin + '/' + encodeURI('images/' + p.img);
+          imageAlt = p.name;
+          ogType = 'product';
+        } else {
+          path = '/shop/';
+          desc = 'المنتج المطلوب غير متوفر. تصفّح جميع منتجات iBoardz من أردوينو وESP32 وحساسات وشاشات ومستلزمات التوصيل.';
+        }
+      } else if (this.pageType === 'category') {
+        const cat = this.state.filter;
+        path = `/category/${encodeURIComponent(cat)}/`;
+        desc = `${this.catLabel(cat)}: ${this.catDesc(cat)} — ${this.catCount(cat)} منتجات من متجر iBoardz مع شحن سريع لجميع مناطق المملكة.`;
+        if (this.state.search) desc = `بحث عن "${this.state.search}" داخل ${this.catLabel(cat)} — متجر iBoardz.`;
+      } else if (this.pageType === 'shop') {
+        path = '/shop/';
+        desc = 'تسوق جميع منتجات iBoardz من أردوينو وESP32 وحساسات وشاشات ووحدات طاقة ومستلزمات توصيل، مع شحن سريع لجميع مناطق المملكة.';
+        if (this.state.search) desc = `نتائج البحث عن "${this.state.search}" في متجر iBoardz — قطع إلكترونية أصلية وشحن سريع.`;
+      } else if (this.pageType === 'contact') {
+        path = '/contact/';
+        desc = 'تواصل مع فريق iBoardz عبر واتساب أو البريد الإلكتروني للاستفسار عن المنتجات والطلبات وخدمة الطباعة ثلاثية الأبعاد.';
+      } else if (this.pageType === 'terms') {
+        path = '/terms/';
+        desc = 'الشروط والأحكام وسياسة الشحن والاستبدال والضمان والخصوصية في متجر iBoardz.';
+      } else if (this.pageType === 'projects') {
+        path = '/projects/';
+        desc = 'مشاريع أردوينو وESP32 جاهزة مع قائمة القطع المطلوبة والسعر الإجمالي. اختر مشروعك وأضف كل القطع إلى السلة بضغطة واحدة من iBoardz.';
+      }
+
+      const url = new URL(path, origin + '/');
+      const canonical = document.querySelector('link[rel="canonical"]');
+      if (canonical) canonical.href = url.toString();
+      const ogUrl = document.querySelector('meta[property="og:url"]');
+      if (ogUrl) ogUrl.content = url.toString();
+      const ogImage = document.querySelector('meta[property="og:image"]');
+      const twImage = document.querySelector('meta[name="twitter:image"]');
+      const ogAlt = document.querySelector('meta[property="og:image:alt"]');
+      if (ogImage) ogImage.content = image;
+      if (twImage) twImage.content = image;
+      if (ogAlt) ogAlt.content = imageAlt;
+      const ogTitle = document.querySelector('meta[property="og:title"]');
+      if (ogTitle) ogTitle.content = this.pageTitle();
+      const twTitle = document.querySelector('meta[name="twitter:title"]');
+      if (twTitle) twTitle.content = this.pageTitle();
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) metaDesc.content = desc;
+      const ogTypeMeta = document.querySelector('meta[property="og:type"]');
+      if (ogTypeMeta) ogTypeMeta.content = ogType;
+    } catch {}
+  },
+
+  pageTitle() {
+    if (this.pageType === 'product') {
+      const p = this.state.currentProduct;
+      return p ? `${p.name} — ${p.nameAr || 'منتج iBoardz'} | iBoardz` : `المنتج غير موجود | iBoardz`;
+    }
+    if (this.pageType === 'category') {
+      if (this.state.search) return `بحث: ${this.state.search} في ${this.catLabel(this.state.filter)} | iBoardz`;
+      return `${this.catLabel(this.state.filter)} — ${this.productCount(this.catCount(this.state.filter))} | iBoardz`;
+    }
+    if (this.pageType === 'shop') {
+      if (this.state.search) return `بحث: ${this.state.search} | iBoardz`;
+      return `كل المنتجات — ${this.productCount(this.products.length)} | iBoardz`;
+    }
+    if (this.pageType === 'projects') return `مشاريع جاهزة — ابنِ مشروعك | iBoardz`;
+    if (this.pageType === 'terms') return `الشروط والأحكام | iBoardz`;
+    if (this.pageType === 'contact') return `تواصل معنا | iBoardz`;
+    return `iBoardz | متجر الإلكترونيات والاردوينو الأول في السعودية - ARDUINO FUTURE`;
   },
 
   // ============================================================
@@ -1080,38 +1800,30 @@ const App = {
     return `
     ${adStrip}
 
-    <div class="carousel">
-      <img src="images/banners/add.jpg" alt="iBoardz - متجر إلكترونيات وأردوينو" width="1100" height="620" fetchpriority="high" style="opacity:${this.state.ci === 0 ? 1 : 0}" decoding="async">
-      <img src="images/banners/add1.jpg" alt="iBoardz - عروض المنتجات" width="1100" height="619" loading="lazy" style="opacity:${this.state.ci === 1 ? 1 : 0}" decoding="async">
-      <button class="carousel-arrow prev" onclick="App.setCi(${(this.state.ci - 1 + 2) % 2})" aria-label="السابق">${this.svgIcon('<polyline points="9 18 15 12 9 6"/>', 22)}</button>
-      <button class="carousel-arrow next" onclick="App.setCi(${(this.state.ci + 1) % 2})" aria-label="التالي">${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 22)}</button>
-      <div class="carousel-dots">
-        <button class="carousel-dot${this.state.ci === 0 ? ' active' : ''}" onclick="App.setCi(0)" aria-label="الشريحة 1"></button>
-        <button class="carousel-dot${this.state.ci === 1 ? ' active' : ''}" onclick="App.setCi(1)" aria-label="الشريحة 2"></button>
-      </div>
-    </div>
+    ${this.renderHero()}
 
     <div class="marquee" aria-hidden="true">
       <div class="marquee-track">${this.marqueeItems()}${this.marqueeItems()}</div>
     </div>
 
-    <div class="quick-features reveal">
-      <div class="quick-features-inner">
-        <div class="quick-feature"><div class="quick-feature-icon">${this.svgIcon(this.icons.truck, 28)}</div><div><h3>شحن سريع</h3><p>توصيل لجميع مناطق المملكة</p></div></div>
-        <div class="quick-feature"><div class="quick-feature-icon">${this.svgIcon(this.icons.shield, 28)}</div><div><h3>ضمان كامل</h3><p>ضمان على جميع المنتجات</p></div></div>
-        <div class="quick-feature"><div class="quick-feature-icon">${this.svgIcon(this.icons.headset, 28)}</div><div><h3>دعم فني</h3><p class="phone"><a href="tel:+${this.meta.whatsapp}">${this.meta.whatsappDisplay}</a></p></div></div>
+    <div class="section reveal home-products">
+      <div class="home-products-head">
+        <div class="home-products-copy">
+          <div class="section-badge">مختارات iBoardz</div>
+          <h2 class="section-title">منتجات مختارة لمشروعك</h2>
+          <p class="section-subtitle">أكثر القطع طلباً، وأحدث ما وصل، وأفضل العروض في مكان واحد</p>
+        </div>
+        <div class="home-tabs" id="homeTabs" role="tablist" aria-label="تصفية المنتجات المختارة">
+          ${this.homeTabs().map(t => `<button class="home-tab${this.state.homeTab === t.key ? ' active' : ''}" data-tab="${t.key}" role="tab" aria-selected="${this.state.homeTab === t.key}" onclick="App.setHomeTab('${t.key}')">${t.label}</button>`).join('')}
+        </div>
+      </div>
+      <div class="products-grid" id="homeFeaturedGrid" role="tabpanel" aria-live="polite">${this.homeFeaturedList(this.state.homeTab).map(p => this.productCard(p)).join('')}</div>
+      <div class="home-products-footer">
+        <a class="show-all-btn" href="${this.esc(this.shopUrl())}">عرض جميع المنتجات (${this.products.length}) ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 22)}</a>
       </div>
     </div>
 
-    <div class="section reveal">
-      <div class="section-header">
-        <div class="section-badge">الأكثر مبيعاً</div>
-        <h2 class="section-title">الأكثر رواجاً</h2>
-        <p class="section-subtitle">المنتجات الأكثر طلباً من عملائنا</p>
-      </div>
-      <div class="products-grid">${this.products.filter(p => p.pop).map(p => this.productCard(p)).join('')}</div>
-      <div style="text-align:center;margin-top:40px"><button class="show-all-btn" onclick="App.nav('products')">عرض جميع المنتجات ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 22)}</button></div>
-    </div>
+    ${this.renderHomeProjects()}
 
     ${ad ? this.renderAdSection(ad) : ''}
 
@@ -1119,6 +1831,7 @@ const App = {
       <div class="section-header">
         <div class="section-badge">آراء العملاء</div>
         <h2 class="section-title">ماذا يقول عملاؤنا</h2>
+        <p class="section-subtitle">تجارب حقيقية من عملاء صمموا مشاريعهم مع iBoardz</p>
       </div>
       <div class="reviews-grid-home">
         ${this.reviews.slice(0, 3).map(r => `
@@ -1129,8 +1842,118 @@ const App = {
           </div>
         `).join('')}
       </div>
-      <div style="text-align:center;margin-top:40px"><button class="show-all-btn" onclick="App.nav('features')">عرض جميع التقييمات ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 22)}</button></div>
+      <div style="text-align:center;margin-top:40px"><a class="show-all-btn" href="${this.esc(this.pagePath('projects'))}#reviews">عرض جميع التقييمات ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 22)}</a></div>
     </div>`;
+  },
+
+  // ---- home project teaser ----------------------------------
+  renderHomeProjects() {
+    if (!this.projects.length) return '';
+    const picks = ['weather-station', 'plant-watering', 'gas-alarm']
+      .map(key => this.projects.find(project => project.key === key))
+      .filter(Boolean);
+    if (!picks.length) return '';
+    return `<div class="section projects-teaser reveal">
+      <div class="projects-teaser-head">
+        <div>
+          <span class="section-badge">مشاريع جاهزة</span>
+          <h2 class="section-title">ابنِ مشروعك من أول قطعة</h2>
+          <p class="section-subtitle">اختر مشروعاً، شوف القطع المطلوبة وسعرها، وأضفها للسلة بضغطة.</p>
+        </div>
+        <a class="projects-text-link" href="${this.esc(this.pagePath('projects'))}">كل المشاريع ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 14)}</a>
+      </div>
+      <div class="home-projects-grid">${picks.map(project => this.homeProjectCard(project)).join('')}</div>
+    </div>`;
+  },
+
+  homeProjectCard(project) {
+    const totals = this.projectTotals(project);
+    const icon = this.icons[project.icon] || this.icons.grid;
+    const level = project.level || 'intermediate';
+    return `<a class="home-project-card" href="${this.esc(this.pagePath('projects'))}#${this.esc(this.projectAnchor(project))}">
+      <span class="home-project-top">
+        <span class="home-project-icon" aria-hidden="true">${this.svgIcon(icon, 20)}</span>
+        <span class="home-project-level level-${level}">${this.projectLevelLabel(level)}</span>
+      </span>
+      <strong class="home-project-title">${this.esc(project.title)}</strong>
+      <span class="home-project-summary">${this.esc(project.summary)}</span>
+      <span class="home-project-meta">${totals.parts.length} قطع · ${this.esc(project.time)}</span>
+      <span class="home-project-foot">
+        <span class="home-project-price">⃁ ${this.money(totals.price)}</span>
+        <span class="home-project-link">شوف المشروع ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 13)}</span>
+      </span>
+    </a>`;
+  },
+
+  // ---- hero -------------------------------------------------
+  renderHero() {
+    const picks = ['esp32-dev-model', 'arduino-uno-r3', 'sh1107-oled-display', 'dht11-sensor']
+      .map(slug => this.products.find(p => p.slug === slug))
+      .filter(Boolean);
+    const cards = picks.map((p, i) => `
+      <a class="hero-product hero-product-${i + 1}" href="${this.esc(this.productUrl(p))}">
+        <span class="hero-product-img"><img src="${this.esc(this.imgPath(p.img))}" alt="" width="180" height="150" loading="${i === 0 ? 'eager' : 'lazy'}" decoding="async"></span>
+        <span class="hero-product-meta">
+          <span class="hero-product-name">${this.esc(p.name)}</span>
+          <span class="hero-product-price">⃁ ${p.price}</span>
+        </span>
+      </a>`).join('');
+
+    return `<section class="home-hero" aria-labelledby="heroTitle">
+      <div class="home-hero-grid" aria-hidden="true"></div>
+      <div class="home-hero-glow" aria-hidden="true"></div>
+      <div class="home-hero-inner">
+        <div class="hero-copy">
+          <h1 class="hero-title" id="heroTitle">كل قطع مشروعك<br><span>في مكان واحد.</span></h1>
+          <p class="hero-desc">متحكمات أردوينو وESP32، حساسات، شاشات، وحدات طاقة ومستلزمات توصيل — منتجات أصلية مع شحن سريع لكل مناطق المملكة ودعم فني يساعدك حتى تشغّل مشروعك.</p>
+          <div class="hero-actions">
+            <a class="hero-btn primary" href="${this.esc(this.shopUrl())}">تسوق المنتجات ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 18)}</a>
+            <a class="hero-btn ghost" href="${this.esc(this.pagePath('projects'))}">${this.svgIcon(this.icons.grid, 17)} ابنِ مشروعك</a>
+            <button class="hero-btn ghost" onclick="App.showService('svc-3d-printing')">خدمة الطباعة 3D ${this.svgIcon(this.icons.printer, 18)}</button>
+          </div>
+          <div class="hero-stats">
+            <div><strong>${this.products.length}+</strong><span>قطعة متوفرة</span></div>
+            <div><strong>${this.cats().length - 1}</strong><span>أقسام رئيسية</span></div>
+            <div><strong>7 أيام</strong><span>استبدال واسترجاع</span></div>
+          </div>
+        </div>
+        <div class="hero-visual">${cards}</div>
+      </div>
+    </section>`;
+  },
+
+  // ---- home featured tabs -----------------------------------
+  homeTabs() {
+    return [
+      { key: 'popular', label: 'الأكثر رواجاً' },
+      { key: 'new', label: 'وصل حديثاً' },
+      { key: 'deals', label: 'أفضل العروض' },
+    ];
+  },
+
+  homeFeaturedList(tab) {
+    const list = this.products.slice();
+    if (tab === 'new') list.sort((a, b) => Number(b.id) - Number(a.id));
+    else if (tab === 'deals') list.sort((a, b) => this.disc(b) - this.disc(a) || a.price - b.price);
+    else list.sort((a, b) => (b.pop ? 1 : 0) - (a.pop ? 1 : 0) || a.price - b.price);
+    return list.slice(0, 8);
+  },
+
+  setHomeTab(tab) {
+    if (!this.homeTabs().some(t => t.key === tab)) return;
+    this.state.homeTab = tab;
+    document.querySelectorAll('#homeTabs .home-tab').forEach(btn => {
+      const on = btn.dataset.tab === tab;
+      btn.classList.toggle('active', on);
+      btn.setAttribute('aria-selected', String(on));
+    });
+    const grid = document.getElementById('homeFeaturedGrid');
+    if (grid) {
+      grid.innerHTML = this.homeFeaturedList(tab).map(p => this.productCard(p)).join('');
+      grid.classList.remove('enter');
+      void grid.offsetWidth;
+      grid.classList.add('enter');
+    }
   },
 
   // ---- the announcement marquee ---------------------------
@@ -1184,60 +2007,192 @@ const App = {
   },
 
   // ---- products page ---------------------------------------
+  renderCategoryHero(catKey) {
+    const cat = this.catalog.categories.find(c => c.key === catKey) || { key: 'all', label: 'كل المنتجات', desc: '' };
+    const icon = this.catIcons[catKey] || this.catIcons.all;
+    const count = this.catCount(catKey);
+    return `<section class="category-hero reveal" aria-labelledby="shopTitle">
+      <div class="category-hero-main">
+        <span class="category-hero-icon">${this.svgIcon(icon, 34)}</span>
+        <div class="category-hero-copy">
+          <span class="category-hero-kicker">قسم المنتجات</span>
+          <h1 id="shopTitle">${this.esc(cat.label)}</h1>
+          <p id="shopSubtitle">${this.esc(cat.desc || this.catDesc(catKey))}</p>
+          <div class="category-hero-meta">
+            <span>${this.svgIcon(this.icons.shield, 14)} منتجات أصلية</span>
+            <span>${this.svgIcon(this.icons.truck, 14)} شحن لكل المملكة</span>
+            <span>${this.svgIcon(this.icons.headset, 14)} دعم فني مباشر</span>
+          </div>
+        </div>
+      </div>
+      <div class="category-hero-stat">
+        <strong>${count}</strong>
+        <span>في هذا القسم</span>
+        <a href="#shopResults">تصفح القطع ${this.svgIcon('<polyline points="9 18 15 12 9 6"/>', 14)}</a>
+      </div>
+    </section>`;
+  },
+
+  renderCategoryCrossLinks(activeCat) {
+    const others = this.cats().filter(c => c.key !== 'all' && c.key !== activeCat);
+    if (!others.length) return '';
+    return `<section class="category-cross-links reveal" aria-labelledby="crossCatsTitle">
+      <div class="category-cross-head">
+        <div>
+          <div class="section-badge">أقسام أخرى</div>
+          <h2 id="crossCatsTitle">أكمل مشروعك من هذه الأقسام</h2>
+        </div>
+        <a class="show-all-btn" href="${this.esc(this.shopUrl())}">كل المنتجات ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 18)}</a>
+      </div>
+      <div class="category-cross-grid">
+        ${others.map(c => `<a class="category-cross-link" href="${this.esc(this.categoryUrl(c.key))}">
+          <span class="category-cross-icon">${this.svgIcon(c.icon, 19)}</span>
+          <span class="category-cross-copy"><strong>${this.esc(c.label)}</strong><small>${this.productCount(this.catCount(c.key))}</small></span>
+          <span class="category-cross-arrow">${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 14)}</span>
+        </a>`).join('')}
+      </div>
+    </section>`;
+  },
+
   renderProducts() {
     const q = this.state.search;
-    const pool = this.state.filter === 'all' ? this.products.slice() : this.products.filter(p => p.cat === this.state.filter);
-    let list = pool;
-    let hit = { total: pool.length, tokens: [], suggestion: '', corrected: false };
-    if (this.searchIndex && q) {
-      const res = IBSearch.query(this.searchIndex, q, { pool });
-      list = res.results.map(r => r.product);
-      hit = res;
-    }
-    list.sort(this._sorter(q ? this.state.sort : (this.state.sort === 'relevance' ? 'popular' : this.state.sort)));
-    this._lastResult = hit;
+    const result = this.shopFiltered();
+    const list = result.list;
+    const pageCount = this.shopPages(list.length);
+    this.state.pageNum = Math.min(Math.max(1, this.state.pageNum), pageCount);
+    const start = (this.state.pageNum - 1) * this.state.perPage;
+    const pageItems = list.slice(start, start + this.state.perPage);
+    this._lastResult = result.hit;
 
-    return `<div class="section">
-      <div class="products-head reveal">
-        <h1>المنتجات</h1>
-        <p class="products-subtitle">ابحث عن القطعة التي تحتاجها بالاسم أو بالوصف — النتائج فورية</p>
-      </div>
+    const cats = this.cats();
+    const activeCat = this.state.filter;
+    const total = this.products.length;
+    const isCategory = this.pageType === 'category';
+    const head = isCategory
+      ? this.renderCategoryHero(activeCat)
+      : `<div class="shop-head reveal">
+          <div class="shop-head-row">
+            <div class="shop-head-copy">
+              <span class="section-badge">متجر iBoardz</span>
+              <h1 id="shopTitle">كل المنتجات</h1>
+              <p id="shopSubtitle">تصفح جميع القطع، أو اختر قسماً من القائمة لتصفية النتائج.</p>
+            </div>
+            <div class="shop-head-stat">
+              <span class="shop-head-stat-num">${total}</span>
+              <span class="shop-head-stat-label">منتج في المتجر</span>
+              <span class="shop-head-stat-sub">${cats.length - 1} أقسام رئيسية</span>
+            </div>
+          </div>
+        </div>`;
 
-      <div class="search-bar">
-        <input type="search" id="productsSearchInput" placeholder="مثال: حساس حرارة، ESP32، بطارية 3.7V…" value="${this.esc(q)}"
-          oninput="App.searchDebounced(this.value,'page')" onfocus="App.focusSearch()" onkeydown="App.searchKeydown(event)"
+    return `<div class="section shop-section">
+      <nav class="breadcrumbs" id="shopBreadcrumb" aria-label="مسار التصفح">${this.renderBreadcrumbs()}</nav>
+      ${head}
+
+      <div class="search-bar shop-search">
+        <input type="search" id="productsSearchInput" placeholder="${isCategory ? 'ابحث داخل هذا القسم…' : 'ابحث بالاسم أو الوصف أو رقم القطعة… مثال: ESP32، حساس حرارة، بطارية 3.7V'}"
+          value="${this.esc(q)}"
+          oninput="App.searchDebounced(this.value,'page')" onfocus="App.focusSearch('page')" onkeydown="App.searchKeydown(event)"
           autocomplete="off" autocapitalize="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="searchSuggest" aria-autocomplete="list" aria-label="ابحث عن منتج">
         <span class="search-icon">${this.svgIcon(this.icons.search, 20)}</span>
         <button class="search-clear" data-search-clear onclick="App.clearSearch('page')" aria-label="مسح البحث" ${q ? '' : 'hidden'}>${this.svgIcon(this.icons.close, 16)}</button>
       </div>
 
-      <div class="filter-bar" id="filterBar">
-        ${this.cats().map(c => {
-          const count = c.key === 'all' ? this.products.length : this.products.filter(p => p.cat === c.key).length;
-          return `<button class="filter-btn${this.state.filter === c.key ? ' active' : ''}" data-cat="${c.key}" onclick="App.setFilter('${c.key}')"><span class="filter-ico">${this.svgIcon(c.icon, 15)}</span>${c.label}<span class="filter-count">${count}</span></button>`;
-        }).join('')}
-      </div>
+      <div class="shop-layout">
+        <div class="shop-filter-backdrop" id="shopFilterBackdrop" onclick="App.toggleFilters(false)"></div>
+        <aside class="shop-sidebar" id="shopSidebar" aria-label="فلاتر المنتجات">
+          <div class="shop-sidebar-head">
+            <h2>${this.svgIcon(this.icons.filter, 17)} الفلاتر</h2>
+            <button class="shop-sidebar-close" onclick="App.toggleFilters(false)" aria-label="إغلاق الفلاتر">${this.svgIcon(this.icons.close, 18)}</button>
+          </div>
 
-      <div class="sort-bar" id="sortBar">
-        <span class="sort-label">ترتيب حسب:</span>
-        ${this.sorts.map(s => `<button class="sort-btn${this.state.sort === s.key ? ' active' : ''}" data-sort="${s.key}" onclick="App.setSort('${s.key}')">${s.label}</button>`).join('')}
-        <span class="products-count" id="productsCount">${q ? list.length + ' نتيجة' : list.length + ' منتج'}</span>
-      </div>
+          <div class="filter-card">
+            <h3>الأقسام</h3>
+            <div class="cat-filter-list">
+              ${cats.map(c => `<a class="cat-filter${activeCat === c.key ? ' active' : ''}" href="${this.esc(c.key === 'all' ? this.shopUrl() : this.categoryUrl(c.key))}" data-cat="${c.key}" aria-current="${activeCat === c.key ? 'page' : 'false'}">
+                <span class="cat-filter-ico">${this.svgIcon(c.icon, 15)}</span>
+                <span class="cat-filter-label">${this.esc(c.label)}</span>
+                <span class="cat-filter-count">${c.key === 'all' ? total : this.catCount(c.key)}</span>
+              </a>`).join('')}
+            </div>
+          </div>
 
-      <div id="productsResults" class="enter">${this.renderResults(list, hit)}</div>
+          <div class="filter-card">
+            <h3>نطاق السعر</h3>
+            <div class="price-filter-list">
+              ${this.priceRanges.map(r => `<button class="price-filter${this.state.price === r.key ? ' active' : ''}" data-price="${r.key}" aria-pressed="${this.state.price === r.key}" onclick="App.setPrice('${r.key}')">${r.label}</button>`).join('')}
+            </div>
+          </div>
+
+          <div class="filter-card">
+            <h3>خيارات إضافية</h3>
+            <label class="filter-check">
+              <input type="checkbox" id="filterOnlySale" ${this.state.onlySale ? 'checked' : ''} onchange="App.setFlag('onlySale', this.checked)">
+              <span class="filter-check-box"></span>
+              <span>خصم 50% أو أكثر</span>
+            </label>
+            <label class="filter-check">
+              <input type="checkbox" id="filterOnlyPop" ${this.state.onlyPop ? 'checked' : ''} onchange="App.setFlag('onlyPop', this.checked)">
+              <span class="filter-check-box"></span>
+              <span>الأكثر رواجاً</span>
+            </label>
+          </div>
+
+          <button class="clear-filters-btn" onclick="App.clearFilters()">${this.svgIcon('<polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/>', 15)} مسح كل الفلاتر</button>
+
+          <div class="sidebar-help">
+            <div class="sidebar-help-icon">${this.svgIcon(this.icons.headset, 22)}</div>
+            <h4>محتاج مساعدة؟</h4>
+            <p>ساعدناك تختار القطعة المناسبة لمشروعك.</p>
+            <a href="${this.wa('مرحباً، أحتاج مساعدة في اختيار قطعة من متجر iBoardz')}" target="_blank" rel="noopener noreferrer">تواصل عبر واتساب</a>
+          </div>
+        </aside>
+
+        <div class="shop-main" id="shopResults">
+          <div class="shop-toolbar">
+            <button class="shop-filter-toggle" onclick="App.toggleFilters()" aria-controls="shopSidebar" aria-expanded="false">${this.svgIcon(this.icons.filter, 16)} الفلاتر <span class="filter-badge" id="filterCountBadge" style="${this.activeFilterCount() ? '' : 'display:none'}">${this.activeFilterCount() || ''}</span></button>
+            <div class="shop-count">
+              <span class="products-count" id="productsCount" aria-live="polite">${q ? this.resultCount(list.length) : this.productCount(list.length)}</span>
+              <span class="products-range" id="productsRange">${list.length ? `عرض ${start + 1}–${Math.min(start + pageItems.length, list.length)} من ${list.length}` : ''}</span>
+            </div>
+            <label class="sort-control">
+              <span>ترتيب حسب</span>
+              <select id="shopSort" onchange="App.setSort(this.value)" aria-label="ترتيب المنتجات">
+                ${this.sorts.map(s => `<option value="${s.key}" ${this.displaySort() === s.key ? 'selected' : ''}>${s.label}</option>`).join('')}
+              </select>
+              <span class="sort-caret">${this.svgIcon(this.icons.chevronDown, 14)}</span>
+            </label>
+          </div>
+
+          <div class="shop-active-filters" id="shopActiveFilters">${this.renderActiveFilters()}</div>
+
+          <div id="productsResults" class="enter">${this.renderResults(pageItems, result.hit)}</div>
+          <div id="shopPagination">${this.renderPagination(list.length)}</div>
+        </div>
+      </div>
+      ${isCategory ? this.renderCategoryCrossLinks(activeCat) : ''}
     </div>`;
+  },
+
+  renderBreadcrumbs() {
+    const activeCat = this.state.filter;
+    const sep = `<span class="crumb-sep">${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 12)}</span>`;
+    if (activeCat === 'all') {
+      return `<a href="${this.esc(this.pagePath('home'))}">الرئيسية</a>${sep}<span class="crumb-current" aria-current="page">المنتجات</span>${this.state.search ? `${sep}<span class="crumb-current">نتائج البحث</span>` : ''}`;
+    }
+    return `<a href="${this.esc(this.pagePath('home'))}">الرئيسية</a>${sep}<a href="${this.esc(this.shopUrl())}">المنتجات</a>${sep}<span class="crumb-current" aria-current="page">${this.esc(this.catLabel(activeCat))}</span>${this.state.search ? `${sep}<span class="crumb-current">نتائج البحث</span>` : ''}`;
   },
 
   renderResults(list, hit) {
     const q = this.state.search;
     const tokens = q ? IBSearch.tokenize(q) : [];
-    const serviceHits = (q && this.serviceIndex)
+    const serviceHits = (q && this.serviceIndex && this.state.pageNum === 1)
       ? IBSearch.query(this.serviceIndex, q, { limit: 2 }).results.map(r => r.product.service)
       : [];
 
     let html = '';
 
-    if (hit.corrected) {
+    if (hit.corrected && this.state.pageNum === 1) {
       html += `<div class="search-tip">هل تقصد <button class="link" onclick="App.applySuggestion('${this.esc(hit.suggestion)}')">${this.esc(hit.suggestion)}</button>؟</div>`;
     }
 
@@ -1255,15 +2210,15 @@ const App = {
       html += `<div class="products-empty">
         ${this.svgIcon(this.icons.search, 48)}
         <p style="margin-top:12px;font-size:16px">لا توجد نتائج مطابقة${this.state.filter !== 'all' ? ' في هذا القسم' : ''}</p>
-        <p style="font-size:13px">جرّب كلمة مختلفة أو تصفّح الأقسام</p>
+        <p style="font-size:13px">جرّب كلمة مختلفة أو خفف الفلاتر</p>
         <div class="empty-actions">
-          <button class="show-all-btn" onclick="App.clearSearch('page')">مسح البحث</button>
+          <button class="show-all-btn" onclick="App.clearFilters()">مسح كل الفلاتر</button>
         </div>
         <div class="empty-suggest">
           <h4>بحث شائع</h4>
           <div class="sg-chips">${this.popularSearches.map(s => `<button class="sg-chip" onclick="App.applySuggestion(this.dataset.q)" data-q="${this.esc(s)}">${this.esc(s)}</button>`).join('')}</div>
           <h4>تصفح الأقسام</h4>
-          <div class="sg-chips">${this.cats().filter(c => c.key !== 'all').map(c => `<button class="sg-chip" onclick="App.setFilter('${c.key}')">${c.label}</button>`).join('')}</div>
+          <div class="sg-chips">${this.cats().filter(c => c.key !== 'all').map(c => `<a class="sg-chip" href="${this.esc(this.categoryUrl(c.key))}">${c.label}</a>`).join('')}</div>
         </div>
       </div>`;
       return html;
@@ -1273,29 +2228,540 @@ const App = {
     return html;
   },
 
-  renderFeatures() {
-    return `<div class="section-full">
-      <div class="section-header reveal">
-        <div class="section-badge">لماذا نحن؟</div>
-        <h1 class="section-title">لماذا <span style="direction:ltr;display:inline-block">iBoardz</span>؟</h1>
-        <p class="section-subtitle">مميزات تجعلنا الخيار الأول لعشاق الإلكترونيات</p>
-      </div>
-      <div class="features-grid">${this.features.map((f, i) => `<div class="feature-card reveal"><div class="feature-num">${i + 1}</div><h3>${f.title}</h3><p>${f.desc}</p></div>`).join('')}</div>
+  // ---- product detail page ---------------------------------
+  renderProductPage() {
+    const p = this.state.currentProduct;
+    if (!p) return this.renderProductNotFound();
 
-      <div class="section-header reveal" style="margin-top:48px;margin-bottom:32px">
-        <div class="section-badge">آراء العملاء</div>
-        <h2 style="font-size:28px;font-weight:900;margin:0 0 6px">ماذا يقول عملاؤنا</h2>
-        <p style="color:#999;font-size:15px">تجارب حقيقية من عملاء <strong style="direction:ltr;display:inline-block;color:#ff9500">iBoardz</strong></p>
+    const stock = this.getStock(p);
+    const out = stock === 0;
+    const cat = this.catalog.categories.find(c => c.key === p.cat) || { key: p.cat, label: this.catLabel(p.cat), desc: this.catDesc(p.cat) };
+    const catIcon = this.catIcons[p.cat] || this.catIcons.all;
+    const specs = Array.isArray(p.specs) ? p.specs : [];
+    const discount = this.disc(p);
+    const categoryUrl = this.categoryUrl(p.cat);
+    const waText = 'مرحباً، أريد طلب: ' + p.name + ' (الرمز: ' + (p.sku || p.id) + ')';
+
+    const related = this.products
+      .filter(x => x.id !== p.id && x.cat === p.cat)
+      .concat(this.products.filter(x => x.id !== p.id && x.cat !== p.cat && x.pop))
+      .filter((x, i, arr) => arr.findIndex(y => y.id === x.id) === i)
+      .slice(0, 4);
+
+    const optionMarkup = p.customInput
+      ? `<div class="product-option-group">
+          <label class="product-option-label" for="prodCustomValue">${this.esc(p.customInput.label || 'القيمة:')}</label>
+          <input type="text" id="prodCustomValue" class="product-custom-input" placeholder="${this.esc(p.customInput.placeholder || '')}" autocomplete="off">
+        </div>`
+      : p.colorOptions
+        ? `<div class="product-option-group">
+            <span class="product-option-label">${this.esc(p.optionLabel || 'اختر اللون المناسب:')}</span>
+            <div class="product-option-list">
+              ${p.colorOptions.map(c => `<label class="product-option">
+                <input type="radio" name="prodOption" value="${this.esc(c)}" class="product-option-radio">
+                <span class="product-option-chip">${this.esc(c)}</span>
+              </label>`).join('')}
+            </div>
+          </div>`
+        : '';
+
+    return `<div class="product-page">
+      <nav class="breadcrumbs product-breadcrumbs" aria-label="مسار التصفح">
+        <a href="${this.esc(this.pagePath('home'))}">الرئيسية</a>
+        <span class="crumb-sep">${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 12)}</span>
+        <a href="${this.esc(this.shopUrl())}">المنتجات</a>
+        <span class="crumb-sep">${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 12)}</span>
+        <a href="${this.esc(categoryUrl)}">${this.esc(cat.label)}</a>
+        <span class="crumb-sep">${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 12)}</span>
+        <span class="crumb-current" aria-current="page">${this.esc(p.name)}</span>
+      </nav>
+
+      <div class="product-hero">
+        <div class="product-gallery">
+          <div class="product-gallery-frame">
+            <span class="product-gallery-badge">${this.esc(cat.label)}</span>
+            ${p.badge ? `<span class="product-gallery-flag">${this.esc(p.badge)}</span>` : ''}
+            <span class="product-gallery-save">-${discount}%</span>
+            <img src="${this.esc(this.imgPath(p.img))}" alt="${this.esc(p.name)} — ${this.esc(p.nameAr || '')}" width="640" height="480" loading="eager" decoding="async" onerror="App.imgFallback(this)">
+          </div>
+          <div class="product-gallery-trust">
+            <div>${this.svgIcon(this.icons.shield, 19)}<span><strong>منتج أصلي</strong><small>جودة مضمونة</small></span></div>
+            <div>${this.svgIcon(this.icons.truck, 19)}<span><strong>شحن سريع</strong><small>لكل المملكة</small></span></div>
+            <div>${this.svgIcon(this.icons.headset, 19)}<span><strong>دعم فني</strong><small>عبر واتساب</small></span></div>
+          </div>
+        </div>
+
+        <div class="product-detail">
+          <div class="product-detail-top">
+            <a class="product-cat-chip" href="${this.esc(categoryUrl)}">${this.svgIcon(catIcon, 15)} ${this.esc(cat.label)}</a>
+            <span class="stock-pill${out ? ' out' : ''}">${out ? 'غير متوفر حالياً' : 'متوفر للطلب'}</span>
+          </div>
+
+          <h1 class="product-title">${this.esc(p.name)}</h1>
+          ${p.nameAr ? `<p class="product-title-ar">${this.esc(p.nameAr)}</p>` : ''}
+          <p class="product-lead">${this.esc(p.desc || this.catDesc(p.cat))}</p>
+          ${p.sku ? `<p class="product-sku">رمز القطعة: <strong dir="ltr">${this.esc(p.sku)}</strong></p>` : ''}
+
+          <div class="product-buybox">
+            <div class="product-price-block">
+              <span class="product-price-main">⃁ ${p.price}</span>
+              <span class="product-price-old">⃁ ${p.op}</span>
+              <span class="product-save-pill">وفّر ${discount}%</span>
+            </div>
+            <p class="product-price-note">السعر شامل ضريبة القيمة المضافة</p>
+
+            ${optionMarkup}
+
+            <div class="product-cta-row">
+              <button class="product-buy-btn add-btn" onclick="App.addCartWithColor(${p.id})" ${out ? 'disabled' : ''}>
+                ${this.svgIcon('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>', 18)}
+                <span>${out ? 'غير متوفر' : 'أضف إلى السلة'}</span>
+              </button>
+              <a class="product-wa-btn" href="${this.wa(waText)}" target="_blank" rel="noopener noreferrer">
+                ${this.svgIcon(this.icons.whatsapp, 18, 'currentColor', 'currentColor')}
+                <span>اطلب عبر واتساب</span>
+              </a>
+            </div>
+
+            <ul class="product-assurances">
+              <li>${this.svgIcon(this.icons.check, 15)} شحن لجميع مناطق المملكة</li>
+              <li>${this.svgIcon(this.icons.check, 15)} استبدال أو استرجاع خلال 7 أيام وفق الشروط</li>
+              <li>${this.svgIcon(this.icons.check, 15)} دعم فني يساعدك حتى تشغيل المشروع</li>
+            </ul>
+          </div>
+
+          <div class="product-quick-facts">
+            <div><span>القسم</span><strong><a href="${this.esc(categoryUrl)}">${this.esc(cat.label)}</a></strong></div>
+            <div><span>رمز القطعة</span><strong dir="ltr">${this.esc(p.sku || String(p.id))}</strong></div>
+            <div><span>التوفر</span><strong class="${out ? 'out' : ''}">${out ? 'غير متوفر' : 'متوفر'}</strong></div>
+          </div>
+        </div>
       </div>
 
-      <div class="reviews-pro reveal" style="max-width:1100px;margin:0 auto">
-        <div class="reviews-pro-grid">${this.reviews.map(r => `<div class="review-pro-card reveal">
-          <div class="review-pro-quote">"</div>
-          <div class="review-pro-stars">${this.renderStars(r.stars || 5)}</div>
-          <p class="review-pro-text">${r.text}</p>
-          <div class="review-decor-pro"><span class="review-decor-line"></span><span class="review-decor-icon">${this.svgIcon('<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>', 14, '#ff9500')}</span><span class="review-decor-line"></span></div>
-        </div>`).join('')}</div>
+      <div class="product-content-grid">
+        <section class="product-panel product-specs-panel" aria-labelledby="specsTitle">
+          <div class="product-panel-head">
+            <span class="section-badge">المواصفات</span>
+            <h2 id="specsTitle">المواصفات التقنية</h2>
+          </div>
+          <div class="product-spec-list">
+            ${specs.map((s, i) => `<div class="product-spec-item">
+              <span class="product-spec-num">${String(i + 1).padStart(2, '0')}</span>
+              <span class="product-spec-text">${this.esc(s)}</span>
+            </div>`).join('')}
+          </div>
+          <div class="product-overview">
+            <h3>نظرة عامة</h3>
+            <p>${this.esc(p.desc || '')}</p>
+            <p>${this.esc(p.nameAr || p.name)} — قطعة من قسم ${this.esc(cat.label)} متوفرة للطلب من iBoardz مع دعم فني يساعدك على توصيلها وتشغيلها في مشروعك.</p>
+          </div>
+        </section>
+
+        <aside class="product-side">
+          <div class="product-panel product-help-panel">
+            <span class="product-help-icon">${this.svgIcon(this.icons.headset, 24)}</span>
+            <h2>محتاج مساعدة؟</h2>
+            <p>نساعدك في التأكد من توافق القطعة مع مشروعك قبل الطلب.</p>
+            <a href="${this.wa('مرحباً، أحتاج مساعدة بخصوص ' + p.name)}" target="_blank" rel="noopener noreferrer">
+              ${this.svgIcon(this.icons.whatsapp, 16, 'currentColor', 'currentColor')} تواصل عبر واتساب
+            </a>
+          </div>
+
+          <div class="product-panel product-shipping-panel">
+            <h2>الشحن والاستبدال</h2>
+            <ul>
+              <li>${this.svgIcon(this.icons.truck, 15)} شحن عبر شركات شحن معتمدة.</li>
+              <li>${this.svgIcon(this.icons.box, 15)} تغليف آمن ومتابعة للشحنة.</li>
+              <li>${this.svgIcon(this.icons.clock, 15)} استبدال أو استرجاع خلال 7 أيام.</li>
+              <li>${this.svgIcon(this.icons.shield, 15)} الضمان حسب تفاصيل المنتج.</li>
+            </ul>
+            <a class="product-terms-link" href="${this.esc(this.pagePath('terms'))}">اقرأ الشروط والأحكام ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 13)}</a>
+          </div>
+        </aside>
       </div>
+
+      ${related.length ? `<section class="product-related" aria-labelledby="relatedTitle">
+        <div class="product-related-head">
+          <div>
+            <span class="section-badge">مقترحات لمشروعك</span>
+            <h2 id="relatedTitle">منتجات مشابهة</h2>
+          </div>
+          <a class="show-all-btn" href="${this.esc(categoryUrl)}">كل ${this.esc(cat.label)} ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 18)}</a>
+        </div>
+        <div class="products-grid">${related.map(r => this.productCard(r)).join('')}</div>
+      </section>` : ''}
+
+      ${this.renderCategoryCrossLinks(p.cat)}
+    </div>`;
+  },
+
+  renderProductNotFound() {
+    return `<div class="product-page product-missing">
+      <nav class="breadcrumbs" aria-label="مسار التصفح">
+        <a href="${this.esc(this.pagePath('home'))}">الرئيسية</a>
+        <span class="crumb-sep">${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 12)}</span>
+        <a href="${this.esc(this.shopUrl())}">المنتجات</a>
+      </nav>
+      <div class="product-missing-card">
+        <span class="product-missing-icon">${this.svgIcon(this.icons.search, 42)}</span>
+        <h1>المنتج غير موجود</h1>
+        <p>قد يكون الرابط قديماً أو تمت إعادة تسمية المنتج. تصفح المتجر للوصول إلى جميع القطع المتوفرة.</p>
+        <a class="product-buy-btn add-btn" href="${this.esc(this.shopUrl())}">تصفح كل المنتجات ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 16)}</a>
+      </div>
+    </div>`;
+  },
+
+  // ---- project kits page ------------------------------------
+  projectAnchor(project) {
+    return 'project-' + project.key;
+  },
+
+  projectLevelLabel(level) {
+    return { beginner: 'مبتدئ', intermediate: 'متوسط', advanced: 'متقدم' }[level] || 'متوسط';
+  },
+
+  money(value) {
+    const n = Math.round((Number(value) || 0) * 100) / 100;
+    return n.toFixed(2).replace(/\.00$/, '').replace(/(\.\d)0$/, '$1');
+  },
+
+  pieceWord(count) {
+    const n = Math.abs(Number(count) || 0);
+    const tail = n % 100;
+    if (tail === 1) return 'قطعة';
+    if (tail === 2) return 'قطعتان';
+    if (tail >= 3 && tail <= 10) return 'قطع';
+    return 'قطعة';
+  },
+
+  projectParts(project) {
+    return (project.parts || []).map(part => {
+      const product = this.products.find(p => String(p.id) === String(part.id));
+      if (!product) return null;
+      return Object.assign({}, part, { product, qty: Math.max(1, Math.floor(Number(part.qty) || 1)) });
+    }).filter(Boolean);
+  },
+
+  projectTotals(project) {
+    const parts = this.projectParts(project);
+    const price = parts.reduce((sum, part) => sum + part.product.price * part.qty, 0);
+    const original = parts.reduce((sum, part) => sum + part.product.op * part.qty, 0);
+    return {
+      parts,
+      price: Math.round(price * 100) / 100,
+      original: Math.round(original * 100) / 100,
+    };
+  },
+
+  filteredProjects() {
+    const level = this.state.projectLevel;
+    const rank = { beginner: 0, intermediate: 1, advanced: 2 };
+    return this.projects
+      .filter(project => level === 'all' || project.level === level)
+      .slice()
+      .sort((a, b) => (rank[a.level] || 0) - (rank[b.level] || 0));
+  },
+
+  projectPartRow(part) {
+    const product = part.product;
+    const option = part.option != null ? String(part.option) : (part.value != null ? String(part.value) : '');
+    const out = this.getStock(product) === 0;
+    return `<li class="project-part">
+      <span class="project-part-img"><img src="${this.esc(this.imgPath(product.img))}" alt="" loading="lazy" decoding="async" onerror="App.imgFallback(this)"></span>
+      <a class="project-part-name" href="${this.esc(this.productUrl(product))}" title="عرض ${this.esc(product.name)} — ${this.esc(product.nameAr || '')}">${this.esc(product.name)}${option ? `<span class="project-part-opt">${this.esc(option)}</span>` : ''}</a>
+      ${out ? '<span class="project-part-out">غير متوفر</span>' : ''}
+      <span class="project-part-qty" aria-label="الكمية ${part.qty}">×${part.qty}</span>
+      <span class="project-part-price">⃁ ${this.money(product.price * part.qty)}</span>
+    </li>`;
+  },
+
+  projectCard(project) {
+    const totals = this.projectTotals(project);
+    const level = project.level || 'intermediate';
+    const icon = this.icons[project.icon] || this.icons.grid;
+    const chevron = this.svgIcon('<polyline points="6 9 12 15 18 9"/>', 14);
+    return `<article class="project-card" id="${this.esc(this.projectAnchor(project))}">
+      <div class="project-card-head">
+        <span class="project-icon" aria-hidden="true">${this.svgIcon(icon, 25)}</span>
+        <div class="project-head-copy">
+          <div class="project-title-row">
+            <h3 class="project-title">${this.esc(project.title)}</h3>
+            <span class="project-level level-${level}">${this.projectLevelLabel(level)}</span>
+          </div>
+          <p class="project-summary">${this.esc(project.summary)}</p>
+          <div class="project-tags">${(project.tags || []).map(tag => `<span class="project-tag">${this.esc(tag)}</span>`).join('')}</div>
+          <div class="project-meta">
+            <span>${this.svgIcon(this.icons.clock, 13)} ${this.esc(project.time)}</span>
+            <span>${this.svgIcon(this.icons.box, 13)} ${totals.parts.length} قطع</span>
+          </div>
+        </div>
+      </div>
+
+      <ul class="project-parts" aria-label="قطع مشروع ${this.esc(project.title)}">
+        ${totals.parts.map(part => this.projectPartRow(part)).join('')}
+      </ul>
+
+      <details class="project-steps">
+        <summary>خطوات التركيب ونصيحة قبل ما تبدأ ${chevron}</summary>
+        <ol>${(project.steps || []).map(step => `<li>${this.esc(step)}</li>`).join('')}</ol>
+        ${project.tip ? `<p class="project-tip">${this.svgIcon(this.icons.bulb, 14)}<span>${this.esc(project.tip)}</span></p>` : ''}
+      </details>
+
+      <div class="project-foot">
+        <div class="project-total">
+          <span>إجمالي سعر القطع</span>
+          <strong>⃁ ${this.money(totals.price)}</strong>
+        </div>
+        <button type="button" class="project-add" data-project="${this.esc(project.key)}" aria-label="أضف كل قطع مشروع ${this.esc(project.title)} إلى السلة" onclick="App.addProjectBundle('${this.esc(project.key)}', event)">
+          ${this.svgIcon('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>', 15)}
+          <span>أضف كل القطع للسلة</span>
+        </button>
+      </div>
+    </article>`;
+  },
+
+  renderProjectPreview() {
+    const project = this.projects[0];
+    if (!project) return '';
+    const totals = this.projectTotals(project);
+    const shown = totals.parts.slice(0, 3);
+    return `<aside class="project-preview" aria-label="مثال على قائمة قطع مشروع ${this.esc(project.title)}">
+      <div class="project-preview-top">
+        <span class="project-preview-icon">${this.svgIcon(this.icons[project.icon] || this.icons.grid, 22)}</span>
+        <div><strong>${this.esc(project.title)}</strong><span>${totals.parts.length} قطع · ${this.projectLevelLabel(project.level)}</span></div>
+        <span class="project-preview-total">⃁ ${this.money(totals.price)}</span>
+      </div>
+      <ul class="project-preview-parts">
+        ${shown.map(part => `<li>
+          <span class="project-preview-img"><img src="${this.esc(this.imgPath(part.product.img))}" alt="" loading="eager" decoding="async"></span>
+          <span>${this.esc(part.product.name)}</span>
+          <strong>⃁ ${this.money(part.product.price * part.qty)}</strong>
+        </li>`).join('')}
+        ${totals.parts.length > shown.length ? `<li class="project-preview-more">+ ${totals.parts.length - shown.length} قطع إضافية</li>` : ''}
+      </ul>
+      <div class="project-preview-foot">
+        <span class="project-preview-dot"></span>
+        <span>القطع مربوطة بصفحاتها في المتجر</span>
+        <a class="project-preview-cta" href="#${this.esc(this.projectAnchor(project))}" aria-label="عرض تفاصيل مشروع ${this.esc(project.title)}">شوف المشروع</a>
+      </div>
+    </aside>`;
+  },
+
+  renderBoardPicker() {
+    const cards = this.boards.map(board => {
+      const product = this.products.find(p => String(p.id) === String(board.id));
+      if (!product) return '';
+      const out = this.getStock(product) === 0;
+      return `<article class="board-card">
+        <div class="board-media"><img src="${this.esc(this.imgPath(product.img))}" alt="${this.esc(product.name)}" loading="lazy" decoding="async" onerror="App.imgFallback(this)"><span class="board-badge">${this.esc(board.badge)}</span></div>
+        <h3 class="board-name">${this.esc(product.name)}</h3>
+        <p class="board-ar">${this.esc(product.nameAr)}</p>
+        <div class="board-price">⃁ ${this.money(product.price)} <span>⃁ ${this.money(product.op)}</span></div>
+        <ul class="board-specs">${board.bullets.map(bullet => `<li>${this.svgIcon(this.icons.check, 13)}<span>${this.esc(bullet)}</span></li>`).join('')}</ul>
+        <p class="board-best"><strong>اخترها إذا:</strong> ${this.esc(board.best)}</p>
+        <div class="board-actions">
+          <a class="board-btn ghost" href="${this.esc(this.productUrl(product))}">التفاصيل</a>
+          <button type="button" class="board-btn primary"${out ? ' disabled' : ''} onclick="App.addCart(App.products.find(x=>String(x.id)===String(${product.id})), null, event)" aria-label="${out ? 'غير متوفر' : 'أضف ' + this.esc(product.name) + ' إلى السلة'}">${out ? 'غير متوفر' : 'أضف للسلة'}</button>
+        </div>
+      </article>`;
+    }).join('');
+    return `<section class="projects-subsection reveal" aria-labelledby="boardPickerTitle">
+      <div class="projects-subhead">
+        <div>
+          <span class="section-badge">قبل ما تشتري</span>
+          <h2 id="boardPickerTitle">محتار أي لوحة تختار؟</h2>
+          <p>ثلاث لوحات تغطي أغلب المشاريع. الفرق الأساسي في الجهد والاتصال وحجم اللوح.</p>
+        </div>
+        <a class="projects-text-link" href="${this.esc(this.categoryUrl('mcu'))}">كل المتحكمات ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 14)}</a>
+      </div>
+      <div class="board-grid">${cards}</div>
+    </section>`;
+  },
+
+  setProjectLevel(level) {
+    const valid = ['all', 'beginner', 'intermediate', 'advanced'];
+    if (valid.indexOf(level) === -1) return;
+    this.state.projectLevel = level;
+    document.querySelectorAll('.projects-level').forEach(btn => {
+      const on = btn.dataset.level === level;
+      btn.classList.toggle('active', on);
+      btn.setAttribute('aria-pressed', String(on));
+    });
+    const grid = document.getElementById('projectsGrid');
+    const empty = document.getElementById('projectsEmpty');
+    const list = this.filteredProjects();
+    if (grid) {
+      grid.innerHTML = list.map(project => this.projectCard(project)).join('');
+      grid.classList.remove('enter');
+      void grid.offsetWidth;
+      grid.classList.add('enter');
+    }
+    if (empty) empty.hidden = list.length > 0;
+  },
+
+  addProjectBundle(key, event) {
+    const project = this.projects.find(p => p.key === key);
+    if (!project) return;
+    const totals = this.projectTotals(project);
+    if (!totals.parts.length) return;
+    let added = 0;
+    let skipped = 0;
+
+    totals.parts.forEach(part => {
+      const product = part.product;
+      const selected = product.customInput
+        ? (part.value != null ? String(part.value) : null)
+        : (part.option != null ? String(part.option) : (product.colorOptions && product.colorOptions.length ? product.colorOptions[0] : null));
+      if (product.customInput && !selected) { skipped += part.qty; return; }
+      if (product.colorOptions && !selected) { skipped += part.qty; return; }
+      if (product.colorOptions && selected && product.colorOptions.indexOf(selected) === -1) { skipped += part.qty; return; }
+
+      const stock = this.getStock(product);
+      if (stock === 0) { skipped += part.qty; return; }
+      const keyColor = selected == null ? '' : selected;
+      let line = this.state.cart.find(item =>
+        String(item.product.id) === String(product.id) && String(item.color || '') === keyColor
+      );
+      if (line) {
+        const room = stock === null ? part.qty : Math.max(0, stock - line.qty);
+        const addQty = Math.min(part.qty, room);
+        line.qty += addQty;
+        added += addQty;
+        if (addQty < part.qty) skipped += part.qty - addQty;
+      } else {
+        const addQty = stock === null ? part.qty : Math.min(part.qty, stock);
+        if (addQty < 1) { skipped += part.qty; return; }
+        const item = { product, qty: addQty };
+        if (selected != null) item.color = selected;
+        this.state.cart.push(item);
+        added += addQty;
+        if (addQty < part.qty) skipped += part.qty - addQty;
+      }
+    });
+
+    if (!added) {
+      this.showToast('تعذّر إضافة القطع — تحقق من توفرها', 'error');
+      return;
+    }
+    this.saveCart();
+    this.updateBadge();
+    this.renderCart();
+    const message = skipped
+      ? `أضفنا ${added} ${this.pieceWord(added)} من "${project.title}" — ${skipped} ${this.pieceWord(skipped)} غير متوفرة حالياً`
+      : `تمت إضافة ${added} ${this.pieceWord(added)} من "${project.title}" إلى السلة`;
+    this.showToast(message, skipped ? 'info' : 'success', true);
+    if (event) this.flyToCart(event);
+
+    const btn = event && event.currentTarget;
+    if (btn && btn.classList) {
+      const original = btn.innerHTML;
+      btn.classList.add('added');
+      btn.innerHTML = `${this.svgIcon(this.icons.check, 15)} <span>تمت الإضافة</span>`;
+      setTimeout(() => {
+        if (!btn.isConnected) return;
+        btn.classList.remove('added');
+        btn.innerHTML = original;
+      }, 2400);
+    }
+  },
+
+  projectReviewCard(review) {
+    return `<div class="review-pro-card">
+      <div class="review-pro-quote">"</div>
+      <div class="review-pro-stars">${this.renderStars(review.stars || 5)}</div>
+      <p class="review-pro-text">${review.text}</p>
+      <div class="review-decor-pro"><span class="review-decor-line"></span><span class="review-decor-icon">${this.svgIcon('<path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>', 14, '#ff9500')}</span><span class="review-decor-line"></span></div>
+    </div>`;
+  },
+
+  renderProjects() {
+    const levels = [
+      { key: 'all', label: 'الكل' },
+      { key: 'beginner', label: 'مبتدئ' },
+      { key: 'intermediate', label: 'متوسط' },
+      { key: 'advanced', label: 'متقدم' },
+    ];
+    const counts = { all: this.projects.length };
+    this.projects.forEach(project => {
+      counts[project.level] = (counts[project.level] || 0) + 1;
+    });
+    const list = this.filteredProjects();
+    const usedParts = new Set();
+    this.projects.forEach(project => (project.parts || []).forEach(part => usedParts.add(part.id)));
+    const supportUrl = this.wa('مرحباً، عندي فكرة مشروع وأحتاج مساعدة في اختيار القطع المناسبة من iBoardz');
+    const arrow = this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 16);
+
+    return `<div class="projects-page">
+      <section class="projects-hero" aria-labelledby="projectsTitle">
+        <div class="projects-hero-grid" aria-hidden="true"></div>
+        <div class="projects-hero-glow" aria-hidden="true"></div>
+        <div class="projects-hero-inner">
+          <div class="projects-hero-copy">
+            <span class="projects-kicker">${this.svgIcon(this.icons.bulb, 15)} مشاريع جاهزة بالقطع والأسعار</span>
+            <h1 id="projectsTitle">ابنِ مشروعك <span>من أول قطعة</span></h1>
+            <p>اختر مشروعاً، راجع قائمة القطع المطلوبة، وأضفها كلها للسلة بضغطة واحدة. كل قطعة في القائمة مربوطة بصفحتها في المتجر.</p>
+            <div class="projects-hero-actions">
+              <a class="projects-hero-btn primary" href="#projectList">تصفح المشاريع ${arrow}</a>
+              <a class="projects-hero-btn ghost" href="${supportUrl}" target="_blank" rel="noopener noreferrer">${this.svgIcon(this.icons.whatsapp, 17)} قل لنا فكرتك</a>
+            </div>
+            <div class="projects-hero-stats">
+              <div><strong>${this.projects.length}</strong><span>مشاريع جاهزة</span></div>
+              <div><strong>${usedParts.size}</strong><span>قطعة مرتبطة</span></div>
+              <div><strong>1</strong><span>ضغطة لإضافة القطع</span></div>
+            </div>
+          </div>
+          ${this.renderProjectPreview()}
+        </div>
+      </section>
+
+      <section class="projects-list section" id="projectList" aria-labelledby="projectListTitle">
+        <div class="projects-head">
+          <div class="projects-head-copy">
+            <h2 id="projectListTitle">مشاريع تقدر تخلصها اليوم</h2>
+            <p>كل مشروع فيه القطع، خطوات التركيب، ونصيحة عملية قبل ما تبدأ.</p>
+          </div>
+          <div class="projects-levels" role="group" aria-label="تصفية المشاريع حسب المستوى">
+            ${levels.map(level => `<button type="button" class="projects-level${this.state.projectLevel === level.key ? ' active' : ''}" data-level="${level.key}" aria-pressed="${this.state.projectLevel === level.key}" onclick="App.setProjectLevel('${level.key}')">${level.label}<span>${counts[level.key] || 0}</span></button>`).join('')}
+          </div>
+        </div>
+        <div class="projects-grid" id="projectsGrid">${list.map(project => this.projectCard(project)).join('')}</div>
+        <p class="projects-empty" id="projectsEmpty" ${list.length ? 'hidden' : ''}>لا توجد مشاريع بهذا المستوى حالياً — جرّب مستوى آخر.</p>
+      </section>
+
+      ${this.renderBoardPicker()}
+
+      <section class="projects-reviews section" id="reviews" aria-labelledby="projectsReviewsTitle">
+        <div class="projects-subhead center">
+          <div>
+            <span class="section-badge">آراء العملاء</span>
+            <h2 id="projectsReviewsTitle">مشاريع بدأت من هنا</h2>
+            <p>تجارب حقيقية من عملاء صمموا مشاريعهم مع iBoardz.</p>
+          </div>
+        </div>
+        <div class="reviews-pro-grid project-reviews-grid">
+          ${this.reviews.slice(0, 4).map(review => this.projectReviewCard(review)).join('')}
+        </div>
+        ${this.reviews.length > 4 ? `<details class="projects-more-reviews">
+          <summary>اقرأ ${this.reviews.length - 4} تجارب أخرى ${this.svgIcon('<polyline points="6 9 12 15 18 9"/>', 14)}</summary>
+          <div class="reviews-pro-grid project-reviews-grid">
+            ${this.reviews.slice(4).map(review => this.projectReviewCard(review)).join('')}
+          </div>
+        </details>` : ''}
+      </section>
+
+      <section class="projects-cta" aria-labelledby="projectsCtaTitle">
+        <div class="projects-cta-inner">
+          <div>
+            <span class="projects-cta-kicker">فكرتك تستاهل</span>
+            <h2 id="projectsCtaTitle">مشروعك مو في القائمة؟</h2>
+            <p>قل لنا وش تبي تبني وحدد ميزانيتك، ونرشح لك القطع المناسبة ونرسل لك قائمة كاملة تشتريها بضغطة.</p>
+          </div>
+          <div class="projects-cta-actions">
+            <a class="projects-cta-btn primary" href="${supportUrl}" target="_blank" rel="noopener noreferrer">${this.svgIcon(this.icons.whatsapp, 17)} راسلنا على واتساب</a>
+            <a class="projects-cta-btn ghost" href="${this.esc(this.pagePath('contact'))}">صفحة التواصل ${arrow}</a>
+          </div>
+        </div>
+      </section>
     </div>`;
   },
 
@@ -1319,13 +2785,36 @@ const App = {
       <div class="contact-form reveal">
         <h2>أرسل لنا رسالة</h2>
         <form onsubmit="return App.handleContact(event)">
-          <div class="form-group"><label>الاسم</label><input type="text" id="contactName" class="form-input" placeholder="اسمك الكامل" required></div>
-          <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="contactEmail" class="form-input" placeholder="email@example.com" style="direction:ltr;text-align:right"></div>
-          <div class="form-group"><label>الرسالة</label><textarea rows="5" id="contactMsg" class="form-input" placeholder="اكتب رسالتك هنا..." required></textarea></div>
+          <div class="form-group"><label for="contactName">الاسم</label><input type="text" id="contactName" class="form-input" placeholder="اسمك الكامل" required></div>
+          <div class="form-group"><label for="contactEmail">البريد الإلكتروني</label><input type="email" id="contactEmail" class="form-input" placeholder="email@example.com" style="direction:ltr;text-align:right"></div>
+          <div class="form-group"><label for="contactMsg">الرسالة</label><textarea rows="5" id="contactMsg" class="form-input" placeholder="اكتب رسالتك هنا..." required></textarea></div>
           <button type="submit" class="submit-btn" id="contactSubmitBtn">إرسال الرسالة</button>
         </form>
       </div>
       <div class="work-hours reveal"><h3>ساعات العمل</h3><p>السبت - الخميس: 9 صباحاً - 11 مساءً</p><p style="margin-bottom:0">الجمعة: 4 مساءً - 11 مساءً</p></div>
+
+      <div class="faq-section reveal">
+        <div class="section-header">
+          <div class="section-badge">إجابات سريعة</div>
+          <h2 class="section-title">الأسئلة الشائعة</h2>
+        </div>
+        <details class="faq-item">
+          <summary>كم يستغرق الشحن داخل السعودية؟<span class="faq-plus">${this.svgIcon('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>', 16)}</span></summary>
+          <p>يتم تجهيز طلبك وشحنه عبر شركات الشحن المعتمدة، وتختلف مدة التوصيل حسب المدينة. نتابع كل شحنة حتى وصولها إليك.</p>
+        </details>
+        <details class="faq-item">
+          <summary>ما طرق الدفع المتوفرة؟<span class="faq-plus">${this.svgIcon('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>', 16)}</span></summary>
+          <p>نوفر الدفع عبر مدى، Apple Pay، STC Pay، والتحويل البنكي. يمكنك تأكيد الطلب عبر واتساب واختيار الطريقة الأنسب لك.</p>
+        </details>
+        <details class="faq-item">
+          <summary>هل يمكنني استبدال أو استرجاع منتج؟<span class="faq-plus">${this.svgIcon('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>', 16)}</span></summary>
+          <p>نعم، يمكنك طلب الاستبدال أو الاسترجاع خلال سبعة أيام من الاستلام بشرط أن يكون المنتج بحالته الأصلية مع كامل ملحقاته وتغليفه.</p>
+        </details>
+        <details class="faq-item">
+          <summary>هل توفرون قطعاً مخصصة أو خدمة طباعة ثلاثية الأبعاد؟<span class="faq-plus">${this.svgIcon('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>', 16)}</span></summary>
+          <p>نعم، نوفر خدمة طباعة ثلاثية الأبعاد احترافية بمقاسات حسب الطلب. أرسل تصميمك أو فكرتك عبر واتساب للحصول على عرض سعر.</p>
+        </details>
+      </div>
     </div>`;
   },
 
@@ -1334,7 +2823,7 @@ const App = {
       <div class="terms-hero">
         <div class="terms-hero-icon"><svg width="80" height="80" viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="40" fill="rgba(255,149,0,0.1)"/><rect x="22" y="15" width="36" height="50" rx="4" fill="none" stroke="#ff9500" stroke-width="2"/><line x1="30" y1="27" x2="50" y2="27" stroke="#ff9500" stroke-width="2" stroke-linecap="round"/><line x1="30" y1="34" x2="50" y2="34" stroke="#ff9500" stroke-width="2" stroke-linecap="round"/><line x1="30" y1="41" x2="44" y2="41" stroke="#ff9500" stroke-width="2" stroke-linecap="round"/><circle cx="55" cy="55" r="12" fill="#ff9500"/><path d="M50 55l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <h1 class="terms-hero-title">الشروط والأحكام</h1>
-        <p class="terms-hero-sub">آخر تحديث: يناير 2025</p>
+        <p class="terms-hero-sub">آخر تحديث: أكتوبر 2026</p>
         <div class="terms-hero-badges">
           <span class="terms-badge">${this.svgIcon('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>', 14)} موثوق وآمن</span>
           <span class="terms-badge">${this.svgIcon('<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>', 14)} محدّث باستمرار</span>
@@ -1342,6 +2831,7 @@ const App = {
         </div>
       </div>
       <div class="terms-container">
+        <h2 class="sr-only">مقدمة الشروط</h2>
         <div class="terms-intro-card">
           <div class="terms-intro-icon">${this.svgIcon('<circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>', 32, '#ff9500')}</div>
           <div><h3>مقدمة</h3><p>تمت صياغة الشروط والأحكام للتأكد من معرفة العميل التامة بحقوقه وواجباته قبل التعامل مع المتجر. يتعهد المتجر بالالتزام بالفقرات التالية في كافة العمليات في هذا المتجر الإلكتروني.</p></div>
@@ -1363,6 +2853,7 @@ const App = {
             <div class="terms-section-icon icon-blue">${this.svgIcon(this.icons.truck, 28, '#3b82f6')}</div>
             <div><span class="terms-section-num">02</span><h2>الشحن والتوصيل</h2></div>
           </div>
+          <h3 class="sr-only">تفاصيل الشحن والتوصيل</h3>
           <div class="terms-grid-2">
             <div class="terms-grid-card"><div class="terms-grid-icon blue">${this.svgIcon(this.icons.truck, 24, '#3b82f6')}</div><h4>أفضل الشركات</h4><p>يتم تقديم خدمة الشحن والتوصيل بواسطة أفضل الشركات المتواجدة في المنطقة.</p></div>
             <div class="terms-grid-card"><div class="terms-grid-icon blue">${this.svgIcon(this.icons.box, 24, '#3b82f6')}</div><h4>تغليف آمن</h4><p>يقوم المتجر بالتأكد من تغليف المنتجات بطريقة لا تجعلها عرضة للتلف بسهولة.</p></div>
@@ -1376,6 +2867,7 @@ const App = {
             <div><span class="terms-section-num">03</span><h2>سياسة الاستبدال والاسترجاع</h2></div>
           </div>
           <div class="terms-highlight-box green">${this.svgIcon('<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/>', 22, '#16a34a')}<div><strong>إثبات عملية الشراء مطلوب</strong><p>يجب إبراز الفاتورة الأصلية للاستفادة من خدمات الاستبدال أو الاسترجاع.</p></div></div>
+          <h3 class="sr-only">مراحل الاستبدال والاسترجاع</h3>
           <div class="terms-timeline">
             <div class="terms-timeline-item"><div class="terms-timeline-dot green"></div><div class="terms-timeline-content"><h4>مدة 7 أيام</h4><p>يمكن استبدال أو استرجاع المنتج خلال سبعة أيام من تاريخ الشراء مع استيفاء الشروط المطلوبة.</p></div></div>
             <div class="terms-timeline-item"><div class="terms-timeline-dot orange"></div><div class="terms-timeline-content"><h4>شروط حالة المنتج</h4><p>يجب أن يكون المنتج في حالته الأصلية مع كامل الملحقات والتغليف الأصلي.</p></div></div>
@@ -1393,6 +2885,7 @@ const App = {
             <div class="terms-section-icon icon-purple">${this.svgIcon(this.icons.shield, 28, '#8b5cf6')}</div>
             <div><span class="terms-section-num">04</span><h2>الضمان على المنتجات</h2></div>
           </div>
+          <h3 class="sr-only">تفاصيل الضمان</h3>
           <div class="terms-warranty-cards">
             <div class="terms-warranty-card"><div class="terms-warranty-icon">${this.svgIcon(this.icons.clipboard, 26, '#8b5cf6')}</div><h4>تفاصيل الضمان</h4><p>يتم توضيح تفاصيل الضمان في صفحة المنتج نفسه. في حال عدم ذكر أي تفاصيل، يُعتبر المنتج بدون ضمان.</p></div>
             <div class="terms-warranty-card"><div class="terms-warranty-icon">${this.svgIcon(this.icons.clock, 26, '#8b5cf6')}</div><h4>مدة الإصلاح</h4><p>يستغرق زمن الإصلاح (14) يومًا كحد أقصى للأعطال المشمولة بالضمان.</p></div>
@@ -1404,10 +2897,21 @@ const App = {
           </div>
           <div class="terms-note">${this.svgIcon('<path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>', 18, '#ff9500')}<p>بعد مرور أول أسبوع من استلام المنتج، يتحمل العميل قيمة شحن المنتج إلى مقر المتجر أو أحد الوكلاء المعتمدين.</p></div>
         </div>
+        <div class="terms-section">
+          <div class="terms-section-header">
+            <div class="terms-section-icon icon-blue">${this.svgIcon('<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/>', 28, '#3b82f6')}</div>
+            <div><span class="terms-section-num">05</span><h2>الخصوصية وحماية البيانات</h2></div>
+          </div>
+          <div class="terms-items">
+            <div class="terms-item"><div class="terms-item-icon">${this.svgIcon('<polyline points="20 6 9 17 4 12"/>', 20, '#22c55e')}</div><p>نستخدم بياناتك (الاسم، رقم الجوال، عنوان التوصيل) فقط لتجهيز الطلب والتواصل معك بشأنه، ولا نشاركها مع أي طرف خارج نطاق الشحن.</p></div>
+            <div class="terms-item"><div class="terms-item-icon">${this.svgIcon('<polyline points="20 6 9 17 4 12"/>', 20, '#22c55e')}</div><p>المحادثات عبر واتساب والبريد الإلكتروني تُستخدم لخدمة العميل ومتابعة الطلبات، ويمكنك طلب حذف بياناتك في أي وقت.</p></div>
+            <div class="terms-item"><div class="terms-item-icon">${this.svgIcon('<polyline points="20 6 9 17 4 12"/>', 20, '#22c55e')}</div><p>لا نحتفظ ببيانات البطاقات البنكية؛ تتم عمليات الدفع عبر مزودي الدفع المعتمدين فقط.</p></div>
+          </div>
+        </div>
         <div class="terms-section terms-general">
           <div class="terms-section-header">
             <div class="terms-section-icon icon-orange">${this.svgIcon('<circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/>', 28, '#ff9500')}</div>
-            <div><span class="terms-section-num">05</span><h2>الأحكام العامة</h2></div>
+            <div><span class="terms-section-num">06</span><h2>الأحكام العامة</h2></div>
           </div>
           <div class="terms-general-content">
             <p>إرسال العميل للطلب يعني موافقته على كافة البنود والشروط بلا استثناء. يحق لـ <strong style="color:#ff9500">iBoardz</strong> تحديث وتغيير الشروط والأحكام في أي وقت، ويتم تفعيلها فور نشرها.</p>
@@ -1425,8 +2929,8 @@ const App = {
           <h3>هل لديك استفسار؟</h3>
           <p>فريقنا جاهز للإجابة على جميع تساؤلاتك</p>
           <div class="terms-cta-btns">
-            <a href="${this.wa()}" target="_blank" class="terms-cta-btn primary">${this.svgIcon(this.icons.whatsapp, 18, '#fff', '#fff')} تواصل عبر واتساب</a>
-            <button class="terms-cta-btn secondary" onclick="App.nav('contact')">${this.svgIcon(this.icons.envelope, 18)} أرسل رسالة</button>
+            <a href="${this.wa()}" target="_blank" class="terms-cta-btn primary">${this.svgIcon(this.icons.whatsapp, 18, 'currentColor', 'currentColor')} تواصل عبر واتساب</a>
+            <a class="terms-cta-btn secondary" href="${this.esc(this.pagePath('contact'))}">${this.svgIcon(this.icons.envelope, 18)} أرسل رسالة</a>
           </div>
         </div>
       </div>
@@ -1447,6 +2951,7 @@ const App = {
 
   startCarousel() {
     if (this.carouselTimer) clearInterval(this.carouselTimer);
+    if (!document.querySelector('.carousel')) return;
     this.carouselTimer = setInterval(() => {
       const next = (this.state.ci + 1) % 2;
       this.state.ci = next;
@@ -1468,14 +2973,18 @@ const App = {
   },
 
   setupBackToTop() {
+    if (this._backToTopSetup) return;
     const btn = document.getElementById('backToTop');
     if (!btn) return;
+    this._backToTopSetup = true;
     window.addEventListener('scroll', () => { btn.classList.toggle('visible', window.scrollY > 400); }, { passive: true });
   },
 
   setupHeaderScroll() {
+    if (this._headerScrollSetup) return;
     const header = document.getElementById('header');
     if (!header) return;
+    this._headerScrollSetup = true;
     window.addEventListener('scroll', () => { header.classList.toggle('scrolled', window.scrollY > 50); }, { passive: true });
   },
 
@@ -1495,6 +3004,7 @@ const App = {
         else if (this._suggestOpen) this.closeSearch();
         else if (this.state.cartOpen) this.closeCart();
         else if (this.state.menuOpen) this.closeMenu();
+        else if (this.state.filtersOpen) this.toggleFilters(false);
         return;
       }
       // "/" focuses search like the big stores
@@ -1535,6 +3045,7 @@ const App = {
         const el = document.getElementById('headerSearch');
         if (el) el.classList.remove('open');
       }
+      if (window.innerWidth > 980 && this.state.filtersOpen) this.toggleFilters(false);
       if (this._suggestOpen) this._positionSuggest(this._currentSearchAnchor());
     });
     // keep the panel glued to its input while the page scrolls
@@ -1569,32 +3080,48 @@ const App = {
   },
 
   async init() {
+    // Old query-string links (/?product=2, /?cat=mcu, /?shop=1 …) are moved to
+    // the matching directory path before anything is rendered.
+    if (this.legacyRedirect()) return;
+
+    this.siteOrigin = String(this.siteOrigin || 'https://iboardz.netlify.app').replace(/\/+$/, '');
     this.buildSearchIndex();
-    await this.syncCatalog();
     this.loadCart();
     this.setTheme(this.getTheme());
     this.setupReducedMotion();
-
-    const fromUrl = this.readUrl();
-    if (fromUrl) this.state.page = 'products';
+    this.readPageContext();
+    this.readQueryState();
+    this.localizeLinks();
 
     this.render();
     this.renderCart();
-    this.injectStructuredData();
+    this.updateUrl();
+    if (this.pageType === 'home') this.injectStructuredData();
     const yearEl = document.getElementById('footerYear');
     if (yearEl) yearEl.textContent = new Date().getFullYear();
-    setTimeout(() => this.setupScrollReveal(), 200);
 
     this._setupKeyboard();
     this._setupClickOutside();
     this._setupResize();
     this.syncSearchInputs();
+    this.closeSearch();
 
-    // if the URL carried a query, run it through the pipeline once
-    if (fromUrl) {
-      this._searchOrigin = 'header';
-      this.updateProductsView();
-      this.closeSearch();
+    // The static catalog paints instantly; live prices/stock are merged after.
+    const updated = await this.syncCatalog();
+    if (updated) {
+      this.buildSearchIndex();
+      this.loadCart();
+      if (this.pageType === 'product') {
+        const slug = document.body.dataset.product || '';
+        this.state.currentProduct = this.products.find(p => String(p.slug) === String(slug)) || null;
+        this.render();
+      } else if (this.isListingPage()) {
+        this.updateProductsView();
+      } else if (this.pageType === 'home' || this.pageType === 'projects') {
+        this.render();
+      }
+      this.renderCart();
+      this.syncSearchInputs();
     }
   },
 
@@ -1606,18 +3133,21 @@ const App = {
       const origin = 'https://iboardz.netlify.app';
       const items = this.products.map(p => ({
         '@type': 'Product',
-        '@id': `${origin}/#product-${p.id}`,
+        '@id': `${origin}/product/${encodeURIComponent(p.slug)}/#product`,
         name: p.name,
         sku: p.sku || String(p.id),
         description: p.desc,
-        image: `${origin}/images/${p.img}`,
+        image: `${origin}/${encodeURI('images/' + p.img)}`,
         category: this.catLabel(p.cat),
+        brand: { '@type': 'Brand', name: 'iBoardz' },
+        itemCondition: 'https://schema.org/NewCondition',
         offers: {
           '@type': 'Offer',
           priceCurrency: 'SAR',
           price: p.price,
           availability: this.getStock(p) === 0 ? 'https://schema.org/OutOfStock' : 'https://schema.org/InStock',
-          url: `${origin}/?q=${encodeURIComponent(p.name)}`,
+          url: `${origin}/product/${encodeURIComponent(p.slug)}/`,
+          seller: { '@type': 'Organization', name: 'iBoardz' },
         },
       }));
       const services = this.services.map(s => ({
@@ -1625,7 +3155,7 @@ const App = {
         name: s.name,
         alternateName: s.nameEn,
         description: s.summary,
-        image: `${origin}/images/${s.img}`,
+        image: `${origin}/${encodeURI('images/' + s.img)}`,
         serviceType: s.name,
         provider: { '@type': 'Organization', name: 'iBoardz', url: origin },
         areaServed: 'SA',
