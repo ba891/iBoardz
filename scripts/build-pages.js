@@ -32,6 +32,20 @@ const esc = (value) => String(value == null ? '' : value)
   .replace(/"/g, '&quot;')
   .replace(/'/g, '&#39;');
 
+// Specs are stored as "label: value" strings (or {label, value} objects).
+const specParts = (value) => {
+  if (value && typeof value === 'object') {
+    return {
+      label: String(value.label == null ? '' : value.label).trim(),
+      value: String(value.value == null ? '' : value.value).trim(),
+    };
+  }
+  const text = String(value == null ? '' : value).trim();
+  const sep = text.indexOf(':');
+  if (sep > 0) return { label: text.slice(0, sep).trim(), value: text.slice(sep + 1).trim() };
+  return { label: '', value: text };
+};
+
 const json = (value) => JSON.stringify(value, null, 2).replace(/</g, '\\u003c');
 const imagePath = (rel) => encodeURI('images/' + String(rel || '').replace(/^images\//, ''));
 const absoluteImage = (rel) => SITE + '/' + imagePath(rel);
@@ -105,10 +119,9 @@ ${keywords ? `<meta name="keywords" content="${esc(keywords)}">` : ''}
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Noto+Sans+Symbols+2&display=swap" rel="stylesheet">
-<link rel="icon" type="image/png" href="${root}images/logo.png">
-<link rel="apple-touch-icon" href="${root}images/logo.png">
-<link rel="manifest" href="${root}site.webmanifest">
-<link rel="stylesheet" href="${root}assets/css/style.css">
+<link rel="icon" type="image/png" href="${root}images/logo.png?v=3">
+<link rel="apple-touch-icon" href="${root}images/logo.png?v=3">
+<link rel="stylesheet" href="${root}assets/css/style.css?v=9">
 <link rel="stylesheet" href="${root}assets/css/mega-menu.css">
 ${extraLd ? extraLd : ''}
 </head>`;
@@ -264,7 +277,7 @@ ${footer(root)}
 <script src="${root}catalog-data.js"></script>
 <script src="${root}assets/js/search-engine.js"></script>
 <script src="${root}assets/js/menu.js"></script>
-<script src="${root}assets/js/app.js"></script>
+<script src="${root}assets/js/app.js?v=6"></script>
 </body>
 </html>
 `;
@@ -335,8 +348,8 @@ function productPage(product) {
     <p>${esc(product.nameAr)}</p>
     <p>${esc(product.desc)}</p>
     <p><strong>السعر: ${esc(product.price)} ر.س</strong> — بدلاً من ${esc(product.op)} ر.س</p>
-    <h2>المواصفات</h2>
-    <ul>${specs.map((s) => `<li>${esc(s)}</li>`).join('')}</ul>
+    <h2>المواصفات التقنية</h2>
+    <ul>${specs.map((s) => { const parts = specParts(s); return `<li>${parts.label ? `<strong>${esc(parts.label)}:</strong> ` : ''}${esc(parts.value)}</li>`; }).join('')}</ul>
     <p><a href="${esc(wa)}" target="_blank" rel="noopener noreferrer">اطلب عبر واتساب</a></p>
   </div>
 </noscript>`;

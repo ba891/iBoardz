@@ -393,7 +393,10 @@
   // ===== QUERY =====
   function runQuery(index, query, options) {
     options = options || {};
-    var rawTokens = tokenize(query);
+    var rawTokens = tokenize(query).filter(function (t) {
+      // A lone Latin letter is noise ("s" from I2S etc.), not a real query.
+      return !(t.length === 1 && /[a-z]/.test(t));
+    });
     var queryCompact = compact(query);
     if (!rawTokens.length) {
       return { results: [], total: 0, tokens: [], terms: [], corrected: false, suggestion: '', empty: true };

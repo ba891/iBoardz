@@ -22,8 +22,8 @@ const EXPECTED_TOP = {
   'اردوينو': 'ARDUINO UNO R3',
   'arduino': 'ARDUINO UNO R3',
   'إردوينو': 'ARDUINO UNO R3',
-  'ESP32': 'ESP32 D1 BOARD',
-  'esp 32': 'ESP32 D1 BOARD',
+  'ESP32': 'ESP32 DEV MODEL',
+  'esp 32': 'ESP32 DEV MODEL',
   'حساس حرارة': 'DHT11 SENSOR',
   'حراره': 'DHT11 SENSOR',
   'سنسور حراره': 'DHT11 SENSOR',
@@ -56,7 +56,7 @@ const EXPECTED_TOP = {
   'سير': 'SERVO MOTOR',
   'حسا': 'حساس التبديل المغناطيسي Dry Reed Pipe Module',
   'mq': 'MQ-2 GAS SENSOR',
-  'esp': 'ESP32 D1 BOARD',
+  'esp': 'ESP32 DEV MODEL',
 };
 
 Object.keys(EXPECTED_TOP).forEach((q) => {

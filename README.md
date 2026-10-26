@@ -69,13 +69,13 @@ iBoardz/
 ├── features/index.html         /features/ — meta-refresh redirect to /projects/
 ├── contact/index.html          /contact/
 ├── terms/index.html            /terms/
-├── site.webmanifest            PWA metadata + install icon
 ├── robots.txt                  crawler rules
 ├── sitemap.xml                 generated from the catalog (all paths)
 ├── _headers                    Netlify security + cache headers
 ├── _redirects                  Netlify 301: /features/ → /projects/
 ├── logo111.jpeg                logo used by the dashboard / preview placeholders
-├── logo123.jpeg                storefront logo (kept at the root on purpose)
+├── logo123.png                 main storefront logo (PNG)
+├── logo123.jpeg                legacy JPEG kept for the dashboard
 │
 ├── assets/
 │   ├── css/style.css           one stylesheet: base, dark mode, search UI, product page
@@ -102,12 +102,14 @@ iBoardz/
 
 ### Why some files stay in the root
 
-`catalog-data.js`, `logo111.jpeg` and `logo123.jpeg` are intentionally **not** moved:
+`catalog-data.js`, `logo111.jpeg`, `logo123.png` and `logo123.jpeg` are intentionally **not** moved:
 
 * `store-dashboard/server.js` does `require(<storefront>/catalog-data.js)` to seed and
   validate the dashboard catalog.
 * `store-dashboard/dashboard.js` references `logo123.jpeg` and builds product image URLs
   as `<storefrontBase()>images/<img>`.
+* `logo123.png` is the main storefront logo; `logo123.jpeg` is kept because the dashboard
+  still references it.
 
 Everything else (CSS, JS, fonts, banners, product photos) lives in `assets/` and
 `images/`.

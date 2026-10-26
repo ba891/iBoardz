@@ -159,7 +159,10 @@ const App = {
   _searchTimer: null,
   _searchOrigin: 'header',
   _lastResult: null,
+  _sectionScrollTop: null,
+  _sectionScrollSetup: false,
   RECENT_KEY: 'iboardz-recent-searches',
+  SECTION_SCROLL_KEY: 'iboardz-section-scroll',
   AD_KEY: 'iboardz-ad-3d-dismissed',
 
   // ===== 3. HELPERS =====
@@ -300,6 +303,20 @@ const App = {
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   },
 
+  // Specs can be "label: value" strings (catalog) or {label, value} objects.
+  specParts(value) {
+    if (value && typeof value === 'object') {
+      return {
+        label: String(value.label == null ? '' : value.label).trim(),
+        value: String(value.value == null ? '' : value.value).trim(),
+      };
+    }
+    const text = String(value == null ? '' : value).trim();
+    const sep = text.indexOf(':');
+    if (sep > 0) return { label: text.slice(0, sep).trim(), value: text.slice(sep + 1).trim() };
+    return { label: '', value: text };
+  },
+
   // ===== 4. PERSISTENCE =====
   async syncCatalog() {
     // Straight from disk there is no server origin to call; catalog-data.js
@@ -430,6 +447,113 @@ const App = {
       return;
     }
     this.go(target);
+  },
+
+  // ---- section switching --------------------------------------------
+  // Every section is a real page (for shareable/indexable URLs), so a section
+  // switch is a normal page load and a fresh load starts at the top. The
+  // category list in the shop sidebar instead remembers where the product
+  // grid sat in the viewport and lines it up again on the next section. Every
+  // other destination (home, a product, projects, the menu, the footer) still
+  // opens at the top of the page.
+  setupSectionScroll() {
+    if (this._sectionScrollSetup) return;
+    this._sectionScrollSetup = true;
+    document.addEventListener('click', e => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const link = e.target && e.target.closest ? e.target.closest('a[data-scroll-keep]') : null;
+      if (!link || link.target === '_blank' || !this.isListingPage()) return;
+
+      // Already in this section with no filters applied: a reload would only
+      // throw the visitor back to the top for no reason.
+      const cat = link.dataset.cat;
+      const dirty = !!this.state.search || this.state.price !== 'all' || this.state.onlySale ||
+        this.state.onlyPop || this.state.pageNum > 1 || this.state.sort !== 'relevance';
+      if (cat && cat === this.state.filter && !dirty) {
+        e.preventDefault();
+        if (this.state.filtersOpen) this.toggleFilters(false);
+        this.closeSearch();
+        // The visitor tapped the section they are already in; bring its
+        // products back into view instead of doing nothing at all.
+        const results = document.getElementById('shopResults');
+        const rect = results && results.getBoundingClientRect();
+        if (rect && (rect.bottom <= 0 || rect.top >= window.innerHeight)) {
+          window.scrollTo({ top: Math.max(0, rect.top + window.scrollY - 92), behavior: 'smooth' });
+        }
+        return;
+      }
+
+      let dest = null;
+      try { dest = new URL(link.href, window.location.href); } catch {}
+      if (!dest) return;
+      this.rememberSectionScroll(dest.pathname + dest.search);
+    });
+  },
+
+  rememberSectionScroll(dest) {
+    const results = document.getElementById('shopResults');
+    if (!results) return;
+    // Only keep the position when the product grid is actually on screen.
+    // From the hero or from the section cards at the bottom of the page the
+    // new section should open normally at its beginning.
+    if (window.scrollY < 40) return;
+    const rect = results.getBoundingClientRect();
+    if (rect.bottom <= 0 || rect.top >= window.innerHeight) return;
+    try {
+      window.sessionStorage.setItem(this.SECTION_SCROLL_KEY, JSON.stringify({
+        dest,
+        resultsTop: Math.round(rect.top),
+        time: Date.now(),
+      }));
+    } catch {}
+  },
+
+  restoreSectionScroll() {
+    let raw = null;
+    try { raw = window.sessionStorage.getItem(this.SECTION_SCROLL_KEY); } catch { return; }
+    if (!raw) return;
+    let saved = null;
+    try { saved = JSON.parse(raw); } catch {}
+    try { window.sessionStorage.removeItem(this.SECTION_SCROLL_KEY); } catch {}
+    if (!saved || !this.isListingPage()) return;
+    if (Date.now() - Number(saved.time) > 20000) return;
+    if (saved.dest !== window.location.pathname + window.location.search) return;
+    if (!Number.isFinite(saved.resultsTop)) return;
+
+    this._sectionScrollTop = saved.resultsTop;
+    this.alignSectionScroll();
+    this._releaseSectionScroll();
+    // Late layout changes (fonts, live catalog refresh) may shift the grid a
+    // few pixels; after a moment the page belongs to the visitor again.
+    setTimeout(() => { this._sectionScrollTop = null; }, 1500);
+    window.addEventListener('load', () => this.alignSectionScroll(), { once: true });
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => this.alignSectionScroll()).catch(() => {});
+    }
+  },
+
+  /** Put #shopResults back at the viewport offset it had on the last section. */
+  alignSectionScroll() {
+    if (this._sectionScrollTop == null) return;
+    const results = document.getElementById('shopResults');
+    if (!results) return;
+    const delta = Math.round(results.getBoundingClientRect().top - this._sectionScrollTop);
+    if (!delta) return;
+    // The global `scroll-behavior: smooth` would animate the correction and
+    // make the switch feel like a scroll instead of a seamless swap.
+    const root = document.documentElement;
+    const previous = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+    window.scrollTo(0, Math.max(0, Math.round(window.scrollY + delta)));
+    root.style.scrollBehavior = previous;
+  },
+
+  /** Stop late corrections (fonts, live catalog) once the visitor scrolls. */
+  _releaseSectionScroll() {
+    const release = () => { this._sectionScrollTop = null; };
+    window.addEventListener('wheel', release, { once: true, passive: true });
+    window.addEventListener('touchmove', release, { once: true, passive: true });
+    window.addEventListener('keydown', release, { once: true });
   },
 
   toggleMenu(e) {
@@ -1560,7 +1684,7 @@ const App = {
               ? `<div class="modal-color-picker"><label class="modal-color-label">${this.esc(p.optionLabel || 'اختر اللون المناسب:')}</label><div class="modal-color-options">${p.colorOptions.map(c => `<label class="modal-color-option"><input type="radio" name="prodOption" value="${this.esc(c)}" class="modal-color-radio"><span class="modal-color-swatch" data-color="${this.esc(c)}">${this.esc(c)}</span></label>`).join('')}</div></div>`
             : ''}
           <div class="modal-prices"><span class="modal-new-price">⃁ ${p.price}</span><span class="modal-old-price">⃁ ${p.op}</span><span class="modal-save">توفير ${this.disc(p)}%</span></div>
-          <div class="modal-specs"><h3>المواصفات التقنية:</h3>${p.specs.map(s => `<div class="spec-item"><div class="spec-dot"></div><span class="spec-text">${this.esc(s)}</span></div>`).join('')}</div>
+          <div class="modal-specs"><h3>المواصفات التقنية:</h3>${(p.specs || []).map(s => { const parts = this.specParts(s); return `<div class="spec-item"><div class="spec-dot"></div><span class="spec-text">${parts.label ? `<strong>${this.esc(parts.label)}:</strong> ` : ''}${this.esc(parts.value)}</span></div>`; }).join('')}</div>
           <div class="modal-trust">
             <span>${this.svgIcon(this.icons.truck, 14)} شحن لكل المملكة</span>
             <span>${this.svgIcon(this.icons.shield, 14)} ضمان على المنتجات</span>
@@ -2109,7 +2233,7 @@ const App = {
           <div class="filter-card">
             <h3>الأقسام</h3>
             <div class="cat-filter-list">
-              ${cats.map(c => `<a class="cat-filter${activeCat === c.key ? ' active' : ''}" href="${this.esc(c.key === 'all' ? this.shopUrl() : this.categoryUrl(c.key))}" data-cat="${c.key}" aria-current="${activeCat === c.key ? 'page' : 'false'}">
+              ${cats.map(c => `<a class="cat-filter${activeCat === c.key ? ' active' : ''}" href="${this.esc(c.key === 'all' ? this.shopUrl() : this.categoryUrl(c.key))}" data-cat="${c.key}" data-scroll-keep aria-current="${activeCat === c.key ? 'page' : 'false'}">
                 <span class="cat-filter-ico">${this.svgIcon(c.icon, 15)}</span>
                 <span class="cat-filter-label">${this.esc(c.label)}</span>
                 <span class="cat-filter-count">${c.key === 'all' ? total : this.catCount(c.key)}</span>
@@ -2238,6 +2362,16 @@ const App = {
     const cat = this.catalog.categories.find(c => c.key === p.cat) || { key: p.cat, label: this.catLabel(p.cat), desc: this.catDesc(p.cat) };
     const catIcon = this.catIcons[p.cat] || this.catIcons.all;
     const specs = Array.isArray(p.specs) ? p.specs : [];
+    const specRowHtml = specs.map((s) => {
+      const parts = this.specParts(s);
+      if (!parts.label) return `<tr><td colspan="2" dir="auto">${this.esc(parts.value)}</td></tr>`;
+      return `<tr><th scope="row">${this.esc(parts.label)}</th><td dir="auto">${this.esc(parts.value)}</td></tr>`;
+    });
+    const specHalf = Math.ceil(specRowHtml.length / 2);
+    const specTable = (rows) => `<table class="product-spec-table" aria-label="المواصفات التقنية"><thead><tr><th scope="col">المواصفة</th><th scope="col">القيمة</th></tr></thead><tbody>${rows.join('')}</tbody></table>`;
+    const specCountLabel = specs.length >= 3 && specs.length <= 10
+      ? specs.length + ' بنود'
+      : specs.length + ' بنداً';
     const discount = this.disc(p);
     const categoryUrl = this.categoryUrl(p.cat);
     const waText = 'مرحباً، أريد طلب: ' + p.name + ' (الرمز: ' + (p.sku || p.id) + ')';
@@ -2284,11 +2418,6 @@ const App = {
             <span class="product-gallery-save">-${discount}%</span>
             <img src="${this.esc(this.imgPath(p.img))}" alt="${this.esc(p.name)} — ${this.esc(p.nameAr || '')}" width="640" height="480" loading="eager" decoding="async" onerror="App.imgFallback(this)">
           </div>
-          <div class="product-gallery-trust">
-            <div>${this.svgIcon(this.icons.shield, 19)}<span><strong>منتج أصلي</strong><small>جودة مضمونة</small></span></div>
-            <div>${this.svgIcon(this.icons.truck, 19)}<span><strong>شحن سريع</strong><small>لكل المملكة</small></span></div>
-            <div>${this.svgIcon(this.icons.headset, 19)}<span><strong>دعم فني</strong><small>عبر واتساب</small></span></div>
-          </div>
         </div>
 
         <div class="product-detail">
@@ -2329,26 +2458,24 @@ const App = {
               <li>${this.svgIcon(this.icons.check, 15)} دعم فني يساعدك حتى تشغيل المشروع</li>
             </ul>
           </div>
-
-          <div class="product-quick-facts">
-            <div><span>القسم</span><strong><a href="${this.esc(categoryUrl)}">${this.esc(cat.label)}</a></strong></div>
-            <div><span>رمز القطعة</span><strong dir="ltr">${this.esc(p.sku || String(p.id))}</strong></div>
-            <div><span>التوفر</span><strong class="${out ? 'out' : ''}">${out ? 'غير متوفر' : 'متوفر'}</strong></div>
-          </div>
         </div>
       </div>
 
-      <div class="product-content-grid">
+      <div class="product-content">
         <section class="product-panel product-specs-panel" aria-labelledby="specsTitle">
-          <div class="product-panel-head">
-            <span class="section-badge">المواصفات</span>
-            <h2 id="specsTitle">المواصفات التقنية</h2>
+          <div class="product-panel-head product-specs-head">
+            <div class="product-specs-title">
+              <span class="product-specs-icon">${this.svgIcon('<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/>', 20)}</span>
+              <div>
+                <h2 id="specsTitle">المواصفات التقنية</h2>
+                <p class="product-specs-sub">بيانات تقنية تفصيلية للقطعة</p>
+              </div>
+            </div>
+            <span class="product-specs-count">${specCountLabel}</span>
           </div>
-          <div class="product-spec-list">
-            ${specs.map((s, i) => `<div class="product-spec-item">
-              <span class="product-spec-num">${String(i + 1).padStart(2, '0')}</span>
-              <span class="product-spec-text">${this.esc(s)}</span>
-            </div>`).join('')}
+          <div class="product-spec-columns">
+            <div class="product-spec-col">${specTable(specRowHtml.slice(0, specHalf))}</div>
+            <div class="product-spec-col">${specTable(specRowHtml.slice(specHalf))}</div>
           </div>
           <div class="product-overview">
             <h3>نظرة عامة</h3>
@@ -2357,7 +2484,7 @@ const App = {
           </div>
         </section>
 
-        <aside class="product-side">
+        <div class="product-support-grid">
           <div class="product-panel product-help-panel">
             <span class="product-help-icon">${this.svgIcon(this.icons.headset, 24)}</span>
             <h2>محتاج مساعدة؟</h2>
@@ -2377,7 +2504,7 @@ const App = {
             </ul>
             <a class="product-terms-link" href="${this.esc(this.pagePath('terms'))}">اقرأ الشروط والأحكام ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 13)}</a>
           </div>
-        </aside>
+        </div>
       </div>
 
       ${related.length ? `<section class="product-related" aria-labelledby="relatedTitle">
@@ -3096,6 +3223,9 @@ const App = {
     this.render();
     this.renderCart();
     this.updateUrl();
+    this.setupSectionScroll();
+    // Switching sections should feel like a swap of the grid, not a new page.
+    this.restoreSectionScroll();
     if (this.pageType === 'home') this.injectStructuredData();
     const yearEl = document.getElementById('footerYear');
     if (yearEl) yearEl.textContent = new Date().getFullYear();
@@ -3117,6 +3247,7 @@ const App = {
         this.render();
       } else if (this.isListingPage()) {
         this.updateProductsView();
+        this.alignSectionScroll();
       } else if (this.pageType === 'home' || this.pageType === 'projects') {
         this.render();
       }
