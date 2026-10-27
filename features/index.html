@@ -1,12 +1,31 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+<script>
+(function() {
+  try {
+    var t = localStorage.getItem('iboardz-theme');
+    if (t !== 'dark' && t !== 'light') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
+})();
+</script>
 <meta charset="UTF-8">
+<meta name="color-scheme" content="light dark">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="refresh" content="0; url=/projects/">
 <meta name="robots" content="noindex, follow">
 <link rel="canonical" href="https://iboardz.netlify.app/projects/">
 <title>انتقل إلى ابنِ مشروعك — iBoardz</title>
+<style>
+  body { margin: 0; padding: 24px; font-family: 'IBM Plex Sans Arabic', sans-serif; background: #fafafa; color: #1a1a2e; }
+  html[data-theme="dark"] body { background: #0a0a14; color: #e8e8f0; }
+  a { color: #ff9500; }
+</style>
 </head>
 <body>
 <p>انتقل قسم المميزات إلى صفحة <a href="/projects/">ابنِ مشروعك</a>.</p>

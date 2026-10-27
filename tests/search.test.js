@@ -220,7 +220,8 @@ test('every product and category has a generated path page', () => {
 
 test('project kits reference real products and have usable steps', () => {
   assert.ok(Array.isArray(catalog.projects) && catalog.projects.length >= 4, 'no projects in the catalog');
-  const ids = new Set(catalog.products.map((p) => String(p.id)));
+  const productsById = new Map(catalog.products.map((p) => [String(p.id), p]));
+  const ids = new Set(productsById.keys());
   const keys = new Set();
   catalog.projects.forEach((project) => {
     assert.ok(project.key && !keys.has(project.key), `project key missing or duplicated: ${project.key}`);
@@ -232,6 +233,13 @@ test('project kits reference real products and have usable steps', () => {
       assert.ok(ids.has(String(part.id)), `project ${project.key} references missing product ${part.id}`);
       assert.ok(Number(part.qty) >= 1, `project ${project.key} has invalid qty for product ${part.id}`);
     });
+    const partsTotal = project.parts.reduce((sum, part) => {
+      const product = productsById.get(String(part.id));
+      return sum + Number(product.price) * Math.max(1, Number(part.qty) || 1);
+    }, 0);
+    let expectedPrice = Math.max(1, Math.ceil(partsTotal));
+    while (!String(expectedPrice).includes('9')) expectedPrice += 1;
+    assert.equal(Number(project.price), expectedPrice, `project ${project.key} price should be the next 9-ending number (${expectedPrice})`);
     assert.ok(Array.isArray(project.steps) && project.steps.length >= 3, `project ${project.key} has too few steps`);
     assert.ok(project.tip, `project ${project.key} has no practical tip`);
   });

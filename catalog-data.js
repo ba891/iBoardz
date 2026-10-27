@@ -65,15 +65,16 @@
     ],
 
     // ===== READY-TO-BUILD PROJECTS =====
-    // Every project is a bill of materials built from `products[].id`.
-    // `option` / `value` preselects colour options or custom values so the
-    // "add the whole project to cart" button can work in one click.
+    // Each project is sold as ONE product (a complete kit) at `price`.
+    // `parts` documents what is inside the box and is built from `products[].id`.
+    // `option` / `value` preselect colour options or custom values for that kit.
     projects: [
       {
         key: 'weather-station',
         icon: 'cloud',
         title: 'محطة طقس منزلية',
         summary: 'حساس حرارة ورطوبة وضغط مع شاشة OLED تعرض القراءات لحظياً، وقاعدة جاهزة للربط بالواي فاي.',
+        price: 129,
         level: 'intermediate',
         time: '60–90 دقيقة',
         tags: ['حساسات', 'شاشة', 'منزل ذكي'],
@@ -97,6 +98,7 @@
         icon: 'droplet',
         title: 'ريّ نباتات تلقائي',
         summary: 'حساس رطوبة تربة يقرأ احتياج النبتة، وريلاي يشغّل المضخة فقط وقت الجفاف.',
+        price: 129,
         level: 'intermediate',
         time: '60–90 دقيقة',
         tags: ['منزل ذكي', 'ريلاي', 'مضخة'],
@@ -121,6 +123,7 @@
         icon: 'fire',
         title: 'كاشف غاز ودخان',
         summary: 'حساس MQ-2 مع جرس وإنذار ضوئي ينبهك عند ارتفاع نسبة الغاز أو الدخان.',
+        price: 99,
         level: 'beginner',
         time: '30–45 دقيقة',
         tags: ['سلامة', 'حساسات', 'تنبيه'],
@@ -146,6 +149,7 @@
         icon: 'radar',
         title: 'رادار مسافة بالسونار',
         summary: 'محرك سيرفو يحرّك حساس المسافة يميناً ويساراً، والجرس يصدر تنبيهاً عند الاقتراب.',
+        price: 109,
         level: 'intermediate',
         time: '60–90 دقيقة',
         tags: ['روبوت', 'حساسات', 'سيرفو'],
@@ -170,6 +174,7 @@
         icon: 'heart',
         title: 'مقياس نبضات القلب',
         summary: 'حساس MAX30102 يقرأ النبض، وشاشة OLED تعرض القراءة أثناء وضع الإصبع.',
+        price: 129,
         level: 'advanced',
         time: '90–120 دقيقة',
         tags: ['صحة', 'I2C', 'شاشة'],
@@ -193,6 +198,7 @@
         icon: 'door',
         title: 'إنذار باب مغناطيسي',
         summary: 'حساس مغناطيسي يكتشف فتح الباب ويشغّل جرساً وليداً، مع إمكانية إشعار واي فاي لاحقاً.',
+        price: 89,
         level: 'beginner',
         time: '30–45 دقيقة',
         tags: ['أمان', 'ESP32', 'منزل ذكي'],
@@ -255,7 +261,7 @@
       {
         id: 3, sku: 'IB-MCU-002', slug: 'arduino-uno-r3',
         name: 'ARDUINO UNO R3', nameAr: 'لوح أردوينو UNO R3',
-        price: 32.75, op: 50, cat: 'mcu', img: 'products/arduino-uno-r3/arduino-uno-r3.png',
+        price: 39.75, op: 50, cat: 'mcu', img: 'products/arduino-uno-r3/arduino-uno-r3.png',
         specs: [
           'المتحكم: ATmega328P',
           'تردد المعالج: 16MHz',
@@ -585,7 +591,7 @@
       {
         id: 22, sku: 'IB-ACC-001', slug: 'jumper-wires',
         name: 'JUMPER WIRES', nameAr: 'أسلاك توصيل بأنواع متعددة',
-        price: 11.75, op: 18, cat: 'accessory', img: 'products/jumper-wires/jumperwires.jpg',
+        price: 11.75, op: 18, cat: 'accessory', img: 'products/jumper-wires/jumper-wires.png',
         specs: [
           'الأنواع: Male-Male / Male-Female / Female-Female',
           'العدد: 40 سلكاً لكل مجموعة',
@@ -694,7 +700,7 @@
       {
         id: 28, sku: 'IB-DIS-003', slug: 'ssd1306-oled-display',
         name: 'SSD1306 OLED 0.96"', nameAr: 'شاشة OLED 0.96 بوصة SSD1306',
-        price: 35.75, op: 52, cat: 'display', img: 'products/ssd1306-oled-display/ssd1306-oled-096.png',
+        price: 35.75, op: 52, cat: 'display', img: 'products/ssd1306-oled-display/ssd1306-oled-display.png',
         specs: [
           'الشريحة: SSD1306',
           'المقاس: 0.96 بوصة',
@@ -731,7 +737,7 @@
       {
         id: 30, sku: 'IB-SEN-010', slug: 'rain-water-level-sensor',
         name: 'RAIN WATER LEVEL DETECTION SENSOR MODULE 3-5VDC', nameAr: 'حساس كشف المطر ومستوى المياه',
-        price: 14.75, op: 22, cat: 'sensor', img: 'products/rain-water-level-sensor/rainsensor.jpg',
+        price: 14.75, op: 22, cat: 'sensor', img: 'products/rain-water-level-sensor/rain-water-level-sensor.png',
         specs: [
           'المقارن: LM393',
           'جهد التشغيل: 3.3-5V',
@@ -748,7 +754,7 @@
       {
         id: 31, sku: 'IB-MOD-002', slug: 'ds1302-rtc-module',
         name: 'DS1302 RTC Real Time Clock Module', nameAr: 'موديول الساعة الحقيقي RTC DS1302',
-        price: 17.75, op: 25, cat: 'module', img: 'products/ds1302-rtc-module/ds1302.jpg',
+        price: 17.75, op: 25, cat: 'module', img: 'products/ds1302-rtc-module/ds1302-rtc-module.png',
         specs: [
           'الشريحة: DS1302',
           'الواجهة: SPI (3-Wire)',
@@ -766,7 +772,7 @@
       {
         id: 32, sku: 'IB-OUT-002', slug: 'piezo-buzzer',
         name: 'Piezo Buzzer (جرس صوتي)', nameAr: 'جرس بيزو صوتي Piezo Buzzer',
-        price: 5.75, op: 8, cat: 'output', img: 'products/piezo-buzzer/buzzer.jpg',
+        price: 5.75, op: 8, cat: 'output', img: 'products/piezo-buzzer/piezo-buzzer.png',
         specs: [
           'النوع: Piezo Buzzer',
           'جهد التشغيل: 3.5-5V',
@@ -783,7 +789,7 @@
       {
         id: 33, sku: 'IB-SEN-011', slug: 'ttp223-touch-sensor',
         name: 'TTP223 TOUCH SENSOR', nameAr: 'حساس لمس TTP223',
-        price: 5.75, op: 9, cat: 'sensor', img: 'products/ttp223-touch-sensor/ttp223.jpeg',
+        price: 5.75, op: 9, cat: 'sensor', img: 'products/ttp223-touch-sensor/ttp223-touch-sensor.png',
         specs: [
           'الشريحة: TTP223',
           'النوع: لمس سعوي',
@@ -801,7 +807,7 @@
       {
         id: 34, sku: 'IB-IN-004', slug: 'switch-on-off',
         name: 'SWITCH ON/OFF (مفتاح تبديل)', nameAr: 'مفتاح تبديل تشغيل وإيقاف',
-        price: 5.75, op: 8, cat: 'input', img: 'products/switch-on-off/switch-on-off.webp',
+        price: 5.75, op: 8, cat: 'input', img: 'products/switch-on-off/switch-on-off.png',
         specs: [
           'النوع: Rocker Switch',
           'الأطراف: 3 (ON / OFF / Earth)',
@@ -818,7 +824,7 @@
       {
         id: 35, sku: 'IB-PWR-001', slug: 'tp4056-charger-module',
         name: 'TP4056 CHARGER MODULE', nameAr: 'موديول شحن بطاريات ليثيوم TP4056',
-        price: 5.75, op: 8, cat: 'power', img: 'products/tp4056-charger-module/tp4056.webp',
+        price: 5.75, op: 8, cat: 'power', img: 'products/tp4056-charger-module/tp4056-charger-module.png',
         specs: [
           'الشريحة: TP4056',
           'البطاريات: Li-ion / Li-Po',
@@ -836,7 +842,7 @@
       {
         id: 36, sku: 'IB-PWR-002', slug: 'mt3608-step-up-converter',
         name: 'MT3608 DC-DC STEP UP CONVERTER', nameAr: 'محوّل رفع الجهد MT3608 DC-DC',
-        price: 6.75, op: 10, cat: 'power', img: 'products/mt3608-step-up-converter/mt3036.jpg',
+        price: 6.75, op: 10, cat: 'power', img: 'products/mt3608-step-up-converter/mt3608-step-up-converter.png',
         specs: [
           'الشريحة: MT3608',
           'جهد الدخل: 2-24V',
@@ -853,7 +859,7 @@
       {
         id: 37, sku: 'IB-PWR-003', slug: 'lipo-battery-3v7-550mah',
         name: 'بطارية ليبو 3.7V 550mAh', nameAr: 'بطارية ليبو 3.7 فولت 550 مللي أمبير',
-        price: 29.75, op: 45, cat: 'power', img: 'products/lipo-battery-3v7-550mah/3.7 lipo battery.png',
+        price: 29.75, op: 45, cat: 'power', img: 'products/lipo-battery-3v7-550mah/lipo-battery-3v7-550mah.png',
         specs: [
           'النوع: Li-Po',
           'الجهد الاسمي: 3.7V',
@@ -870,7 +876,7 @@
       {
         id: 38, sku: 'IB-PWR-004', slug: 'liion-battery-3v7-1800mah',
         name: 'بطارية ليثيوم ايون 3.7V 1800mAh', nameAr: 'بطارية ليثيوم أيون 3.7 فولت 1800 مللي أمبير',
-        price: 18.75, op: 40, cat: 'power', img: 'products/liion-battery-3v7-1800mah/Rechargeable-3-7V-18650-Lithium-Battery-1800mAh-Battery.png',
+        price: 18.75, op: 40, cat: 'power', img: 'products/liion-battery-3v7-1800mah/liion-battery-3v7-1800mah.png',
         specs: [
           'النوع: Li-ion 18650',
           'الجهد الاسمي: 3.7V',
@@ -887,7 +893,7 @@
       {
         id: 39, sku: 'IB-SEN-012', slug: 'dry-reed-pipe-module',
         name: 'حساس التبديل المغناطيسي Dry Reed Pipe Module', nameAr: 'حساس مغناطيسي جاف',
-        price: 9.75, op: 15, cat: 'sensor', img: 'products/dry-reed-pipe-module/Dry Reed Pipe Module.jpg',
+        price: 9.75, op: 15, cat: 'sensor', img: 'products/dry-reed-pipe-module/dry-reed-pipe-module.png',
         specs: [
           'النوع: Reed Switch',
           'جهد التشغيل: 3.3-5V',
@@ -905,7 +911,7 @@
       {
         id: 40, sku: 'IB-SEN-013', slug: 'mq-135-gas-sensor',
         name: 'MQ-135 GAS SENSOR', nameAr: 'حساس جودة الهواء والغازات MQ-135',
-        price: 26.75, op: 40, cat: 'sensor', img: 'products/mq-135-gas-sensor/MQ-135.webp',
+        price: 26.75, op: 40, cat: 'sensor', img: 'products/mq-135-gas-sensor/mq-135-gas-sensor.png',
         specs: [
           'الشريحة: MQ-135',
           'الغازات: NH3 / NOx / CO2 / بنزين / كحول / دخان',
@@ -923,7 +929,7 @@
       {
         id: 41, sku: 'IB-SEN-014', slug: 'mq-2-gas-sensor',
         name: 'MQ-2 GAS SENSOR', nameAr: 'حساس غاز ودخان MQ-2',
-        price: 24.75, op: 38, cat: 'sensor', img: 'products/mq-2-gas-sensor/mq-2.jpg',
+        price: 24.75, op: 38, cat: 'sensor', img: 'products/mq-2-gas-sensor/mq-2-gas-sensor.png',
         specs: [
           'الشريحة: MQ-2',
           'الغازات: LPG / CO / هيدروجين / دخان / كحول',
@@ -941,7 +947,7 @@
       {
         id: 42, sku: 'IB-ACC-002', slug: 'resistors',
         name: 'مقاومات', nameAr: 'مقاومات بقيم حسب الطلب',
-        price: 0.5, op: 1, cat: 'accessory', img: 'products/resistors/resistor.jpg',
+        price: 0.5, op: 1, cat: 'accessory', img: 'products/resistors/resistors.png',
         specs: [
           'النوع: مقاومة كربونية (Carbon Film)',
           'القيم: حسب الطلب (1Ω - 1MΩ)',
@@ -959,7 +965,7 @@
       {
         id: 43, sku: 'IB-ACC-003', slug: 'breadboard',
         name: 'BREADBOARD لوحة تجارب', nameAr: 'لوحة تجارب بريدبورد 830 نقطة',
-        price: 14.75, op: 22, cat: 'accessory', img: 'products/breadboard/breadboard.jpg',
+        price: 14.75, op: 22, cat: 'accessory', img: 'products/breadboard/breadboard.png',
         specs: [
           'عدد النقاط: 830',
           'التخطيط: 63 صفاً × 10 نقاط + شريطا طاقة',

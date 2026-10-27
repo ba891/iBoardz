@@ -126,7 +126,7 @@ module.exports = {
   meta:      { brand, tagline, whatsapp, email, site, currency, logo, ... },
   categories: [ { key, label, icon, aliases: [...] } ],   // 9 real + the "all" pseudo-key
   services:   [ { id, slug, name, nameAr, summary, longDesc, features, img, badge } ],
-  projects:   [ { key, icon, title, summary, level, time, tags, parts: [ { id, qty, option?, value? } ], steps, tip } ],
+  projects:   [ { key, icon, title, summary, price, level, time, tags, parts: [ { id, qty, option?, value? } ], steps, tip } ],
   popularSearches: [ 'اردوينو', 'ESP32', ... ],
   products:   [ {
     id, sku, slug, name, nameAr,
@@ -171,17 +171,18 @@ It is also injected as `schema.org/Service` JSON-LD for SEO.
 The old "المميزات" page was replaced by **ابنِ مشروعك**, a working page rather than
 a list of marketing claims. Everything is driven by `catalog.projects`:
 
-* each project is a bill of materials (`parts: [{ id, qty }]`) pointing at real
-  catalogue products; `option` picks a product colour and `value` fills a custom
-  value such as `220Ω`,
-* the UI computes the live total and saving from the catalogue, shows every part
-  with its product link, and adds the whole kit with one button,
+* each project is **one product** with its own `price` (rounded up to the next
+  whole number that contains a 9); `parts: [{ id, qty }]` documents what is inside the kit
+  and points at real catalogue products; `option` picks a product colour and
+  `value` fills a custom value such as `220Ω`,
+* the UI shows the single kit price, lists the contents without per-part prices,
+  and adds the whole kit to the cart as one line item with one click,
 * `steps` and `tip` are real wiring/safety notes, shown in a `<details>` panel,
 * `/projects/` also carries a board picker (UNO R3 / ESP32 / ESP32-C3), an LED
   resistor calculator that adds the computed resistor to the cart, and a battery
   life calculator,
-* the generated page includes `HowTo` JSON-LD and a no-JS fallback listing every
-  kit, its parts, total and steps,
+* the generated page includes `Product`/`HowTo` JSON-LD and a no-JS fallback
+  listing every kit, its contents, single price and steps,
 * the homepage carries a three-project teaser and the header search indexes the
   kits, so “مشروع” and project names return real results.
 
@@ -318,3 +319,21 @@ Lighthouse on the homepage, shop, category and product pages:
 
 Deployment is static: upload this folder to Netlify (or any static host). The
 `_headers` file is Netlify-specific; other hosts simply ignore it.
+
+### Contact form (`/contact/`)
+
+The message form is delivered by **Netlify Forms** — no backend needed:
+
+* `contact/index.html` contains a hidden static form named `contact`. Netlify
+  detects forms at deploy time, and the visible form is injected by `app.js`,
+  so the static twin is what makes detection work. Keep the input names
+  (`name`, `email`, `message`, `bot-field`) in sync with `App.handleContact`.
+* `App.handleContact` POSTs urlencoded data to `/` and shows a success/error
+  toast. It never leaves the page.
+* One-time setup after the first deploy: **Site settings → Forms → Form
+  notifications → Add notification → Email** to `iBoardz@outlook.com`.
+  Without that notification Netlify still stores submissions under
+  **Forms**, but nobody gets an email.
+* On a non-Netlify host the POST fails and the form shows the error toast
+  pointing visitors to WhatsApp.
+

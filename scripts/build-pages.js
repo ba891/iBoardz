@@ -85,11 +85,19 @@ function head(options) {
 <head>
 <script>
 (function() {
-  var t = localStorage.getItem('iboardz-theme') || 'light';
-  document.documentElement.setAttribute('data-theme', t);
+  try {
+    var t = localStorage.getItem('iboardz-theme');
+    if (t !== 'dark' && t !== 'light') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
 })();
 </script>
 <meta charset="UTF-8">
+<meta name="color-scheme" content="light dark">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
@@ -121,8 +129,8 @@ ${keywords ? `<meta name="keywords" content="${esc(keywords)}">` : ''}
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Noto+Sans+Symbols+2&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="${root}images/logo.png?v=3">
 <link rel="apple-touch-icon" href="${root}images/logo.png?v=3">
-<link rel="stylesheet" href="${root}assets/css/style.css?v=9">
-<link rel="stylesheet" href="${root}assets/css/mega-menu.css">
+<link rel="stylesheet" href="${root}assets/css/style.css?v=15">
+<link rel="stylesheet" href="${root}assets/css/mega-menu.css?v=4">
 ${extraLd ? extraLd : ''}
 </head>`;
 }
@@ -190,12 +198,9 @@ function headerAndChrome(root) {
 
 <div id="modalOverlay" class="modal-overlay" style="display:none"></div>
 <div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="false"></div>
-<button id="backToTop" class="back-to-top" onclick="App.scrollToTop()" aria-label="العودة للأعلى">
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>
-</button>
-<a class="wa-float" href="https://wa.me/${esc(catalog.meta.whatsapp)}" target="_blank" rel="noopener noreferrer" aria-label="تواصل عبر واتساب">
-  <svg width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
-</a>`;
+<button id="backToTop" class="back-to-top" type="button" onclick="App.scrollToTop()" aria-label="العودة للأعلى">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></svg>
+</button>`;
 }
 
 function footer(root) {
@@ -277,7 +282,7 @@ ${footer(root)}
 <script src="${root}catalog-data.js"></script>
 <script src="${root}assets/js/search-engine.js"></script>
 <script src="${root}assets/js/menu.js"></script>
-<script src="${root}assets/js/app.js?v=6"></script>
+<script src="${root}assets/js/app.js?v=11"></script>
 </body>
 </html>
 `;
@@ -500,10 +505,10 @@ function contentPage(type) {
   const meta = {
     projects: {
       route: '/projects/',
-      title: 'مشاريع جاهزة — ابنِ مشروعك خطوة بخطوة | iBoardz',
-      description: 'مشاريع أردوينو وESP32 جاهزة مع قائمة القطع المطلوبة والسعر الإجمالي. اختر مشروعك وأضف كل القطع إلى السلة بضغطة واحدة من iBoardz.',
+      title: 'أطقم مشاريع جاهزة — ابنِ مشروعك بطقم واحد | iBoardz',
+      description: 'أطقم مشاريع أردوينو وESP32 جاهزة تُباع كمنتج واحد بسعر واحد يشمل كل القطع. اختر طقمك وأضفه إلى السلة بضغطة واحدة من iBoardz.',
       heading: 'ابنِ مشروعك',
-      intro: 'مشاريع جاهزة بالقطع المطلوبة وأسعارها، مع خطوات التركيب ونصائح عملية.',
+      intro: 'أطقم مشاريع جاهزة تُباع كمنتج واحد بسعر واحد، مع محتويات كل طقم وخطوات التركيب ونصائح عملية.',
     },
     contact: {
       route: '/contact/',
@@ -527,8 +532,17 @@ function contentPage(type) {
     const product = catalog.products.find((p) => String(p.id) === String(part.id));
     return product ? { product, qty: Math.max(1, Number(part.qty) || 1) } : null;
   }).filter(Boolean);
-  const projectTotal = (project) => Math.round(projectLines(project)
-    .reduce((sum, line) => sum + line.product.price * line.qty, 0) * 100) / 100;
+  const roundUpToNine = (value) => {
+    let n = Math.max(1, Math.ceil(Number(value) || 0));
+    while (String(n).indexOf('9') === -1) n += 1;
+    return n;
+  };
+  const projectTotal = (project) => {
+    const listed = Number(project.price);
+    if (Number.isFinite(listed) && listed > 0) return Math.round(listed * 100) / 100;
+    return roundUpToNine(projectLines(project)
+      .reduce((sum, line) => sum + line.product.price * line.qty, 0));
+  };
 
   const ld = {
     '@context': 'https://schema.org',
@@ -547,10 +561,21 @@ function contentPage(type) {
         position: index + 1,
         name: project.title,
         item: {
-          '@type': 'HowTo',
+          '@type': ['Product', 'HowTo'],
           name: project.title,
           description: project.summary,
+          image: (() => {
+            const first = projectLines(project)[0];
+            return first ? absoluteImage(first.product.img) : DEFAULT_IMAGE;
+          })(),
           estimatedCost: { '@type': 'MonetaryAmount', currency: 'SAR', value: projectTotal(project) },
+          offers: {
+            '@type': 'Offer',
+            price: projectTotal(project),
+            priceCurrency: 'SAR',
+            availability: 'https://schema.org/InStock',
+            url: absolute('/projects/') + '#project-' + encodeURIComponent(project.key),
+          },
           supply: projectLines(project).map(({ product, qty }) => ({
             '@type': 'HowToSupply',
             name: `${product.name} ×${qty}`,
@@ -570,9 +595,9 @@ function contentPage(type) {
       <h2>${esc(project.title)}</h2>
       <p>${esc(project.summary)}</p>
       <p><strong>المستوى:</strong> ${esc(levelLabel(project.level))} — <strong>الوقت المتوقع:</strong> ${esc(project.time)}</p>
-      <h3>القطع المطلوبة</h3>
-      <ul>${projectLines(project).map(({ product, qty }) => `<li><a href="${root}product/${esc(product.slug)}/">${esc(product.name)}</a> ×${qty} — ${esc(product.price)} ر.س</li>`).join('')}</ul>
-      <p><strong>إجمالي القطع: ${esc(projectTotal(project))} ر.س</strong></p>
+      <h3>محتويات الطقم</h3>
+      <ul>${projectLines(project).map(({ product, qty }) => `<li><a href="${root}product/${esc(product.slug)}/">${esc(product.name)}</a> ×${qty}</li>`).join('')}</ul>
+      <p><strong>سعر الطقم كامل: ${esc(projectTotal(project))} ر.س</strong> — يُباع كمنتج واحد ويشمل كل القطع أعلاه.</p>
       <h3>خطوات التركيب</h3>
       <ol>${(project.steps || []).map((step) => `<li>${esc(step)}</li>`).join('')}</ol>
       <p>${esc(project.tip)}</p>
@@ -598,7 +623,7 @@ function contentPage(type) {
     title: meta.title,
     description: meta.description,
     keywords: type === 'projects'
-      ? 'مشاريع اردوينو, مشاريع ESP32, مشاريع جاهزة, ابنِ مشروعك, iBoardz'
+      ? 'أطقم مشاريع, مشاريع اردوينو, مشاريع ESP32, مشاريع جاهزة, ابنِ مشروعك, iBoardz'
       : 'iBoardz, ' + meta.heading,
     route: meta.route,
     image: DEFAULT_IMAGE,
@@ -614,12 +639,31 @@ function redirectPage(to) {
   return `<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+<script>
+(function() {
+  try {
+    var t = localStorage.getItem('iboardz-theme');
+    if (t !== 'dark' && t !== 'light') {
+      t = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', t);
+  } catch (e) {
+    document.documentElement.setAttribute('data-theme', 'light');
+  }
+})();
+</script>
 <meta charset="UTF-8">
+<meta name="color-scheme" content="light dark">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="refresh" content="0; url=${esc(to)}">
 <meta name="robots" content="noindex, follow">
 <link rel="canonical" href="${esc(target)}">
 <title>انتقل إلى ابنِ مشروعك — iBoardz</title>
+<style>
+  body { margin: 0; padding: 24px; font-family: 'IBM Plex Sans Arabic', sans-serif; background: #fafafa; color: #1a1a2e; }
+  html[data-theme="dark"] body { background: #0a0a14; color: #e8e8f0; }
+  a { color: #ff9500; }
+</style>
 </head>
 <body>
 <p>انتقل قسم المميزات إلى صفحة <a href="${esc(to)}">ابنِ مشروعك</a>.</p>

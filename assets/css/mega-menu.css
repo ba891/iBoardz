@@ -424,7 +424,7 @@
   padding: 8px;
   border-radius: 9px;
   background: var(--whatsapp);
-  color: #fff;
+  color: #083b1c;
   text-decoration: none;
   font-size: 10.5px;
   font-weight: 800;
@@ -520,16 +520,28 @@
     right: 8px;
     width: calc(100vw - 16px);
     max-height: calc(100vh - 78px);
+    max-height: calc(100dvh - 78px);
     border-radius: 18px;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
   }
 
-  .mega-head { padding: 14px 16px; }
+  .mega-head {
+    padding: 14px 16px;
+    padding-top: max(14px, env(safe-area-inset-top));
+  }
   .mega-head h2 { font-size: 17px; }
+
+  .dropdown-menu button.mega-close {
+    width: 40px !important;
+    height: 40px !important;
+    min-width: 40px !important;
+  }
 
   .mega-body {
     grid-template-columns: 1fr;
     gap: 16px;
-    padding: 14px 16px 16px;
+    padding: 14px 16px calc(18px + env(safe-area-inset-bottom));
   }
 
   .mega-nav {
@@ -540,21 +552,38 @@
 
   .mega-nav > .mega-label { grid-column: 1 / -1; margin-bottom: 2px; }
 
-  .mega-nav-link { padding: 7px 8px; gap: 8px; }
-  .mega-nav-icon { width: 29px; height: 29px; border-radius: 8px; }
-  .mega-nav-copy strong { font-size: 11px; }
+  .mega-nav-link { min-height: 44px; padding: 7px 8px; gap: 8px; }
+  .mega-nav-icon { width: 32px; height: 32px; border-radius: 9px; }
+  .mega-nav-copy strong { font-size: 11.5px; }
   .mega-nav-copy small { display: none; }
   .mega-nav-arrow { display: none; }
 
-  .mega-support { grid-column: 1 / -1; margin-top: 4px; }
+  .mega-support { grid-column: 1 / -1; min-height: 48px; margin-top: 4px; }
 
   .mega-cat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .mega-cat { padding: 8px; }
-  .mega-cat-copy strong { font-size: 10px; }
+  .mega-cat { min-height: 50px; padding: 8px; }
+  .mega-cat-icon { width: 32px; height: 32px; }
+  .mega-cat-copy strong { font-size: 10.5px; }
 }
 
 @media (max-width: 480px) {
   .mega-nav { grid-template-columns: 1fr; }
   .mega-cat-grid { grid-template-columns: 1fr 1fr; }
   .mega-cat-copy small { display: none; }
+}
+
+/* At 320px the two-column category tiles truncate most Arabic labels;
+   one full-width row keeps every label readable. */
+@media (max-width: 380px) {
+  .mega-cat-grid { grid-template-columns: 1fr; }
+  .mega-cat { min-height: 46px; }
+  .mega-cat-copy strong { font-size: 11.5px; }
+}
+
+@media (max-height: 500px) and (max-width: 900px) {
+  .dropdown-menu {
+    top: 60px;
+    max-height: calc(100vh - 64px);
+    max-height: calc(100dvh - 64px);
+  }
 }

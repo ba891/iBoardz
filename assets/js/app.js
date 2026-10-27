@@ -360,8 +360,14 @@ const App = {
     const cart = [];
     saved.forEach(line => {
       if (!line || typeof line !== 'object') return;
-      const productId = line.product && line.product.id != null ? line.product.id : line.id;
-      const product = this.products.find(p => String(p.id) === String(productId));
+      let product = null;
+      if (line.product && line.product.isProjectKit) {
+        const project = this.projects.find(p => p.key === line.product.projectKey || 'kit-' + p.key === String(line.product.id));
+        product = project ? this.projectKitProduct(project) : null;
+      } else {
+        const productId = line.product && line.product.id != null ? line.product.id : line.id;
+        product = this.products.find(p => String(p.id) === String(productId));
+      }
       if (!product) return;
       const qty = Number(line.qty);
       if (!Number.isFinite(qty) || qty <= 0) return;
@@ -393,11 +399,22 @@ const App = {
   },
 
   // ===== 5. THEME =====
-  getTheme() {
-    try { return localStorage.getItem('iboardz-theme') || 'light'; } catch { return 'light'; }
+  /** Saved choice first, then the operating-system preference. */
+  prefersDark() {
+    try {
+      return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    } catch { return false; }
   },
 
-  setTheme(t) {
+  getTheme() {
+    try {
+      const saved = localStorage.getItem('iboardz-theme');
+      if (saved === 'dark' || saved === 'light') return saved;
+    } catch {}
+    return this.prefersDark() ? 'dark' : 'light';
+  },
+
+  setTheme(t, persist = true) {
     document.documentElement.setAttribute('data-theme', t);
     const btn = document.getElementById('themeToggle');
     if (btn) {
@@ -407,7 +424,7 @@ const App = {
         ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>'
         : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>';
     }
-    try { localStorage.setItem('iboardz-theme', t); } catch {}
+    if (persist) { try { localStorage.setItem('iboardz-theme', t); } catch {} }
     const meta = document.querySelector('meta[name="theme-color"]');
     if (meta) meta.content = t === 'dark' ? '#0a0a14' : '#ff9500';
   },
@@ -580,6 +597,20 @@ const App = {
   openCart() {
     if (this.state.cartOpen) { this.renderCart(); return; }
     this.state.cartOpen = true;
+    // Search suggestions live at z-index 1400 and the mobile search bar is
+    // fixed under the header; both should be out of the way while the cart is
+    // open and stay closed after it closes.
+    if (this.state.menuOpen) this.closeMenu();
+    this.closeSearch();
+    if (this._headerSearchOpen) {
+      this._headerSearchOpen = false;
+      const headerSearch = document.getElementById('headerSearch');
+      if (headerSearch) headerSearch.classList.remove('open');
+    }
+    // A toast from the "add to cart" tap would otherwise sit on top of the
+    // freshly opened cart panel for a few seconds and hide its first rows.
+    const toasts = document.getElementById('toastContainer');
+    if (toasts) toasts.innerHTML = '';
     this.renderCart();
     this.lockBody();
   },
@@ -745,19 +776,48 @@ const App = {
   },
 
   // ===== 8. CONTACT / TOAST =====
+  // The visible form is injected by JS, so Netlify's build-time form detection
+  // reads the hidden static twin in contact/index.html (name="contact").
+  // Submissions are POSTed as urlencoded data and Netlify emails them to the
+  // address configured under Site settings -> Forms -> Form notifications.
   handleContact(e) {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
+    const form = (e && e.target && e.target.tagName === 'FORM') ? e.target : document.querySelector('.contact-form form');
     const name = document.getElementById('contactName').value.trim();
     const email = document.getElementById('contactEmail').value.trim();
     const msg = document.getElementById('contactMsg').value.trim();
-    if (!name || !msg) return;
-    const text = `الاسم: ${name}\nالبريد: ${email || 'غير مذكور'}\n\nالرسالة:\n${msg}`;
+    if (!name || !msg) return false;
     const btn = document.getElementById('contactSubmitBtn');
-    btn.textContent = 'جاري الإرسال...';
-    btn.disabled = true;
-    window.open(this.wa(text), '_blank');
-    setTimeout(() => { btn.textContent = 'إرسال الرسالة'; btn.disabled = false; }, 2000);
-    this.showToast('تم تحويلك إلى واتساب لإتمام الإرسال', 'info');
+    const btnLabel = btn ? btn.textContent : '';
+    const hp = form ? form.querySelector('[name="bot-field"]') : null;
+    if (btn) { btn.textContent = 'جاري الإرسال...'; btn.disabled = true; }
+
+    const body = new URLSearchParams({
+      'form-name': 'contact',
+      name: name,
+      email: email,
+      message: msg,
+      'bot-field': hp ? hp.value : '',
+    });
+
+    fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+    })
+      .then(res => {
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        if (form) form.reset();
+        this.showToast('تم إرسال رسالتك بنجاح، وسنرد عليك في أقرب وقت', 'success');
+      })
+      .catch(() => {
+        this.showToast('تعذّر إرسال الرسالة الآن — حاول مرة أخرى أو راسلنا عبر واتساب', 'error');
+      })
+      .finally(() => {
+        if (btn) { btn.textContent = btnLabel; btn.disabled = false; }
+      });
+
+    return false;
   },
 
   showToast(msg, type = 'success', showCartBtn = false) {
@@ -843,8 +903,8 @@ const App = {
           desc: project.summary,
           specs: [],
           price: totals.price,
-          op: totals.original,
-          badge: this.projectLevelLabel(project.level),
+          op: totals.price,
+          badge: 'طقم كامل',
           isProject: true,
           project,
         };
@@ -1030,7 +1090,7 @@ const App = {
       }
 
       if (projectHits.results.length) {
-        html += `<div class="sg-head">${this.svgIcon(this.icons.grid, 14)} مشاريع جاهزة</div>`;
+        html += `<div class="sg-head">${this.svgIcon(this.icons.grid, 14)} أطقم جاهزة</div>`;
         projectHits.results.forEach(hit => {
           const project = hit.product.project;
           const totals = this.projectTotals(project);
@@ -1040,14 +1100,14 @@ const App = {
               <span class="sg-thumb">${firstPart ? this.imgTag(this.imgPath(firstPart.product.img), project.title, 34) : this.svgIcon(this.icons.grid, 20)}</span>
               <span class="sg-meta">
                 <span class="sg-name">${IBSearch.highlight(project.title, hit.matchedTokens)}</span>
-                <span class="sg-sub">${totals.parts.length} قطع · ${this.projectLevelLabel(project.level)} · ⃁ ${this.money(totals.price)}</span>
+                <span class="sg-sub">طقم كامل · ${totals.parts.length} قطع · ⃁ ${this.money(totals.price)}</span>
               </span>
-              <span class="sg-cta">مشروع</span>
+              <span class="sg-cta">طقم</span>
             </a>`;
         });
         if (!productHits.results.length) {
           html += `<a class="sg-all" href="${this.esc(this.pagePath('projects'))}" onclick="App.closeSearch()">
-              عرض كل المشاريع (${this.projects.length}) ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 16)}
+              عرض كل الأطقم (${this.projects.length}) ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 16)}
             </a>`;
         }
       }
@@ -1101,8 +1161,13 @@ const App = {
     if (panel.parentElement !== document.body) document.body.appendChild(panel);
 
     const rect = anchor.getBoundingClientRect();
-    const width = Math.max(300, Math.min(rect.width, Math.max(300, window.innerWidth - 24)));
-    let left = rect.left;
+    // On phones the panel should use the full gutter-to-gutter width of the
+    // viewport. On desktop it stays anchored to the search field.
+    const isPhone = window.innerWidth <= 768;
+    const width = isPhone
+      ? window.innerWidth - 24
+      : Math.max(300, Math.min(rect.width, Math.max(300, window.innerWidth - 24)));
+    let left = isPhone ? 12 : rect.left;
     if (left + width > window.innerWidth - 12) left = window.innerWidth - width - 12;
     if (left < 12) left = 12;
 
@@ -1621,19 +1686,23 @@ const App = {
       return;
     }
 
-    body.innerHTML = this.state.cart.map(item => `<div class="cart-item">
+    body.innerHTML = this.state.cart.map(item => {
+      const idArg = this.esc(JSON.stringify(String(item.product.id)));
+      const colorArg = item.color == null ? '' : ',' + this.esc(JSON.stringify(String(item.color)));
+      return `<div class="cart-item">
       <div class="cart-item-img">${this.imgTag(this.imgPath(item.product.img), item.product.name, 40)}</div>
       <div class="cart-item-info">
-        <div class="cart-item-name">${this.esc(item.product.name)}${item.color ? `<span class="cart-item-color">${item.product.customInput ? ' - القيمة: ' + this.esc(item.color) : ' - ' + this.esc(item.color)}</span>` : ''}</div>
-        <div class="cart-item-prices"><span class="price" style="font-size:15px">⃁ ${item.product.price}</span><span class="old-price">⃁ ${item.product.op}</span></div>
+        <div class="cart-item-name">${this.esc(item.product.name)}${item.product.isProjectKit ? '<span class="cart-item-kit">طقم كامل</span>' : ''}${item.color ? `<span class="cart-item-color">${item.product.customInput ? ' - القيمة: ' + this.esc(item.color) : ' - ' + this.esc(item.color)}</span>` : ''}</div>
+        <div class="cart-item-prices"><span class="price" style="font-size:15px">⃁ ${item.product.price}</span>${Number(item.product.op) > Number(item.product.price) ? `<span class="old-price">⃁ ${item.product.op}</span>` : ''}</div>
       </div>
       <div class="cart-qty-controls">
-        <button class="qty-btn" onclick="App.updQty(${item.product.id},-1${item.color == null ? '' : ',' + JSON.stringify(item.color).replace(/"/g, '&quot;')})" aria-label="نقص" title="نقص الكمية">−</button>
+        <button class="qty-btn" onclick="App.updQty(${idArg},-1${colorArg})" aria-label="نقص" title="نقص الكمية">−</button>
         <span style="font-weight:900;min-width:22px;text-align:center;font-size:16px;color:var(--primary)">${item.qty}</span>
-        <button class="qty-btn" onclick="App.updQty(${item.product.id},1${item.color == null ? '' : ',' + JSON.stringify(item.color).replace(/"/g, '&quot;')})" aria-label="زيادة" title="زيادة الكمية">+</button>
-        <button class="cart-remove" onclick="App.removeCart(${item.product.id}${item.color == null ? '' : ',' + JSON.stringify(item.color).replace(/"/g, '&quot;')})" aria-label="إزالة ${this.esc(item.product.name)} من السلة" title="إزالة من السلة">${this.svgIcon('<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>', 16)}</button>
+        <button class="qty-btn" onclick="App.updQty(${idArg},1${colorArg})" aria-label="زيادة" title="زيادة الكمية">+</button>
+        <button class="cart-remove" onclick="App.removeCart(${idArg}${colorArg})" aria-label="إزالة ${this.esc(item.product.name)} من السلة" title="إزالة من السلة">${this.svgIcon('<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>', 16)}</button>
       </div>
-    </div>`).join('');
+    </div>`;
+    }).join('');
 
     const tp = this.totalPrice(), top2 = this.totalOriginal(), ts = this.totalSaved();
     const waText = 'مرحباً، أريد طلب:\n' + this.state.cart.map(i =>
@@ -1746,11 +1815,16 @@ const App = {
     img.onerror = null;
     img.classList.add('img-fallback');
     img.alt = 'صورة المنتج غير متوفرة';
+    // The placeholder is inlined as an SVG, so it has to follow the theme.
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const bg = dark ? '#22223a' : '#f1f3f8';
+    const shape = dark ? '#3a3a52' : '#c7cedb';
+    const ink = dark ? '#8f8fa3' : '#8b93a7';
     const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="160" height="120">' +
-      '<rect width="160" height="120" rx="12" fill="#f1f3f8"/>' +
-      '<path d="M46 78l20-24 14 16 10-12 24 30H46z" fill="#c7cedb"/>' +
-      '<circle cx="62" cy="44" r="9" fill="#c7cedb"/>' +
-      '<text x="80" y="104" text-anchor="middle" font-family="Arial" font-size="11" fill="#8b93a7">iBoardz</text>' +
+      `<rect width="160" height="120" rx="12" fill="${bg}"/>` +
+      `<path d="M46 78l20-24 14 16 10-12 24 30H46z" fill="${shape}"/>` +
+      `<circle cx="62" cy="44" r="9" fill="${shape}"/>` +
+      `<text x="80" y="104" text-anchor="middle" font-family="Arial" font-size="11" fill="${ink}">iBoardz</text>` +
       '</svg>';
     img.src = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
   },
@@ -1864,7 +1938,7 @@ const App = {
         desc = 'الشروط والأحكام وسياسة الشحن والاستبدال والضمان والخصوصية في متجر iBoardz.';
       } else if (this.pageType === 'projects') {
         path = '/projects/';
-        desc = 'مشاريع أردوينو وESP32 جاهزة مع قائمة القطع المطلوبة والسعر الإجمالي. اختر مشروعك وأضف كل القطع إلى السلة بضغطة واحدة من iBoardz.';
+        desc = 'أطقم مشاريع أردوينو وESP32 جاهزة تُباع كمنتج واحد بسعر واحد يشمل كل القطع. اختر طقمك وأضفه إلى السلة بضغطة واحدة من iBoardz.';
       }
 
       const url = new URL(path, origin + '/');
@@ -1902,7 +1976,7 @@ const App = {
       if (this.state.search) return `بحث: ${this.state.search} | iBoardz`;
       return `كل المنتجات — ${this.productCount(this.products.length)} | iBoardz`;
     }
-    if (this.pageType === 'projects') return `مشاريع جاهزة — ابنِ مشروعك | iBoardz`;
+    if (this.pageType === 'projects') return `أطقم مشاريع جاهزة — ابنِ مشروعك بطقم واحد | iBoardz`;
     if (this.pageType === 'terms') return `الشروط والأحكام | iBoardz`;
     if (this.pageType === 'contact') return `تواصل معنا | iBoardz`;
     return `iBoardz | متجر الإلكترونيات والاردوينو الأول في السعودية - ARDUINO FUTURE`;
@@ -1980,11 +2054,11 @@ const App = {
     return `<div class="section projects-teaser reveal">
       <div class="projects-teaser-head">
         <div>
-          <span class="section-badge">مشاريع جاهزة</span>
-          <h2 class="section-title">ابنِ مشروعك من أول قطعة</h2>
-          <p class="section-subtitle">اختر مشروعاً، شوف القطع المطلوبة وسعرها، وأضفها للسلة بضغطة.</p>
+          <span class="section-badge">أطقم مشاريع جاهزة</span>
+          <h2 class="section-title">ابنِ مشروعك بطقم واحد</h2>
+          <p class="section-subtitle">اختر طقماً، شوف محتوياته وسعره، وأضفه للسلة بضغطة.</p>
         </div>
-        <a class="projects-text-link" href="${this.esc(this.pagePath('projects'))}">كل المشاريع ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 14)}</a>
+        <a class="projects-text-link" href="${this.esc(this.pagePath('projects'))}">كل الأطقم ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 14)}</a>
       </div>
       <div class="home-projects-grid">${picks.map(project => this.homeProjectCard(project)).join('')}</div>
     </div>`;
@@ -2001,10 +2075,10 @@ const App = {
       </span>
       <strong class="home-project-title">${this.esc(project.title)}</strong>
       <span class="home-project-summary">${this.esc(project.summary)}</span>
-      <span class="home-project-meta">${totals.parts.length} قطع · ${this.esc(project.time)}</span>
+      <span class="home-project-meta">طقم كامل · ${totals.parts.length} قطع · ${this.esc(project.time)}</span>
       <span class="home-project-foot">
         <span class="home-project-price">⃁ ${this.money(totals.price)}</span>
-        <span class="home-project-link">شوف المشروع ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 13)}</span>
+        <span class="home-project-link">شوف الطقم ${this.svgIcon('<polyline points="15 18 9 12 15 6"/>', 13)}</span>
       </span>
     </a>`;
   },
@@ -2214,7 +2288,7 @@ const App = {
       ${head}
 
       <div class="search-bar shop-search">
-        <input type="search" id="productsSearchInput" placeholder="${isCategory ? 'ابحث داخل هذا القسم…' : 'ابحث بالاسم أو الوصف أو رقم القطعة… مثال: ESP32، حساس حرارة، بطارية 3.7V'}"
+        <input type="search" id="productsSearchInput" placeholder="${isCategory ? 'ابحث داخل هذا القسم…' : 'ابحث بالاسم أو الوصف أو رمز القطعة…'}"
           value="${this.esc(q)}"
           oninput="App.searchDebounced(this.value,'page')" onfocus="App.focusSearch('page')" onkeydown="App.searchKeydown(event)"
           autocomplete="off" autocapitalize="off" spellcheck="false" role="combobox" aria-expanded="false" aria-controls="searchSuggest" aria-autocomplete="list" aria-label="ابحث عن منتج">
@@ -2569,14 +2643,44 @@ const App = {
     }).filter(Boolean);
   },
 
+  // Round money up to the next whole number that contains a 9 (92, 99, 109…).
+  roundUpToNine(value) {
+    let n = Math.max(1, Math.ceil(Number(value) || 0));
+    while (String(n).indexOf('9') === -1) n += 1;
+    return n;
+  },
+
   projectTotals(project) {
     const parts = this.projectParts(project);
-    const price = parts.reduce((sum, part) => sum + part.product.price * part.qty, 0);
-    const original = parts.reduce((sum, part) => sum + part.product.op * part.qty, 0);
+    const partsPrice = Math.round(parts.reduce((sum, part) => sum + part.product.price * part.qty, 0) * 100) / 100;
+    const original = Math.round(parts.reduce((sum, part) => sum + part.product.op * part.qty, 0) * 100) / 100;
+    const listed = Number(project.price);
     return {
       parts,
-      price: Math.round(price * 100) / 100,
-      original: Math.round(original * 100) / 100,
+      price: Number.isFinite(listed) && listed > 0 ? Math.round(listed * 100) / 100 : this.roundUpToNine(partsPrice),
+      partsPrice,
+      original,
+    };
+  },
+
+  // A project is sold as one product: build a product-shaped object for the cart
+  // without leaking kits into the shop, category pages or the search index.
+  projectKitProduct(project) {
+    const totals = this.projectTotals(project);
+    const firstPart = totals.parts[0];
+    return {
+      id: 'kit-' + project.key,
+      sku: project.sku || '',
+      slug: 'kit-' + project.key,
+      name: 'طقم ' + project.title,
+      nameAr: 'طقم مشروع ' + project.title + ' كامل',
+      price: totals.price,
+      op: totals.price,
+      cat: 'project',
+      img: firstPart ? firstPart.product.img : '',
+      desc: project.summary,
+      isProjectKit: true,
+      projectKey: project.key,
     };
   },
 
@@ -2598,7 +2702,6 @@ const App = {
       <a class="project-part-name" href="${this.esc(this.productUrl(product))}" title="عرض ${this.esc(product.name)} — ${this.esc(product.nameAr || '')}">${this.esc(product.name)}${option ? `<span class="project-part-opt">${this.esc(option)}</span>` : ''}</a>
       ${out ? '<span class="project-part-out">غير متوفر</span>' : ''}
       <span class="project-part-qty" aria-label="الكمية ${part.qty}">×${part.qty}</span>
-      <span class="project-part-price">⃁ ${this.money(product.price * part.qty)}</span>
     </li>`;
   },
 
@@ -2619,12 +2722,12 @@ const App = {
           <div class="project-tags">${(project.tags || []).map(tag => `<span class="project-tag">${this.esc(tag)}</span>`).join('')}</div>
           <div class="project-meta">
             <span>${this.svgIcon(this.icons.clock, 13)} ${this.esc(project.time)}</span>
-            <span>${this.svgIcon(this.icons.box, 13)} ${totals.parts.length} قطع</span>
+            <span>${this.svgIcon(this.icons.box, 13)} طقم كامل · ${totals.parts.length} قطع</span>
           </div>
         </div>
       </div>
 
-      <ul class="project-parts" aria-label="قطع مشروع ${this.esc(project.title)}">
+      <ul class="project-parts" aria-label="محتويات طقم ${this.esc(project.title)}">
         ${totals.parts.map(part => this.projectPartRow(part)).join('')}
       </ul>
 
@@ -2636,12 +2739,12 @@ const App = {
 
       <div class="project-foot">
         <div class="project-total">
-          <span>إجمالي سعر القطع</span>
+          <span>سعر الطقم كامل</span>
           <strong>⃁ ${this.money(totals.price)}</strong>
         </div>
-        <button type="button" class="project-add" data-project="${this.esc(project.key)}" aria-label="أضف كل قطع مشروع ${this.esc(project.title)} إلى السلة" onclick="App.addProjectBundle('${this.esc(project.key)}', event)">
+        <button type="button" class="project-add" data-project="${this.esc(project.key)}" aria-label="أضف طقم ${this.esc(project.title)} كاملاً إلى السلة" onclick="App.addProjectBundle('${this.esc(project.key)}', event)">
           ${this.svgIcon('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>', 15)}
-          <span>أضف كل القطع للسلة</span>
+          <span>أضف الطقم للسلة</span>
         </button>
       </div>
     </article>`;
@@ -2652,24 +2755,23 @@ const App = {
     if (!project) return '';
     const totals = this.projectTotals(project);
     const shown = totals.parts.slice(0, 3);
-    return `<aside class="project-preview" aria-label="مثال على قائمة قطع مشروع ${this.esc(project.title)}">
+    return `<aside class="project-preview" aria-label="مثال على محتويات طقم ${this.esc(project.title)}">
       <div class="project-preview-top">
         <span class="project-preview-icon">${this.svgIcon(this.icons[project.icon] || this.icons.grid, 22)}</span>
-        <div><strong>${this.esc(project.title)}</strong><span>${totals.parts.length} قطع · ${this.projectLevelLabel(project.level)}</span></div>
+        <div><strong>${this.esc(project.title)}</strong><span>طقم كامل · ${totals.parts.length} قطع</span></div>
         <span class="project-preview-total">⃁ ${this.money(totals.price)}</span>
       </div>
       <ul class="project-preview-parts">
         ${shown.map(part => `<li>
           <span class="project-preview-img"><img src="${this.esc(this.imgPath(part.product.img))}" alt="" loading="eager" decoding="async"></span>
           <span>${this.esc(part.product.name)}</span>
-          <strong>⃁ ${this.money(part.product.price * part.qty)}</strong>
         </li>`).join('')}
-        ${totals.parts.length > shown.length ? `<li class="project-preview-more">+ ${totals.parts.length - shown.length} قطع إضافية</li>` : ''}
+        ${totals.parts.length > shown.length ? `<li class="project-preview-more">+ ${totals.parts.length - shown.length} قطع داخل الطقم</li>` : ''}
       </ul>
       <div class="project-preview-foot">
         <span class="project-preview-dot"></span>
-        <span>القطع مربوطة بصفحاتها في المتجر</span>
-        <a class="project-preview-cta" href="#${this.esc(this.projectAnchor(project))}" aria-label="عرض تفاصيل مشروع ${this.esc(project.title)}">شوف المشروع</a>
+        <span>كل القطع داخل طقم واحد بسعر واحد</span>
+        <a class="project-preview-cta" href="#${this.esc(this.projectAnchor(project))}" aria-label="عرض تفاصيل طقم ${this.esc(project.title)}">شوف الطقم</a>
       </div>
     </aside>`;
   },
@@ -2731,52 +2833,35 @@ const App = {
     if (!project) return;
     const totals = this.projectTotals(project);
     if (!totals.parts.length) return;
-    let added = 0;
-    let skipped = 0;
 
-    totals.parts.forEach(part => {
-      const product = part.product;
-      const selected = product.customInput
-        ? (part.value != null ? String(part.value) : null)
-        : (part.option != null ? String(part.option) : (product.colorOptions && product.colorOptions.length ? product.colorOptions[0] : null));
-      if (product.customInput && !selected) { skipped += part.qty; return; }
-      if (product.colorOptions && !selected) { skipped += part.qty; return; }
-      if (product.colorOptions && selected && product.colorOptions.indexOf(selected) === -1) { skipped += part.qty; return; }
-
-      const stock = this.getStock(product);
-      if (stock === 0) { skipped += part.qty; return; }
-      const keyColor = selected == null ? '' : selected;
-      let line = this.state.cart.find(item =>
-        String(item.product.id) === String(product.id) && String(item.color || '') === keyColor
-      );
-      if (line) {
-        const room = stock === null ? part.qty : Math.max(0, stock - line.qty);
-        const addQty = Math.min(part.qty, room);
-        line.qty += addQty;
-        added += addQty;
-        if (addQty < part.qty) skipped += part.qty - addQty;
-      } else {
-        const addQty = stock === null ? part.qty : Math.min(part.qty, stock);
-        if (addQty < 1) { skipped += part.qty; return; }
-        const item = { product, qty: addQty };
-        if (selected != null) item.color = selected;
-        this.state.cart.push(item);
-        added += addQty;
-        if (addQty < part.qty) skipped += part.qty - addQty;
-      }
-    });
-
-    if (!added) {
-      this.showToast('تعذّر إضافة القطع — تحقق من توفرها', 'error');
+    // A kit can only ship when every part inside it is available.
+    const unavailable = totals.parts.filter(part => this.getStock(part.product) === 0);
+    if (unavailable.length) {
+      this.showToast(`طقم "${project.title}" غير متوفر حالياً — بعض قطعه ناقصة`, 'error');
       return;
     }
+
+    const kit = this.projectKitProduct(project);
+    const line = this.state.cart.find(item =>
+      item.product && item.product.isProjectKit && String(item.product.projectKey) === String(project.key)
+    );
+    if (line) {
+      line.qty += 1;
+      line.product = kit;
+    } else {
+      this.state.cart.push({ product: kit, qty: 1 });
+    }
+
     this.saveCart();
     this.updateBadge();
     this.renderCart();
-    const message = skipped
-      ? `أضفنا ${added} ${this.pieceWord(added)} من "${project.title}" — ${skipped} ${this.pieceWord(skipped)} غير متوفرة حالياً`
-      : `تمت إضافة ${added} ${this.pieceWord(added)} من "${project.title}" إلى السلة`;
-    this.showToast(message, skipped ? 'info' : 'success', true);
+    this.showToast(
+      line
+        ? `تم زيادة كمية طقم "${project.title}" إلى ${line.qty}`
+        : `تمت إضافة طقم "${project.title}" كاملاً إلى السلة`,
+      'success',
+      true
+    );
     if (event) this.flyToCart(event);
 
     const btn = event && event.currentTarget;
@@ -2824,17 +2909,17 @@ const App = {
         <div class="projects-hero-glow" aria-hidden="true"></div>
         <div class="projects-hero-inner">
           <div class="projects-hero-copy">
-            <span class="projects-kicker">${this.svgIcon(this.icons.bulb, 15)} مشاريع جاهزة بالقطع والأسعار</span>
-            <h1 id="projectsTitle">ابنِ مشروعك <span>من أول قطعة</span></h1>
-            <p>اختر مشروعاً، راجع قائمة القطع المطلوبة، وأضفها كلها للسلة بضغطة واحدة. كل قطعة في القائمة مربوطة بصفحتها في المتجر.</p>
+            <span class="projects-kicker">${this.svgIcon(this.icons.bulb, 15)} مشاريع جاهزة — كل القطع في طقم واحد</span>
+            <h1 id="projectsTitle">ابنِ مشروعك <span>بطقم واحد</span></h1>
+            <p>اختر طقماً جاهزاً، راجع محتوياته وخطوات التركيب، وأضفه للسلة بضغطة واحدة. كل طقم يُباع كمنتج واحد بسعر واحد يشمل كل قطعه.</p>
             <div class="projects-hero-actions">
-              <a class="projects-hero-btn primary" href="#projectList">تصفح المشاريع ${arrow}</a>
+              <a class="projects-hero-btn primary" href="#projectList">تصفح الأطقم ${arrow}</a>
               <a class="projects-hero-btn ghost" href="${supportUrl}" target="_blank" rel="noopener noreferrer">${this.svgIcon(this.icons.whatsapp, 17)} قل لنا فكرتك</a>
             </div>
             <div class="projects-hero-stats">
-              <div><strong>${this.projects.length}</strong><span>مشاريع جاهزة</span></div>
-              <div><strong>${usedParts.size}</strong><span>قطعة مرتبطة</span></div>
-              <div><strong>1</strong><span>ضغطة لإضافة القطع</span></div>
+              <div><strong>${this.projects.length}</strong><span>أطقم جاهزة</span></div>
+              <div><strong>${usedParts.size}</strong><span>قطعة داخل الأطقم</span></div>
+              <div><strong>1</strong><span>ضغطة لإضافة الطقم</span></div>
             </div>
           </div>
           ${this.renderProjectPreview()}
@@ -2844,8 +2929,8 @@ const App = {
       <section class="projects-list section" id="projectList" aria-labelledby="projectListTitle">
         <div class="projects-head">
           <div class="projects-head-copy">
-            <h2 id="projectListTitle">مشاريع تقدر تخلصها اليوم</h2>
-            <p>كل مشروع فيه القطع، خطوات التركيب، ونصيحة عملية قبل ما تبدأ.</p>
+            <h2 id="projectListTitle">أطقم مشاريع تقدر تخلصها اليوم</h2>
+            <p>كل طقم فيه القطع كاملة بسعر واحد، خطوات التركيب، ونصيحة عملية قبل ما تبدأ.</p>
           </div>
           <div class="projects-levels" role="group" aria-label="تصفية المشاريع حسب المستوى">
             ${levels.map(level => `<button type="button" class="projects-level${this.state.projectLevel === level.key ? ' active' : ''}" data-level="${level.key}" aria-pressed="${this.state.projectLevel === level.key}" onclick="App.setProjectLevel('${level.key}')">${level.label}<span>${counts[level.key] || 0}</span></button>`).join('')}
@@ -2881,7 +2966,7 @@ const App = {
           <div>
             <span class="projects-cta-kicker">فكرتك تستاهل</span>
             <h2 id="projectsCtaTitle">مشروعك مو في القائمة؟</h2>
-            <p>قل لنا وش تبي تبني وحدد ميزانيتك، ونرشح لك القطع المناسبة ونرسل لك قائمة كاملة تشتريها بضغطة.</p>
+            <p>قل لنا وش تبي تبني وحدد ميزانيتك، ونرشح لك القطع كطقم واحد جاهز تشتريه بضغطة.</p>
           </div>
           <div class="projects-cta-actions">
             <a class="projects-cta-btn primary" href="${supportUrl}" target="_blank" rel="noopener noreferrer">${this.svgIcon(this.icons.whatsapp, 17)} راسلنا على واتساب</a>
@@ -2911,10 +2996,11 @@ const App = {
       </div>
       <div class="contact-form reveal">
         <h2>أرسل لنا رسالة</h2>
-        <form onsubmit="return App.handleContact(event)">
-          <div class="form-group"><label for="contactName">الاسم</label><input type="text" id="contactName" class="form-input" placeholder="اسمك الكامل" required></div>
-          <div class="form-group"><label for="contactEmail">البريد الإلكتروني</label><input type="email" id="contactEmail" class="form-input" placeholder="email@example.com" style="direction:ltr;text-align:right"></div>
-          <div class="form-group"><label for="contactMsg">الرسالة</label><textarea rows="5" id="contactMsg" class="form-input" placeholder="اكتب رسالتك هنا..." required></textarea></div>
+        <form name="contact" onsubmit="return App.handleContact(event)">
+          <div class="form-group"><label for="contactName">الاسم</label><input type="text" id="contactName" name="name" class="form-input" placeholder="اسمك الكامل" required></div>
+          <div class="form-group"><label for="contactEmail">البريد الإلكتروني</label><input type="email" id="contactEmail" name="email" class="form-input" placeholder="email@example.com" style="direction:ltr;text-align:right"></div>
+          <div class="form-group"><label for="contactMsg">الرسالة</label><textarea rows="5" id="contactMsg" name="message" class="form-input" placeholder="اكتب رسالتك هنا..." required></textarea></div>
+          <p class="form-hp" aria-hidden="true"><label for="contactBotField">اترك هذا الحقل فارغاً</label><input type="text" id="contactBotField" name="bot-field" tabindex="-1" autocomplete="off"></p>
           <button type="submit" class="submit-btn" id="contactSubmitBtn">إرسال الرسالة</button>
         </form>
       </div>
@@ -3185,6 +3271,21 @@ const App = {
     }, { passive: true });
   },
 
+  /** Follow the OS theme live until the visitor picks a theme manually. */
+  _setupTheme() {
+    if (!window.matchMedia) return;
+    let mq;
+    try { mq = window.matchMedia('(prefers-color-scheme: dark)'); } catch { return; }
+    const onChange = (event) => {
+      let saved = null;
+      try { saved = localStorage.getItem('iboardz-theme'); } catch {}
+      if (saved === 'dark' || saved === 'light') return;
+      this.setTheme(event.matches ? 'dark' : 'light', false);
+    };
+    if (mq.addEventListener) mq.addEventListener('change', onChange);
+    else if (mq.addListener) mq.addListener(onChange);
+  },
+
   toggleHeaderSearch() {
     const el = document.getElementById('headerSearch');
     const inp = document.getElementById('headerSearchInput');
@@ -3214,7 +3315,8 @@ const App = {
     this.siteOrigin = String(this.siteOrigin || 'https://iboardz.netlify.app').replace(/\/+$/, '');
     this.buildSearchIndex();
     this.loadCart();
-    this.setTheme(this.getTheme());
+    this.setTheme(this.getTheme(), false);
+    this._setupTheme();
     this.setupReducedMotion();
     this.readPageContext();
     this.readQueryState();

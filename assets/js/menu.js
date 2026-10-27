@@ -12,7 +12,7 @@
       var navMeta = {
         home: { icon: 'home', desc: 'ابدأ من الصفحة الرئيسية', href: app.pagePath('home') },
         products: { icon: 'box', desc: 'تصفّح ' + app.productCount(app.products.length) + ' حسب القسم', href: app.shopUrl() },
-        projects: { icon: 'grid', desc: 'مشاريع جاهزة وقطعها وأسعارها', href: app.pagePath('projects') },
+        projects: { icon: 'grid', desc: 'أطقم مشاريع جاهزة بسعر واحد', href: app.pagePath('projects') },
         contact: { icon: 'envelope', desc: 'واتساب، بريد ودعم فني', href: app.pagePath('contact') },
         terms: { icon: 'shield', desc: 'الشحن والاسترجاع والضمان', href: app.pagePath('terms') }
       };
