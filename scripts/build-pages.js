@@ -129,7 +129,7 @@ ${keywords ? `<meta name="keywords" content="${esc(keywords)}">` : ''}
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&family=Noto+Naskh+Arabic:wght@400;500;600;700&family=Noto+Sans+Symbols+2&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="${root}images/logo.png?v=3">
 <link rel="apple-touch-icon" href="${root}images/logo.png?v=3">
-<link rel="stylesheet" href="${root}assets/css/style.css?v=16">
+<link rel="stylesheet" href="${root}assets/css/style.css?v=18">
 <link rel="stylesheet" href="${root}assets/css/mega-menu.css?v=4">
 ${extraLd ? extraLd : ''}
 </head>`;
@@ -282,7 +282,7 @@ ${footer(root)}
 <script src="${root}catalog-data.js"></script>
 <script src="${root}assets/js/search-engine.js"></script>
 <script src="${root}assets/js/menu.js"></script>
-<script src="${root}assets/js/app.js?v=11"></script>
+<script src="${root}assets/js/app.js?v=13"></script>
 </body>
 </html>
 `;

@@ -2574,14 +2574,43 @@ textarea.form-input {
 /* ===== FLY TO CART ===== */
 .fly-to-cart {
   position: fixed;
-  width: 20px;
-  height: 20px;
-  background: var(--primary);
-  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  border: 2px solid var(--primary);
+  border-radius: 10px;
   z-index: 99999;
   pointer-events: none;
-  box-shadow: 0 0 12px rgba(255,149,0,0.6);
-  transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow: hidden;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.22), 0 0 0 4px rgba(255,149,0,0.12);
+  transition:
+    left 0.72s cubic-bezier(0.22, 0.7, 0.3, 1),
+    top 0.72s cubic-bezier(0.22, 0.7, 0.3, 1),
+    transform 0.72s cubic-bezier(0.5, 0, 0.75, 0),
+    opacity 0.72s ease;
+  will-change: left, top, transform, opacity;
+}
+
+.fly-to-cart img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  display: block;
+}
+
+.fly-to-cart-plus {
+  color: #151515;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.fly-to-cart.flying {
+  transform: scale(0.28) rotate(12deg);
+  opacity: 0.45;
 }
 
 /* ===== BACK TO TOP ===== */
@@ -11628,5 +11657,164 @@ html[data-theme="dark"] .dropdown-menu button.mega-promo-service:hover {
     color: #151515 !important;
     box-shadow: 3px 3px var(--primary), 5px 5px #000 !important;
     transform: none !important;
+  }
+}
+
+/* ==========================================================================
+   ADD-TO-CART FEEDBACK
+   --------------------------------------------------------------------------
+   A three-part confirmation that mirrors the desktop interaction:
+   1. the pressed button locks into a dark "added" state with an orange check
+      and a single luxury sheen sweep;
+   2. a mini product tile flies from the button into the header cart;
+   3. the cart bumps, its badge pops and an orange ring pulses out.
+   ========================================================================== */
+@keyframes addSuccessPop {
+  0% { transform: scale(0.94); }
+  55% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+@keyframes addSuccessSheen {
+  from { background-position: 120% 0; }
+  to { background-position: -40% 0; }
+}
+
+@keyframes cartBump {
+  0% { transform: scale(1); }
+  28% { transform: scale(1.22); }
+  52% { transform: scale(0.95); }
+  74% { transform: scale(1.06); }
+  100% { transform: scale(1); }
+}
+
+@keyframes cartRing {
+  0% { opacity: 0.85; transform: scale(0.9); }
+  100% { opacity: 0; transform: scale(1.45); }
+}
+
+.add-btn.is-added,
+.product-buy-btn.is-added,
+.modal-add-btn.is-added,
+.board-btn.is-added {
+  position: relative !important;
+  overflow: hidden !important;
+  background: var(--darker) !important;
+  border-color: var(--primary) !important;
+  color: #ffb14d !important;
+  box-shadow: 4px 4px var(--primary), 8px 8px rgba(255,149,0,0.28) !important;
+  transform: none !important;
+  transition: none !important;
+  animation: addSuccessPop 0.42s var(--ease-bounce);
+}
+
+.add-btn.is-added::after,
+.product-buy-btn.is-added::after,
+.modal-add-btn.is-added::after,
+.board-btn.is-added::after {
+  content: '✓  تمت الإضافة';
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 8px;
+  background: linear-gradient(110deg, var(--darker) 0%, #1e1e36 42%, rgba(255,149,0,0.30) 50%, #1e1e36 58%, var(--darker) 100%);
+  background-size: 250% 100%;
+  color: #ffb14d;
+  font-family: inherit;
+  font-size: 0.92em;
+  font-weight: 800;
+  letter-spacing: 0;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: addSuccessSheen 0.9s var(--ease) both;
+}
+
+[data-theme="dark"] .add-btn.is-added,
+[data-theme="dark"] .product-buy-btn.is-added,
+[data-theme="dark"] .modal-add-btn.is-added,
+[data-theme="dark"] .board-btn.is-added {
+  background: var(--darker) !important;
+  border-color: var(--primary) !important;
+  color: #ffb14d !important;
+  box-shadow: 4px 4px var(--primary), 8px 8px rgba(255,149,0,0.28) !important;
+}
+
+/* A tap can leave a sticky :hover on touch; the success state must win. */
+.add-btn.is-added:hover,
+.product-buy-btn.is-added:hover,
+.modal-add-btn.is-added:hover,
+.board-btn.is-added:hover {
+  background: var(--darker) !important;
+  border-color: var(--primary) !important;
+  color: #ffb14d !important;
+  box-shadow: 4px 4px var(--primary), 8px 8px rgba(255,149,0,0.28) !important;
+  transform: none !important;
+}
+
+[data-theme="dark"] .add-btn.is-added:hover,
+[data-theme="dark"] .product-buy-btn.is-added:hover,
+[data-theme="dark"] .modal-add-btn.is-added:hover,
+[data-theme="dark"] .board-btn.is-added:hover {
+  background: var(--darker) !important;
+  border-color: var(--primary) !important;
+  color: #ffb14d !important;
+  box-shadow: 4px 4px var(--primary), 8px 8px rgba(255,149,0,0.28) !important;
+}
+
+.cart-btn.cart-bump {
+  animation: cartBump 0.55s var(--ease-bounce);
+}
+
+.cart-btn::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border: 2px solid var(--primary);
+  border-radius: 10px;
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: center;
+}
+
+.cart-btn.cart-bump::after {
+  animation: cartRing 0.6s ease-out;
+}
+
+@media (max-width: 768px) {
+  /* keep the success shadow inside the product card's padding */
+  .product-card .add-btn.is-added,
+  .products-grid .add-btn.is-added,
+  .products-grid-large .add-btn.is-added {
+    box-shadow: 3px 3px var(--primary), 6px 6px rgba(255,149,0,0.24) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fly-to-cart {
+    transition-duration: 0.01ms;
+  }
+
+  .add-btn.is-added,
+  .product-buy-btn.is-added,
+  .modal-add-btn.is-added,
+  .board-btn.is-added,
+  .add-btn.is-added::after,
+  .product-buy-btn.is-added::after,
+  .modal-add-btn.is-added::after,
+  .board-btn.is-added::after,
+  .cart-btn.cart-bump,
+  .cart-btn.cart-bump::after {
+    animation: none !important;
+  }
+
+  .add-btn.is-added::after,
+  .product-buy-btn.is-added::after,
+  .modal-add-btn.is-added::after,
+  .board-btn.is-added::after {
+    background: var(--darker);
   }
 }

@@ -676,46 +676,77 @@ const App = {
     this.saveCart();
     this.updateBadge();
     this.renderCart();
-    if (event) this.flyToCart(event);
+    if (event) this.flyToCart(event, product);
+    this.addButtonFeedback(event && event.currentTarget);
+    this.haptic();
     return true;
   },
 
-  flyToCart(event) {
+  flyToCart(event, product) {
     const cartBtn = document.querySelector('.cart-btn');
     if (!cartBtn || !event) return;
     const target = event.currentTarget || event.target;
+    if (!target || !target.getBoundingClientRect) return;
     const btnRect = target.getBoundingClientRect();
     const cartRect = cartBtn.getBoundingClientRect();
+    const size = 36;
     const flyEl = document.createElement('div');
     flyEl.className = 'fly-to-cart';
-    flyEl.style.cssText = `
-      position: fixed;
-      width: 20px;
-      height: 20px;
-      background: var(--primary);
-      border-radius: 50%;
-      z-index: 99999;
-      pointer-events: none;
-      box-shadow: 0 0 12px rgba(255,149,0,0.6);
-      transition: all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-    `;
-    flyEl.style.left = (btnRect.left + btnRect.width / 2 - 10) + 'px';
-    flyEl.style.top = (btnRect.top + btnRect.height / 2 - 10) + 'px';
+    flyEl.setAttribute('aria-hidden', 'true');
+    flyEl.innerHTML = product && product.img
+      ? `<img src="${this.esc(this.imgPath(product.img))}" alt="">`
+      : '<span class="fly-to-cart-plus">+</span>';
+    flyEl.style.left = (btnRect.left + btnRect.width / 2 - size / 2) + 'px';
+    flyEl.style.top = (btnRect.top + btnRect.height / 2 - size / 2) + 'px';
     document.body.appendChild(flyEl);
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      flyEl.style.left = (cartRect.left + cartRect.width / 2 - 10) + 'px';
-      flyEl.style.top = (cartRect.top + cartRect.height / 2 - 10) + 'px';
-      flyEl.style.transform = 'scale(0.3)';
-      flyEl.style.opacity = '0.6';
-    }));
-    setTimeout(() => {
-      flyEl.remove();
-      cartBtn.style.transform = 'scale(1.2)';
-      setTimeout(() => { cartBtn.style.transform = ''; }, 200);
-    }, 700);
+    this.bumpCart();
+    // Force the starting position to be laid out before moving, so the
+    // transition runs even when requestAnimationFrame is throttled.
+    void flyEl.offsetWidth;
+    flyEl.style.left = (cartRect.left + cartRect.width / 2 - size / 2) + 'px';
+    flyEl.style.top = (cartRect.top + cartRect.height / 2 - size / 2) + 'px';
+    flyEl.classList.add('flying');
+    setTimeout(() => flyEl.remove(), 780);
   },
 
-  addCartWithColor(id) {
+  /** One-shot "added" state on the button that was pressed. */
+  addButtonFeedback(btn) {
+    if (!btn || !btn.classList) return;
+    btn.classList.remove('is-added');
+    void btn.offsetWidth;
+    btn.classList.add('is-added');
+    clearTimeout(btn._addedTimer);
+    btn._addedTimer = setTimeout(() => {
+      if (btn.isConnected) btn.classList.remove('is-added');
+    }, 1300);
+  },
+
+  /** Bump the header cart and replay the badge pop. */
+  bumpCart() {
+    const cartBtn = document.querySelector('.cart-btn');
+    if (cartBtn) {
+      cartBtn.classList.remove('cart-bump');
+      void cartBtn.offsetWidth;
+      cartBtn.classList.add('cart-bump');
+      clearTimeout(cartBtn._bumpTimer);
+      cartBtn._bumpTimer = setTimeout(() => cartBtn.classList.remove('cart-bump'), 650);
+    }
+    const badge = document.getElementById('cartBadge');
+    if (badge) {
+      // The stylesheet animation only runs once; clearing it replays the pop.
+      badge.style.animation = 'none';
+      void badge.offsetWidth;
+      badge.style.animation = '';
+    }
+  },
+
+  haptic() {
+    if (!navigator.vibrate) return;
+    if (window.matchMedia && !window.matchMedia('(pointer: coarse)').matches) return;
+    try { navigator.vibrate(12); } catch (e) {}
+  },
+
+  addCartWithColor(id, event) {
     const prod = this.products.find(x => x.id === id);
     if (!prod) return;
     let color = null;
@@ -729,7 +760,7 @@ const App = {
       color = sel ? sel.value : null;
       if (prod.colorOptions && !color) { this.showToast('الرجاء اختيار اللون أولاً', 'error'); return; }
     }
-    if (this.addCart(prod, color)) this.closeModal();
+    if (this.addCart(prod, color, event)) this.closeModal();
   },
 
   removeCart(id, color) {
@@ -1759,7 +1790,7 @@ const App = {
             <span>${this.svgIcon(this.icons.shield, 14)} ضمان على المنتجات</span>
             <span>${this.svgIcon(this.icons.headset, 14)} دعم فني</span>
           </div>
-          <button class="modal-add-btn" onclick="App.addCartWithColor(${p.id})">أضف إلى السلة ${this.svgIcon('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>', 16)}</button>
+          <button class="modal-add-btn" onclick="App.addCartWithColor(${p.id}, event)">أضف إلى السلة ${this.svgIcon('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>', 16)}</button>
           <a class="modal-wa-link" href="${this.wa('مرحباً، أريد طلب: ' + p.name + ' (الرمز: ' + (p.sku || p.id) + ')')}" target="_blank" rel="noopener noreferrer">${this.svgIcon(this.icons.whatsapp, 16)} أو اطلب مباشرة عبر واتساب</a>
           ${related.length ? `<div class="modal-related">
             <h3>منتجات مشابهة</h3>
@@ -2516,7 +2547,7 @@ const App = {
             ${optionMarkup}
 
             <div class="product-cta-row">
-              <button class="product-buy-btn add-btn" onclick="App.addCartWithColor(${p.id})" ${out ? 'disabled' : ''}>
+              <button class="product-buy-btn add-btn" onclick="App.addCartWithColor(${p.id}, event)" ${out ? 'disabled' : ''}>
                 ${this.svgIcon('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>', 18)}
                 <span>${out ? 'غير متوفر' : 'أضف إلى السلة'}</span>
               </button>
@@ -2862,7 +2893,8 @@ const App = {
       'success',
       true
     );
-    if (event) this.flyToCart(event);
+    if (event) this.flyToCart(event, kit);
+    this.haptic();
 
     const btn = event && event.currentTarget;
     if (btn && btn.classList) {
