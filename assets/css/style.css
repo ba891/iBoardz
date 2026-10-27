@@ -11417,3 +11417,216 @@ html[data-theme="dark"] .dropdown-menu button.mega-promo-service:hover {
 [data-theme="dark"] .page-enter {
   opacity: 1;
 }
+
+/* ==========================================================================
+   MOBILE BUTTON PASS
+   --------------------------------------------------------------------------
+   Phones keep the same signature "hard shadow" language as the desktop, but at
+   a scale that belongs on a 360–430 px screen:
+   • the card add button becomes a full-width, labelled action instead of a
+     38 px icon square, with a compact 3/5 px shadow that fits inside the card;
+   • the header menu button uses that same compact shadow instead of 4/8 px;
+   • supporting controls get comfortable 42 px touch targets;
+   • hover lifts are disabled on touch so cards do not stay raised after a tap.
+   Desktop is untouched: every rule below lives in a mobile query.
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* ---- product card: price row + full-width add action ----------------- */
+  .product-card .product-bottom,
+  .products-grid-large .product-bottom {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 9px;
+  }
+
+  .product-card .product-prices,
+  .products-grid-large .product-prices {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 2px 6px;
+  }
+
+  .product-card .add-btn,
+  .products-grid .add-btn,
+  .products-grid-large .add-btn {
+    width: 100% !important;
+    height: 42px !important;
+    min-width: 0 !important;
+    padding: 0 10px !important;
+    gap: 6px !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    line-height: 1;
+    letter-spacing: 0 !important;
+    text-transform: none !important;
+    border: 1.5px solid var(--text) !important;
+    border-radius: 10px !important;
+    background: var(--surface) !important;
+    color: var(--text) !important;
+    box-shadow: 3px 3px var(--primary), 5px 5px var(--text) !important;
+    position: relative !important;
+    z-index: 1 !important;
+    /* the card clips overflow — keep the 5 px shadow inside its padding */
+    margin-bottom: 4px;
+  }
+
+  .product-card .add-btn .add-btn-label,
+  .products-grid .add-btn .add-btn-label,
+  .products-grid-large .add-btn .add-btn-label {
+    display: inline !important;
+  }
+
+  .product-card .add-btn svg,
+  .products-grid .add-btn svg,
+  .products-grid-large .add-btn svg {
+    width: 17px !important;
+    height: 17px !important;
+    flex: none;
+  }
+
+  .product-card .add-btn:active,
+  .products-grid .add-btn:active,
+  .products-grid-large .add-btn:active {
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: #151515 !important;
+    box-shadow: 1px 1px var(--primary), 2px 2px var(--text) !important;
+    transform: translate(2px, 2px) !important;
+  }
+
+  [data-theme="dark"] .product-card .add-btn,
+  [data-theme="dark"] .products-grid .add-btn,
+  [data-theme="dark"] .products-grid-large .add-btn {
+    background: #ececf4 !important;
+    border-color: #ececf4 !important;
+    color: #151515 !important;
+    box-shadow: 3px 3px var(--primary), 5px 5px #000 !important;
+  }
+
+  [data-theme="dark"] .product-card .add-btn:active,
+  [data-theme="dark"] .products-grid .add-btn:active,
+  [data-theme="dark"] .products-grid-large .add-btn:active {
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: #151515 !important;
+    box-shadow: 1px 1px var(--primary), 2px 2px #000 !important;
+    transform: translate(2px, 2px) !important;
+  }
+
+  /* ---- header: compact shadow + press feedback ------------------------- */
+  .header-actions .icon-btn,
+  .header-actions .cart-btn,
+  .header-actions .search-toggle,
+  .header-actions .theme-toggle,
+  .header-actions .menu-btn {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+    padding: 0 !important;
+    justify-content: center;
+  }
+
+  .header-actions .menu-btn {
+    border-radius: 10px !important;
+    box-shadow: 3px 3px var(--primary), 5px 5px var(--text) !important;
+  }
+
+  .header-actions .menu-btn:active {
+    opacity: 1;
+    transform: translate(2px, 2px) !important;
+    box-shadow: 1px 1px var(--primary), 2px 2px var(--text) !important;
+  }
+
+  [data-theme="dark"] .header-actions .menu-btn {
+    box-shadow: 3px 3px var(--primary), 5px 5px #000 !important;
+  }
+
+  [data-theme="dark"] .header-actions .menu-btn:active {
+    box-shadow: 1px 1px var(--primary), 2px 2px #000 !important;
+  }
+
+  .header-actions .icon-btn:active,
+  .header-actions .cart-btn:active {
+    background: var(--primary-light) !important;
+    color: var(--primary) !important;
+    transform: scale(0.94);
+  }
+
+  /* ---- supporting controls: comfortable tap targets -------------------- */
+  .home-tab { min-height: 42px; }
+  .ad-strip-cta { min-height: 40px; }
+  .shop-filter-toggle,
+  .sort-control select { min-height: 42px; }
+  .page-btn { min-width: 38px; height: 38px; }
+  .page-nav { height: 38px; }
+  .qty-btn { width: 42px; height: 42px; }
+  .cart-remove { width: 42px; height: 42px; }
+  .modal-close,
+  .cart-close { min-width: 44px; min-height: 44px; }
+
+  /* ---- touch press feedback ------------------------------------------- */
+  .hero-btn:active,
+  .ad-btn:active,
+  .show-all-btn:active,
+  .submit-btn:active,
+  .projects-hero-btn:active,
+  .projects-cta-btn:active,
+  .terms-cta-btn:active,
+  .modal-add-btn:active,
+  .whatsapp-btn:active,
+  .product-buy-btn:active,
+  .product-wa-btn:active {
+    transform: translateY(1px) !important;
+  }
+
+  a,
+  button,
+  [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Touch screens have no real hover: tapping a card must not leave it raised,
+   and the add button should return to its resting look after the tap. */
+@media (max-width: 768px) and (hover: none) {
+  .product-card:hover {
+    transform: none;
+    border-color: var(--border);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  }
+
+  [data-theme="dark"] .product-card:hover {
+    transform: none;
+    border-color: var(--border);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .product-card:hover .product-img {
+    background: var(--img-tile);
+  }
+
+  .product-card:hover .product-img img,
+  .product-card:hover .discount-badge {
+    transform: none;
+  }
+
+  .product-card .add-btn:hover,
+  .products-grid .add-btn:hover,
+  .products-grid-large .add-btn:hover {
+    background: var(--surface) !important;
+    border-color: var(--text) !important;
+    color: var(--text) !important;
+    box-shadow: 3px 3px var(--primary), 5px 5px var(--text) !important;
+    transform: none !important;
+  }
+
+  [data-theme="dark"] .product-card .add-btn:hover,
+  [data-theme="dark"] .products-grid .add-btn:hover,
+  [data-theme="dark"] .products-grid-large .add-btn:hover {
+    background: #ececf4 !important;
+    border-color: #ececf4 !important;
+    color: #151515 !important;
+    box-shadow: 3px 3px var(--primary), 5px 5px #000 !important;
+    transform: none !important;
+  }
+}
